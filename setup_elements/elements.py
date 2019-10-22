@@ -1,10 +1,14 @@
-#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-Created on Thu Dec  6 13:18:06 2018
+#
+# This file is part of the E21 FRM2 Research Group.
+# Copyright (C) 2019 TUM.
+#
+# This is free software; you can redistribute it and/or modify it
+# under the terms of the MIT License; see LICENSE file for more details.
 
-@author: henri*
-"""
+
+"""Description """
+
 import mpmath
 import numpy as np
 
@@ -12,27 +16,79 @@ from physics_constants import MU_0, pi
 
 
 class BaseCoil:
+    """Class that implements basic method and attributes for a coil."""
 
     def __init__(self):
         self.coil_mid_pos = None
         self.l = None
         self.N = None
+        self.windings_x = None
+        self.windings_y = None
         self.R = None
         self.I = None
+        self.wire_d = None
         self.angle_y = None
         self.angle_z = None
 
     def create_coil(self):
+        """Simulate physical geometry of the coil."""
         raise NotImplementedError
+
+    def _K(cls, m):
+        """Compute the elliptical function of first kind."""
+        return float(mpmath.ellipk(m))
+
+    def _E(cls, m):
+        """Compute the elliptical function of second kind."""
+        return float(mpmath.ellipe(m))
+
+    def _P(cls, n, m):
+        """Compute the elliptical function third kind"""
+        return float(mpmath.ellippi(n, np.pi / 2, m))
+
+    def _rotate(self, vektor, phi, axis):
+        """Rotate the vector along an axis for the given angle phi.
+
+        Parameters
+        ----------
+        vektor: np.array
+            3D vector
+        phi: float, int
+            Angle in radians
+        axis: np.array
+            3D vector used as reference for the rotation
+
+        Returns
+        -------
+        out: np.array
+            The rotated vector
+        """
+        n = axis / np.linalg.norm(axis)
+        c = np.cos(phi)
+        s = np.sin(phi)
+        n1 = n[0]
+        n2 = n[1]
+        n3 = n[2]
+        R = [[n1 ** 2 * (1 - c) + c, n1 * n2 * (1 - c) - n3 * s, n1 * n3 * (1 - c) + n2 * s],
+             [n2 * n1 * (1 - c) + n3 * s, n2 ** 2 * (1 - c) + c, n2 * n3 * (1 - c) - n1 * s],
+             [n3 * n1 * (1 - c) - n2 * s, n3 * n2 * (1 - c) + n1 * s, n3 ** 2 * (1 - c) + c]]
+        return np.dot(R, vektor)
+
+    def change_current(self, I):
+        """Change the assigned current value."""
+        self.I = I
 
 
 class Coil(BaseCoil):
+    """Class that implements an ideal circular coil."""
+
     MU_0 = 4e-7 * np.pi
 
     # oc = Oct2Py()
 
     def create_coil(self, coil_mid_pos=0, length=0.1, windings=100, current=10, r=0.05, wire_d=0.006, angle_y=0,
                     angle_z=0):
+        """Simulate physical geometry of the coil."""
         self.coil_mid_pos = coil_mid_pos
         self.l = length
         self.N = windings
@@ -48,28 +104,21 @@ class Coil(BaseCoil):
         self.angle_y = angle_y
         self.angle_z = angle_z
 
-    def _K(cls, m):  # elliptical function first kind
-        return float(mpmath.ellipk(m))
 
-    def _E(cls, m):  # elliptical function second kind
-        return float(mpmath.ellipe(m))
+    def Brho(self, x, rho):
+        """Computes radial magnetic field
 
-    def _P(cls, n, m):  # elliptical function third kind
-        return float(mpmath.ellippi(n, np.pi / 2, m))
+        Parameters
+        ----------
+        x: float, int
+            Position on the x axis
+        rho: float, int
+            Position
 
-    def _rotate(self, vektor, phi, axis):
-        n = axis / np.linalg.norm(axis)
-        c = np.cos(phi)
-        s = np.sin(phi)
-        n1 = n[0]
-        n2 = n[1]
-        n3 = n[2]
-        R = [[n1 ** 2 * (1 - c) + c, n1 * n2 * (1 - c) - n3 * s, n1 * n3 * (1 - c) + n2 * s],
-             [n2 * n1 * (1 - c) + n3 * s, n2 ** 2 * (1 - c) + c, n2 * n3 * (1 - c) - n1 * s],
-             [n3 * n1 * (1 - c) - n2 * s, n3 * n2 * (1 - c) + n1 * s, n3 ** 2 * (1 - c) + c]]
-        return np.dot(R, vektor)
+        Returns
+        -------
 
-    def Brho(self, x, rho):  # radial magnetic field
+        """
         x -= self.coil_mid_pos
         if rho == 0:
             return 0
@@ -82,8 +131,23 @@ class Coil(BaseCoil):
 
         return prefac * (sum_element(1) - sum_element(-1))
 
-    def Bx(self, x, rho=0):  # N = turns of winding, I = current (A), R = radius (m), l = length (m)
+    def Bx(self, x, rho=0):
+        """Compute the magnetic field in x direction.
+
+        # N = turns of winding, I = current (A), R = radius (m), l = length (m)
         # x für mich y
+
+        Parameters
+        ----------
+        x: int, float
+
+        rho: int, float
+            Position along the cylinder.
+
+        Returns
+        -------
+
+        """
         x -= self.coil_mid_pos
 
         rho = abs(rho)  # symmetric
@@ -102,6 +166,7 @@ class Coil(BaseCoil):
         return prefac * (-sum_element(-1) + sum_element(1))
 
     def B_field(self, x, y, z):
+        """Compute the magnetic field given the position."""
         r = np.sqrt(y ** 2 + z ** 2)
         field = np.array((self.Bx(x, r), self.Brho(x, y), self.Brho(x, z)))
         if self.angle_y != 0:
@@ -111,9 +176,6 @@ class Coil(BaseCoil):
             field = self._rotate(field, self.angle_z, np.array([0, 0, 1]))
 
         return field
-
-    def change_current(self, I):
-        self.I = I
 
 
 class SquareCoil:
@@ -127,6 +189,7 @@ class SquareCoil:
         self.I = None
 
     def create_coil(self, coil_mid_pos, length, windings, current,  r, wire_d, angle_y, angle_z):
+        """Simulate physical geometry of the coil."""
         self.I = current
 
         self.a = length
@@ -184,27 +247,14 @@ class SquareCoil:
         )
 
 
-
-
-class RealCoil:
+class RealCoil(BaseCoil):
+    """Class that implements a coil with more realistic experimental parameters."""
     MU_0 = 4e-7 * np.pi
 
     # oc = Oct2Py()
-
-    def __init__(self):
-        self.coil_mid_pos = None
-        self.l = None
-        self.N = 1.
-        self.windings_x = None
-        self.windings_y = None
-        self.R = None
-        self.I = None
-        self.wire_d = None
-        self.angle_y = None
-        self.angle_z = None
-
     def create_coil(self, coil_mid_pos=0, length=0.1, windings=100, current=10, r=0.05, wire_d=0.006, angle_y=0,
                     angle_z=0):
+        """Simulate physical geometry of the coil."""
         self.coil_mid_pos = coil_mid_pos
         self.l = length
         self.windings_x = round(length / wire_d)
@@ -214,27 +264,6 @@ class RealCoil:
         self.wire_d = wire_d
         self.angle_y = angle_y
         self.angle_z = angle_z
-
-    def _K(cls, m):  # elliptical function first kind
-        return float(mpmath.ellipk(m))
-
-    def _E(cls, m):  # elliptical function second kind
-        return float(mpmath.ellipe(m))
-
-    def _P(cls, n, m):  # elliptical function third kind
-        return float(mpmath.ellippi(n, np.pi / 2, m))
-
-    def _rotate(self, vector, phi, axis):
-        n = axis / np.linalg.norm(axis)
-        c = np.cos(phi)
-        s = np.sin(phi)
-        n1 = n[0]
-        n2 = n[1]
-        n3 = n[2]
-        R = [[n1 ** 2 * (1 - c) + c, n1 * n2 * (1 - c) - n3 * s, n1 * n3 * (1 - c) + n2 * s],
-             [n2 * n1 * (1 - c) + n3 * s, n2 ** 2 * (1 - c) + c, n2 * n3 * (1 - c) - n1 * s],
-             [n3 * n1 * (1 - c) - n2 * s, n3 * n2 * (1 - c) + n1 * s, n3 ** 2 * (1 - c) + c]]
-        return np.dot(R, vector)
 
     def Brho(self, x, R, rho):  # radial magnetic field
         x -= self.coil_mid_pos
@@ -269,6 +298,7 @@ class RealCoil:
         return prefac * (-sum_element(-1) + sum_element(1))
 
     def B_field(self, x, y, z):
+        """Compute the magnetic field given the position."""
         field = np.array((0., 0., 0.))
         r = np.sqrt(y ** 2 + z ** 2)
 
@@ -291,5 +321,3 @@ class RealCoil:
 
         return field
 
-    def change_current(self, I):
-        self.I = I
