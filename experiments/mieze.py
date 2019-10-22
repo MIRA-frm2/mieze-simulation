@@ -1,3 +1,13 @@
+# -*- coding: utf-8 -*-
+#
+# This file is part of the E21 FRM2 Research Group.
+# Copyright (C) 2019 TUM.
+#
+# This is free software; you can redistribute it and/or modify it
+# under the terms of the MIT License; see LICENSE file for more details.
+
+"""An implementation of the MIEZE setup."""
+
 from setup_elements.setup import Setup
 
 

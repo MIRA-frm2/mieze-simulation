@@ -9,7 +9,7 @@ from scipy.interpolate import interp1d
 
 
 class Setup:
-
+    """Class that simulates a physical setup."""
     def __init__(self, increment, speed='fast'):
         self.elements = []
         self.B = None
@@ -21,14 +21,11 @@ class Setup:
         self.increment = increment
         self.speed = speed
 
-    def _find_nearest(self, array, value):
-        array = np.asarray(array)
-        idx = (np.abs(array - value)).argmin()
-        return array[idx]
-
-    def create_coil(self, coil_mid_pos=0, length=0.1, windings=1000, current=10,  r=0.05, wire_d=0.006, angle_y=0, angle_z = 0):
+    def create_coil(self, coil_mid_pos=0, length=0.1, windings=1000, current=10,  r=0.05, wire_d=0.006, angle_y=0,
+                    angle_z = 0):
+        """Create the physical geometry of the coils."""
         if self.speed == 'fast':
-            element = SquareCoil()
+            element = Coil()
         else:
             element = RealCoil()
 
@@ -36,13 +33,20 @@ class Setup:
         self.elements.append(element)
         self.setup_changed = True
 
+    def _find_nearest(self, array, value):
+        array = np.asarray(array)
+        idx = (np.abs(array - value)).argmin()
+        return array[idx]
+
     def b_x(self, x, rho=0):
+        """Compute magnetic field in x direction."""
         field = 0
         for element in self.elements:
             field += element.b_x(x, rho)
         return field
 
     def b_rho(self, x, rho):
+        """Compute magnetic field in rho direction."""
         field = 0
         for element in self.elements:
             np.add(field, element.b_rho(x, rho), out=field)
@@ -50,18 +54,20 @@ class Setup:
         return field
 
     def B_field(self, r: '(x, y, z)'):
+        """Compute magnetic field."""
         field = np.array((0., 0., 0.))
         for element in self.elements:
             np.add(field, element.B_field(*r), out=field)
             # field += element.B_field(*r)
-
         return field
 
     def change_current(self, current):
+        """Change the current vlaue."""
         self.I = current
         self.setup_changed = True
 
     def calculate_b_field(self, zero, meshsize: '(x, y, z)'):
+        """Calculate the magnetic field."""
         
         if self.B is None or self.setup_changed:
 
@@ -117,9 +123,6 @@ class Setup:
 
         return sum(y_values)*self.increment
 
-
-
-
     def plot_1D_abs(self, start, end, rho=0):
 
         self.calculate_b_field(zero=start, meshsize=(end - start, rho, 0))
@@ -132,7 +135,11 @@ class Setup:
         if rho != 0:
             y_values = [np.linalg.norm(self.get_B((x, rho, 0))) for x in x_values]
         else:
-            y_values = [self.B[(x, 0, 0)][0] for x in x_values]
+            try:
+                y_values = [self.B[(x, 0, 0)][0] for x in x_values]
+            except KeyError:
+                # Todo: How to plot B field for non-zero y and z values?
+                y_values = None
         plt.plot(self.x_range, y_values)
         plt.show()
 
@@ -211,6 +218,7 @@ class Setup:
         plt.show()
 
     def plot_2D_vectormap(self, start, end, rho=0):
+        """Plot a 2D vectormap."""
 
         self.calculate_b_field(zero=start, meshsize=(end - start, rho, 0))
 
