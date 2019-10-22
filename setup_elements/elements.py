@@ -18,12 +18,15 @@ from physics_constants import MU_0, pi
 class BaseCoil:
     """Class that implements basic method and attributes for a coil."""
 
+    MU_0 = 4e-7 * np.pi
+
     def __init__(self):
         self.coil_mid_pos = None
         self.length = None
         self.n = None
         self.windings_x = None
         self.windings_y = None
+
         self.r = None
         self.current = None
         self.wire_d = None
@@ -107,10 +110,6 @@ class BaseCoil:
 class Coil(BaseCoil):
     """Class that implements an ideal circular coil."""
 
-    MU_0 = 4e-7 * np.pi
-
-    # oc = Oct2Py()
-
     def create_coil(self, coil_mid_pos=0, length=0.1, windings=100, current=10, r=0.05, wire_d=0.006, angle_y=0,
                     angle_z=0):
         """Simulate physical geometry of the coil."""
@@ -147,6 +146,7 @@ class Coil(BaseCoil):
             return 0
 
         rho = abs(rho)
+
         beta = lambda s: np.sqrt((rho + self.r) ** 2 + (x - s * self.length / 2) ** 2)
         m = lambda s: 4 * self.r * rho / beta(s) ** 2
         sum_element = lambda s: beta(s) / rho * ((2 - m(s)) * self._k(m(s)) - 2 * self._e(m(s)))
@@ -192,6 +192,7 @@ class Coil(BaseCoil):
         """Compute the magnetic field given the position."""
         r = np.sqrt(y ** 2 + z ** 2)
         field = np.array((self.b_field_x(x, r), self.b_field_rho(x, y), self.b_field_rho(x, z)))
+
         if self.angle_y != 0:
             field = self._rotate(field, self.angle_y, np.array([0, 1, 0]))
 
@@ -203,7 +204,9 @@ class Coil(BaseCoil):
 
 class SquareCoil(BaseCoil):
 
-    prefactor = MU_0 / (4 * pi)
+    # Todo: Standardize the prefactor for all coil clases.
+
+    prefactor = 1e4 * MU_0 / (4 * pi)
 
     def create_coil(self, coil_mid_pos=0, length=0.1, windings=100, current=10, r=0.05, wire_d=0.006, angle_y=0,
                     angle_z=0):
@@ -217,15 +220,18 @@ class SquareCoil(BaseCoil):
         self.x = x
         self.y = y
         self.z = z
-        return self.b_field_x, self.b_field_y, self.b_field_z
+
+        field = np.array([self.b_field_z, self.b_field_y, self.b_field_x])
+
+        return field
 
     @property
     def b_field_x(self):
-        return self.prefactor * self.eta_x
+        return self.prefactor * self.current * self.eta_x
 
     @property
     def b_field_y(self):
-        return 0
+        return self.prefactor * self.current * self.eta_y
 
     @property
     def b_field_z(self):
@@ -235,29 +241,58 @@ class SquareCoil(BaseCoil):
     def eta_x(self):
         _eta = 0
         for alpha in np.arange(1, 5):
-            _eta += ((-1)**(alpha+1)) * self.z/(self.r[alpha-1] * (self.r[alpha-1] + self.d[alpha-1]))
+            alpha_index = alpha - 1
+
+            try:
+                _eta += ((-1)**(alpha+1)) * self.z/(self.r_values[alpha_index] * (self.r_values[alpha_index] + self.d[alpha_index]))
+            except RuntimeWarning:
+                # ToDo: what to do when dividing by 0?
+                _eta = 0
+
+        return _eta
+
+    @property
+    def eta_y(self):
+        _eta = 0
+        for alpha in np.arange(1, 5):
+            alpha_index = alpha - 1
+
+            _eta += ((-1)**(alpha+1)) * self.z/(self.r_values[alpha_index]
+                                                * (self.r_values[alpha_index] + ((-1) ** (alpha+1)) * self.c[alpha_index]))
         return _eta
 
     @property
     def eta_z(self):
         _eta = 0
         for alpha in np.arange(1, 5):
-            t1 = ((-1) ** alpha) * self.d[alpha-1] \
-                 / (self.r[alpha-1] * (self.r[alpha-1] + (-1) ** (alpha + 1) * self.c[alpha - 1]))
-            t2 = self.c[alpha - 1] / (self.r[alpha - 1] * (self.r[alpha - 1] + self.d[alpha - 1]))
-            _eta += t1 - t2
+            alpha_index = alpha - 1
+            try:
+                t1 = ((-1) ** alpha) * self.d[alpha_index] \
+                     / (self.r_values[alpha_index] * (self.r_values[alpha_index] + (-1) ** (alpha + 1) * self.c[alpha_index]))
+                t2 = self.c[alpha_index] / (self.r_values[alpha_index] * (self.r_values[alpha_index] + self.d[alpha_index]))
+
+                _eta += t1 - t2
+            except RuntimeWarning:
+                # ToDo: what to do when dividing by 0?
+                _eta = 0
         return _eta
 
     @property
     def c(self):
-        return np.array([self.a+self.x, self.a-self.x, -self.a + self.x, -self.a - self.x])
+        return np.array([self.a + self.x,
+                         self.a - self.x,
+                         -self.a + self.x,
+                         -self.a - self.x])
 
     @property
     def d(self):
-        return np.array([self.b + self.y, self.b + self.y, self.y - self.b, self.y - self.b])
+        return np.array([self.b + self.y,
+                         self.b + self.y,
+                         self.y - self.b,
+                         self.y - self.b])
 
     @property
-    def r(self):
+    def r_values(self):
         return np.array([
             np.sqrt((self.a + self.x) ** 2 + (self.b + self.y) ** 2 + self.z ** 2),
             np.sqrt((self.a - self.x) ** 2 + (self.b + self.y) ** 2 + self.z ** 2),
@@ -276,6 +311,7 @@ class RealCoil(BaseCoil):
         """Simulate physical geometry of the coil."""
         self.coil_mid_pos = coil_mid_pos
         self.length = length
+        self.n = windings
         self.windings_x = round(length / wire_d)
         self.windings_y = windings / self.windings_x
         self.r = r
@@ -284,7 +320,10 @@ class RealCoil(BaseCoil):
         self.angle_y = angle_y
         self.angle_z = angle_z
 
-    def b_field_rho(self, x, r, rho):  # radial magnetic field
+    def b_field_rho(self, x, r, rho):
+        """ # radial magnetic field
+
+        """
         x -= self.coil_mid_pos
         if rho == 0:
             return 0
@@ -297,11 +336,16 @@ class RealCoil(BaseCoil):
 
         return prefac * (sum_element(1) - sum_element(-1))
 
-    def b_field_x(self, x, R, rho=0):  # N = turns of winding, I = current (A), R = radius (m), l = length (m)
+    def b_field_x(self, x, R, rho=0):
+        """
+        # N = turns of winding, I = current (A), R = radius (m), l = length (m)
         # x für mich y
+
+        """
         x -= self.coil_mid_pos
 
         rho = abs(rho)  # symmetric
+
         zeta = lambda s: x - s * self.length / 2.0
 
         beta = lambda s: np.sqrt((rho + R) ** 2 + zeta(s) ** 2)

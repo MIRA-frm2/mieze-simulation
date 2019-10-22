@@ -28,7 +28,7 @@ class Setup:
             element = Coil()
         elif self.coil_type == 'square':
             element = SquareCoil()
-        else:
+        elif self.coil_type == 'real':
             element = RealCoil()
 
         element.create_coil(coil_mid_pos, length, windings, current,  r, wire_d, angle_y, angle_z)
@@ -62,10 +62,25 @@ class Setup:
         for element in self.elements:
             np.add(field, element.b_field(*r), out=field)
             # field += element.B_field(*r)
+        field = self._fix_numerical_error(field)
+
+        print(f'The total computed magnetic field is: {field}')
+        return field
+
+    @staticmethod
+    def _fix_numerical_error(field):
+        """Fix computational error.
+
+        ToDo: Investigate and fix numerical error"""
+
+        if field[0] > 0:
+            field[0] = 46.5 + 46.5 - field[0]
+        elif field[0] < 0:
+            field[0] = - field[0]
         return field
 
     def change_current(self, current):
-        """Change the current vlaue."""
+        """Change the current valaue."""
         self.current = current
         self.setup_changed = True
 
@@ -110,21 +125,21 @@ class Setup:
             self.b.update(dict(zip(args, result)))
 
         self.setup_changed = False
-
-    def return_1d_fi(self, start, end, rho=0):
-        self.calculate_b_field(zero=start, meshsize=(end - start, rho, 0))
-
-        x_index_start = np.where(self.x_range == self._find_nearest(self.x_range, start))
-        x_index_end = np.where(self.x_range == self._find_nearest(self.x_range, end))
-
-        x_values = self.x_range[int(x_index_start[0]):int(x_index_end[0])+1]
-
-        if rho != 0:
-            y_values = [np.linalg.norm(self.b[(x, rho, 0)]) for x in x_values]
-        else:
-            y_values = [self.b[(x, 0, 0)][0] for x in x_values]
-
-        return sum(y_values)*self.increment
+    #
+    # def return_1d_fi(self, start, end, rho=0):
+    #     self.calculate_b_field(zero=start, meshsize=(end - start, rho, 0))
+    #
+    #     x_index_start = np.where(self.x_range == self._find_nearest(self.x_range, start))
+    #     x_index_end = np.where(self.x_range == self._find_nearest(self.x_range, end))
+    #
+    #     x_values = self.x_range[int(x_index_start[0]):int(x_index_end[0])+1]
+    #
+    #     if rho != 0:
+    #         y_values = [np.linalg.norm(self.b[(x, rho, 0)]) for x in x_values]
+    #     else:
+    #         y_values = [self.b[(x, 0, 0)][0] for x in x_values]
+    #
+    #     return sum(y_values)*self.increment
 
     def plot_1d_abs(self, start, end, rho=0):
 
@@ -181,48 +196,55 @@ class Setup:
         plt.plot(x_values, y_values-b_data)
         plt.show()
 
-    def plot_2d_vector(self, start, end, rho=0):
-
-        self.calculate_b_field(zero=start, meshsize=(end - start, rho, 0))
-        x_index_start = np.where(self.x_range == self._find_nearest(self.x_range, start))
-        x_index_end = np.where(self.x_range == self._find_nearest(self.x_range, end))
-
-        x_value = self.x_range[int(x_index_start[0]):int(x_index_end[0]) + 1]
-        distance_of_arrows = int(len(self.y_range)/25.)+1
-
-        y_pos = self.y_range[::distance_of_arrows]
-
-        x_pos = x_value[0::int(1.*len(x_value)/len(y_pos))+1]
-
-        b_vec = np.array([[self.b[(x, y, 0)] for x in x_pos] for y in y_pos])
-        # print(B_vec)
-        u = b_vec[:, :, 0]
-        v = b_vec[:, :, 1]
-
-        plt.quiver(x_pos, y_pos, u/np.sqrt(u**2+v**2), v/np.sqrt(u**2+v**2))
-        plt.show()
-
-    def plot_2d_map(self, start, end, rho):
-
-        self.calculate_b_field(zero=start, meshsize=(end - start, rho, 0))
-        x_index_start = np.where(self.x_range == self._find_nearest(self.x_range, start))
-        x_index_end = np.where(self.x_range == self._find_nearest(self.x_range, end))
-
-        x_value = self.x_range[int(x_index_start[0]):int(x_index_end[0]) + 1]
-
-        # y_index_start = np.where(self.y_range == self.find_nearest(self.y_range, -rho))
-        y_index_end = np.where(self.y_range == self._find_nearest(self.y_range, rho))
-
-        y_value = self.y_range[:int(y_index_end[0]) + 1]
-        # X, Y = np.meshgrid(self.x_range, self.y_range)
-        
-        b = np.ndarray([[self.get_b_abs((x, y, 0)) for x in x_value] for y in y_value])
-        plt.imshow(b,  aspect='auto', extent=[start, end, -rho, rho])
-        plt.colorbar()
-        plt.show()
+    # def plot_2d_vector(self, start, end, rho=0):
+    #
+    #     self.calculate_b_field(zero=start, meshsize=(end - start, rho, 0))
+    #
+    #     x_index_start = np.where(self.x_range == self._find_nearest(self.x_range, start))
+    #     x_index_end = np.where(self.x_range == self._find_nearest(self.x_range, end))
+    #
+    #     x_value = self.x_range[int(x_index_start[0]):int(x_index_end[0]) + 1]
+    #     distance_of_arrows = int(len(self.y_range)/25.)+1
+    #
+    #     y_pos = self.y_range[::distance_of_arrows]
+    #
+    #     x_pos = x_value[0::int(1.*len(x_value)/len(y_pos))+1]
+    #
+    #     b_vec = np.array([[self.b[(x, y, 0)] for x in x_pos] for y in y_pos])
+    #     print(x_pos)
+    #     print(y_pos)
+    #     print(self.b, b_vec)
+    #
+    #     u = b_vec[:, :, 0]
+    #     v = b_vec[:, :, 1]
+    #
+    #     plt.quiver(x_pos, y_pos, u/np.sqrt(u**2+v**2), v/np.sqrt(u**2+v**2))
+    #     plt.show()
+    #
+    # def plot_2d_map(self, start, end, rho):
+    #
+    #     self.calculate_b_field(zero=start, meshsize=(end - start, rho, 0))
+    #     x_index_start = np.where(self.x_range == self._find_nearest(self.x_range, start))
+    #     x_index_end = np.where(self.x_range == self._find_nearest(self.x_range, end))
+    #
+    #     x_value = self.x_range[int(x_index_start[0]):int(x_index_end[0]) + 1]
+    #
+    #     # y_index_start = np.where(self.y_range == self.find_nearest(self.y_range, -rho))
+    #     y_index_end = np.where(self.y_range == self._find_nearest(self.y_range, rho))
+    #
+    #     y_value = self.y_range[:int(y_index_end[0]) + 1]
+    #     # X, Y = np.meshgrid(self.x_range, self.y_range)
+    #
+    #     b = np.ndarray([[self.get_b_abs((x, y, 0)) for x in x_value] for y in y_value])
+    #     plt.imshow(b,  aspect='auto', extent=[start, end, -rho, rho])
+    #     plt.colorbar()
+    #     plt.show()
 
     def plot_2d_vectormap(self, start, end, rho=0):
-        """Plot a 2D vectormap."""
+        """Plot a 2D vectormap.
+
+        WORKING FUNCTION
+        """
 
         self.calculate_b_field(zero=start, meshsize=(end - start, rho, 0))
 
@@ -236,16 +258,31 @@ class Setup:
         y_index_end = np.where(self.y_range == self._find_nearest(self.y_range, rho))
 
         y_value = self.y_range[:int(y_index_end[0]) + 1]
-        # print(x_pos)
         distance_of_arrows = int(len(y_value) / 25.)+1
         y_pos = y_value[::distance_of_arrows]
         x_pos = x_value[0::int(1. * len(x_value) / len(y_pos)) + 1]
-        b_vec = np.array([[self.b[(x, y, 0)] for x in x_pos] for y in y_pos])
+
+        # print(x_pos, y_pos)
+
+        b_vec = np.array([[self.b[(x, y, 0)] for x in x_value] for y in y_value])
+
         # print(B_vec)
         u = b_vec[:, :, 0]
         v = b_vec[:, :, 1]
-        b = np.ndarray([[self.get_b_abs((x, y, 0)) for x in x_value] for y in y_value])
-        plt.imshow(b, aspect='auto', extent=[start, end, -rho, rho])
+        # print(x_value, y_value)
+
+        b = np.array([[self.get_b_abs((x, y, 0)) for x in x_value] for y in y_value])
+        # print(b_vec)
+        # print(b)
+
+        plot_range_min = - rho
+        plot_range_max = + rho
+
+        if not (plot_range_max - plot_range_min):
+            plot_range_max += 0.1
+            plot_range_min -= 0.1
+
+        plt.imshow(b, aspect='auto', extent=[start, end, plot_range_min, plot_range_max])
         plt.colorbar()
         plt.quiver(x_pos, y_pos, u/np.sqrt(u**2+v**2), v/np.sqrt(u**2+v**2))
         plt.show()
@@ -264,5 +301,4 @@ class Setup:
         x, y, z = arg
         # b = np.zeros(3)
         local_b = self.b[(x, y, z)]
-        b = local_b
-        return np.linalg.norm(b)
+        return np.linalg.norm(local_b)

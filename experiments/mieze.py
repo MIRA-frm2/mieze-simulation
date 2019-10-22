@@ -14,7 +14,7 @@ from setup_elements.setup import Setup
 class Mieze:
 
     def __init__(self, sample_distance, coils_dinstance, detector_distance, increment=0.001):
-        self.MIEZE_setup = Setup(increment)
+        self.MIEZE_setup = Setup(increment, coil_type='real')
         self.sample_distance = sample_distance
         self.detector_distance = detector_distance
         self.coil_distance = coils_dinstance
@@ -50,3 +50,6 @@ class Mieze:
 
     def plot_field_1d_vec(self, rho=0):
         self.MIEZE_setup.plot_1d_vector(-0.25, self.sample_distance, rho)
+
+    def plot_2d_vectormap(self, rho=0):
+        self.MIEZE_setup.plot_2d_vectormap(-0.25, self.sample_distance, rho)

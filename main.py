@@ -12,6 +12,7 @@ def main():
 
     plt.plot(x/1000., y/100.)
     Experiment.plot_field_1d_abs()
+    # Experiment.plot_2d_vectormap()
 
 
 if __name__ == "__main__":
