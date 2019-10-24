@@ -11,6 +11,7 @@
 
 import mpmath
 import numpy as np
+import warnings
 
 from physics_constants import MU_0, pi
 
@@ -18,9 +19,10 @@ from physics_constants import MU_0, pi
 class BaseCoil:
     """Class that implements basic method and attributes for a coil."""
 
-    MU_0 = 4e-7 * np.pi
+    MU_0 = MU_0
 
     def __init__(self):
+        self.prefactor = self.MU_0
         self.coil_mid_pos = None
         self.length = None
         self.n = None
@@ -94,17 +96,17 @@ class BaseCoil:
 
     @staticmethod
     def transform_cartesian_to_cylindrical(x, y, z):
-        r = np.sqrt(x ** 2 + y ** 2)
-        theta = np.arctan(y / x)
-        rho = z
-        return r, theta, rho
+        x = x
+        rho = np.sqrt(y ** 2 + z ** 2)
+        theta = np.arctan(y / z)
+        return x, rho, theta
 
     @staticmethod
-    def transform_cylindrical_to_cartesian(r, theta, rho):
+    def transform_cylindrical_to_cartesian(x, rho, theta):
         """Transform coordinates from cylindrical to cartesian."""
-        x = r * np.cos(theta)
-        y = r * np.sin(theta)
-        z = rho
+        x = x
+        y = rho * np.cos(theta)
+        z = rho * np.sin(theta)
         return x, y, z
 
     def zeta(self, x, s):
@@ -126,6 +128,7 @@ class Coil(BaseCoil):
         self.coil_mid_pos = coil_mid_pos
         self.length = length
         self.n = windings
+
         inverse_r_sum = 0
         num_layers = windings * wire_d / length
         r_large = r + wire_d * num_layers
@@ -136,6 +139,8 @@ class Coil(BaseCoil):
         self.current = current
         self.angle_y = angle_y
         self.angle_z = angle_z
+
+        self.prefactor *= 1e4 / (2 * np.pi) * self.n * self.current / self.length
 
     def b_field_rho(self, x, rho):
         """Computes radial magnetic field
@@ -157,9 +162,7 @@ class Coil(BaseCoil):
 
         rho = abs(rho)
 
-        prefac = 1e4 * self.MU_0 / (2 * np.pi) * self.n * self.current / self.length
-
-        return prefac * (self.sum_element_rho(rho, x, s=1) - self.sum_element_rho(rho, x, s=-1))
+        return self.prefactor * (self.sum_element_rho(rho, x, s=1) - self.sum_element_rho(rho, x, s=-1))
 
     def sum_element_rho(self, rho, x, s):
         return self.beta(rho, x, s) / rho \
@@ -168,8 +171,8 @@ class Coil(BaseCoil):
     def b_field_x(self, x, rho=0):
         """Compute the magnetic field in x direction.
 
+
         # N = turns of winding, I = current (A), R = radius (m), l = length (m)
-        # x für mich y
 
         Parameters
         ----------
@@ -212,8 +215,6 @@ class Coil(BaseCoil):
 
 class SquareCoil(BaseCoil):
 
-    prefactor = 1e4 * MU_0 / (4 * pi)
-
     def create_coil(self, coil_mid_pos=0, length=0.1, windings=100, current=10, r=0.05, wire_d=0.006, angle_y=0,
                     angle_z=0):
         """Simulate physical geometry of the coil."""
@@ -221,8 +222,10 @@ class SquareCoil(BaseCoil):
 
         self.current = current
 
-        self.a = length
-        self.b = length
+        self.length = length
+
+        self.a = r
+        self.b = r
 
         self.n = windings
 
@@ -231,15 +234,15 @@ class SquareCoil(BaseCoil):
         self.angle_y = angle_y
         self.angle_z = angle_z
 
-    def b_field(self, x, y, z):
+        self.prefactor *= 1 / (4 * np.pi) * self.n * self.current / self.length
+
+    def b_field(self, x, rho, theta):
         """Compute the magnetic field."""
-        self.x = x - self.coil_mid_pos
-        self.y = y
-        self.z = z
+        self.x, self.y, self.z = self.transform_cylindrical_to_cartesian(x, rho, theta)
 
-        prefactor = 1e4 * self.MU_0 / (2 * np.pi) * self.n * self.current / self.a
+        # self.x -= self.coil_mid_pos
 
-        field = prefactor * np.array([self.b_field_z, self.b_field_y, self.b_field_x])
+        field = self.prefactor * np.array([self.eta_x, self.eta_y, self.eta_z])
 
         return self._fix_numerical_error(field)
 
@@ -253,26 +256,30 @@ class SquareCoil(BaseCoil):
             3D vector
         """
 
-        if field[0] > 0:
-            field[0] = 0
-        elif field[0] < 0:
-            field[0] = - field[0]
+        # if field[0] > 0:
+        #     field[0] = 0
+        # elif field[0] < 0:
+        #     field[0] = - field[0]
+
+        if any(np.isinf(field)) or any(np.isnan(field)):
+            field = np.array([0, 0, 0])
+
         return field
 
-    @property
-    def b_field_x(self):
-        """Compute the B magnetic field in x direction."""
-        return self.eta_x
-
-    @property
-    def b_field_y(self):
-        """Compute the B magnetic field in y direction."""
-        return self.eta_y
-
-    @property
-    def b_field_z(self):
-        """Compute the B magnetic field in z direction."""
-        return  self.eta_z
+    # @property
+    # def b_field_x(self):
+    #     """Compute the B magnetic field in x direction."""
+    #     return self.eta_x
+    #
+    # @property
+    # def b_field_y(self):
+    #     """Compute the B magnetic field in y direction."""
+    #     return self.eta_y
+    #
+    # @property
+    # def b_field_z(self):
+    #     """Compute the B magnetic field in z direction."""
+    #     return  self.eta_z
 
     @property
     def eta_x(self):
@@ -280,12 +287,24 @@ class SquareCoil(BaseCoil):
         for alpha in np.arange(1, 5):
             alpha_index = alpha - 1
 
-            try:
-                _eta += ((-1)**(alpha+1)) * self.z/(self.r_values[alpha_index] * (self.r_values[alpha_index] + self.d[alpha_index]))
-            except RuntimeWarning:
-                # ToDo: what to do when dividing by 0?
-                _eta = 0
+            with warnings.catch_warnings(record=True) as w:
+                # Cause all warnings to always be triggered.
+                warnings.simplefilter("always")
+                # Verify some things
+                t1 = ((-1) ** alpha) * self.d[alpha_index] / \
+                     (self.r_values[alpha_index] * (self.r_values[alpha_index]
+                                                    + (-1) ** (alpha + 1) * self.c[alpha_index]))
+                t2 = self.c[alpha_index] \
+                     / (self.r_values[alpha_index] * (self.r_values[alpha_index] + self.d[alpha_index]))
+                if t1 == 0 or t2 == 0:
+                    print(f"0 value at {self.x}, {self.y}, {self.z}")
 
+                _eta += t1 - t2
+
+                if len(w) == 1:
+                    # ToDo: what to do when dividing by 0?
+                    print(f"Numerical error encountered at {self.x, self.y, self.z}")
+                    _eta = 0
         return _eta
 
     @property
@@ -294,8 +313,9 @@ class SquareCoil(BaseCoil):
         for alpha in np.arange(1, 5):
             alpha_index = alpha - 1
 
-            _eta += ((-1)**(alpha+1)) * self.z/(self.r_values[alpha_index]
-                                                * (self.r_values[alpha_index] + ((-1) ** (alpha+1)) * self.c[alpha_index]))
+            _eta += ((-1)**(alpha+1)) * self.z\
+                    /(self.r_values[alpha_index] * (self.r_values[alpha_index]
+                                                    + ((-1) ** (alpha+1)) * self.c[alpha_index]))
         return _eta
 
     @property
@@ -303,15 +323,15 @@ class SquareCoil(BaseCoil):
         _eta = 0
         for alpha in np.arange(1, 5):
             alpha_index = alpha - 1
-            try:
-                t1 = ((-1) ** alpha) * self.d[alpha_index] \
-                     / (self.r_values[alpha_index] * (self.r_values[alpha_index] + (-1) ** (alpha + 1) * self.c[alpha_index]))
-                t2 = self.c[alpha_index] / (self.r_values[alpha_index] * (self.r_values[alpha_index] + self.d[alpha_index]))
 
-                _eta += t1 - t2
-            except RuntimeWarning:
-                # ToDo: what to do when dividing by 0?
-                _eta = 0
+            with warnings.catch_warnings(record=True) as w:
+                _eta += ((-1) ** (alpha + 1)) * self.z / (
+                            self.r_values[alpha_index] * (self.r_values[alpha_index] + self.d[alpha_index]))
+                if len(w) == 1:
+                    # ToDo: what to do when dividing by 0?
+                    print(f"Numerical error encountered at {self.x, self.y, self.z}")
+                    _eta = 0
+
         return _eta
 
     @property
@@ -357,6 +377,8 @@ class RealCoil(BaseCoil):
         self.angle_y = angle_y
         self.angle_z = angle_z
 
+        self.prefactor *= 1e4 / (2 * np.pi) * self.n * self.current / self.length
+
     def b_field_rho(self, x, r, rho):
         """ # radial magnetic field
 
@@ -366,9 +388,8 @@ class RealCoil(BaseCoil):
             return 0
 
         rho = abs(rho)
-        prefac = 1e4 * self.MU_0 / (2 * np.pi) * self.n * self.current / self.length
 
-        return prefac * (self.sum_element_rho(rho, x, s=1) - self.sum_element_rho(rho, x, s=-1))
+        return self.prefactor * (self.sum_element_rho(rho, x, s=1) - self.sum_element_rho(rho, x, s=-1))
 
     def sum_element_rho(self, rho, x, s):
         return self.beta(rho, x, s) / rho \

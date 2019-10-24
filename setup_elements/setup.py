@@ -75,9 +75,8 @@ class Setup:
             np.add(field, element.b_field(*r), out=field)
             # field += element.B_field(*r)
 
-        print(f'The total computed magnetic field is: {field}')
+        # print(f'The total computed magnetic field at point {r} is: {field}')
         return field
-
 
     def change_current(self, current):
         """Change the current valaue."""
@@ -173,8 +172,19 @@ class Setup:
         b_vec = np.array([self.b[(x, rho, 0)][:2] for x in x_pos])
         u = b_vec[:, 0]
         v = b_vec[:, 1]
+        print(u, v)
 
-        plt.quiver(x_pos, y_pos, u/np.sqrt(u**2+v**2), v/np.sqrt(u**2+v**2))
+        u_plot_data = np.array([0] * len(u))
+        v_plot_data = np.array([0] * len(v))
+        for i in range(len(u)):
+            magnitude = np.sqrt(u[i] ** 2 + v[i] ** 2)
+            if magnitude == 0:
+                u_plot_data[i] = 0
+                v_plot_data[i] = 0
+            else:
+                u_plot_data[i] = u[i]/magnitude
+                v_plot_data[i] = v[i]/magnitude
+        plt.quiver(x_pos, y_pos, u_plot_data, v_plot_data)
         plt.show()
 
     def data_compare_1d(self, x_data, y_data, rho=0):
