@@ -188,9 +188,9 @@ class Coil(BaseCoil):
 
         n = 4.0 * self.r * rho / (rho + self.r) ** 2
 
-        prefac = 1e4 * self.MU_0 / (2 * np.pi) * self.n * self.current / self.length
+        prefactor = 1e4 * self.MU_0 / (2 * np.pi) * self.n * self.current / self.length
 
-        return prefac * (-self.sum_element_x(n, rho, x, s=-1) + self.sum_element_x(n, rho, x, s=1))
+        return prefactor * (-self.sum_element_x(n, rho, x, s=-1) + self.sum_element_x(n, rho, x, s=1))
 
     def sum_element_x(self, n, rho, x, s):
         return self.zeta(x, s) / self.beta(rho, x, s) \
@@ -232,28 +232,47 @@ class SquareCoil(BaseCoil):
         self.angle_z = angle_z
 
     def b_field(self, x, y, z):
+        """Compute the magnetic field."""
         self.x = x - self.coil_mid_pos
         self.y = y
         self.z = z
 
-        field = np.array([self.b_field_z, self.b_field_y, self.b_field_x])
+        prefactor = 1e4 * self.MU_0 / (2 * np.pi) * self.n * self.current / self.a
 
+        field = prefactor * np.array([self.b_field_z, self.b_field_y, self.b_field_x])
+
+        return self._fix_numerical_error(field)
+
+    @staticmethod
+    def _fix_numerical_error(field):
+        """Fix computational error.
+
+        Parameters
+        ----------
+        field: np.array
+            3D vector
+        """
+
+        if field[0] > 0:
+            field[0] = 0
+        elif field[0] < 0:
+            field[0] = - field[0]
         return field
 
     @property
     def b_field_x(self):
         """Compute the B magnetic field in x direction."""
-        return self.prefactor * self.current * self.eta_x
+        return self.eta_x
 
     @property
     def b_field_y(self):
         """Compute the B magnetic field in y direction."""
-        return self.prefactor * self.current * self.eta_y
+        return self.eta_y
 
     @property
     def b_field_z(self):
         """Compute the B magnetic field in z direction."""
-        return self.prefactor * self.current * self.eta_z
+        return  self.eta_z
 
     @property
     def eta_x(self):

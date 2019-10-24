@@ -74,21 +74,10 @@ class Setup:
         for element in self.elements:
             np.add(field, element.b_field(*r), out=field)
             # field += element.B_field(*r)
-        if self.coil_type == 'square':
-            field = self._fix_numerical_error(field)
 
         print(f'The total computed magnetic field is: {field}')
         return field
 
-    @staticmethod
-    def _fix_numerical_error(field):
-        """Fix computational error."""
-
-        # if field[0] > 0:
-        #     field[0] = 46.5 + 46.5 - field[0]
-        # elif field[0] < 0:
-        #     field[0] = - field[0]
-        return field
 
     def change_current(self, current):
         """Change the current valaue."""
