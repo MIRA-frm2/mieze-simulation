@@ -30,6 +30,8 @@ class Setup:
             element = SquareCoil()
         elif self.coil_type == 'real':
             element = RealCoil()
+        else:
+            raise Exception('Coil type not recognized.')
 
         element.create_coil(coil_mid_pos, length, windings, current,  r, wire_d, angle_y, angle_z)
         self.elements.append(element)
@@ -62,7 +64,8 @@ class Setup:
         for element in self.elements:
             np.add(field, element.b_field(*r), out=field)
             # field += element.B_field(*r)
-        field = self._fix_numerical_error(field)
+        if self.coil_type == 'square':
+            field = self._fix_numerical_error(field)
 
         print(f'The total computed magnetic field is: {field}')
         return field

@@ -100,11 +100,21 @@ class BaseCoil:
         return r, theta, rho
 
     @staticmethod
-    def transform_cylindrical_to_cartesina(r, theta, rho):
+    def transform_cylindrical_to_cartesian(r, theta, rho):
+        """Transform coordinates from cylindrical to cartesian."""
         x = r * np.cos(theta)
         y = r * np.sin(theta)
         z = rho
         return x, y, z
+
+    def zeta(self, x, s):
+        return x - s * self.length / 2.0
+
+    def beta(self, rho, x, s):
+        return np.sqrt((rho + self.r) ** 2 + self.zeta(x=x, s=s) ** 2)
+
+    def m(self, rho, x, s):
+        return 4.0 * self.r * rho / self.beta(rho, x, s) ** 2
 
 
 class Coil(BaseCoil):
@@ -147,12 +157,13 @@ class Coil(BaseCoil):
 
         rho = abs(rho)
 
-        beta = lambda s: np.sqrt((rho + self.r) ** 2 + (x - s * self.length / 2) ** 2)
-        m = lambda s: 4 * self.r * rho / beta(s) ** 2
-        sum_element = lambda s: beta(s) / rho * ((2 - m(s)) * self._k(m(s)) - 2 * self._e(m(s)))
         prefac = 1e4 * self.MU_0 / (2 * np.pi) * self.n * self.current / self.length
 
-        return prefac * (sum_element(1) - sum_element(-1))
+        return prefac * (self.sum_element_rho(rho, x, s=1) - self.sum_element_rho(rho, x, s=-1))
+
+    def sum_element_rho(self, rho, x, s):
+        return self.beta(rho, x, s) / rho \
+               * ((2 - self.m(rho, x, s)) * self._k(self.m(rho, x, s)) - 2 * self._e(self.m(rho, x, s)))
 
     def b_field_x(self, x, rho=0):
         """Compute the magnetic field in x direction.
@@ -174,19 +185,16 @@ class Coil(BaseCoil):
         x -= self.coil_mid_pos
 
         rho = abs(rho)  # symmetric
-        zeta = lambda s: x - s * self.length / 2.0
-
-        beta = lambda s: np.sqrt((rho + self.r) ** 2 + zeta(s) ** 2)
-
-        m = lambda s: 4.0 * self.r * rho / beta(s) ** 2
 
         n = 4.0 * self.r * rho / (rho + self.r) ** 2
 
         prefac = 1e4 * self.MU_0 / (2 * np.pi) * self.n * self.current / self.length
 
-        sum_element = lambda s: zeta(s) / beta(s) * ((rho - self.r) / (rho + self.r) * self._p(n, m(s)) - self._k(m(s)))
+        return prefac * (-self.sum_element_x(n, rho, x, s=-1) + self.sum_element_x(n, rho, x, s=1))
 
-        return prefac * (-sum_element(-1) + sum_element(1))
+    def sum_element_x(self, n, rho, x, s):
+        return self.zeta(x, s) / self.beta(rho, x, s) \
+               * ((rho - self.r) / (rho + self.r) * self._p(n, self.m(rho, x, s)) - self._k(self.m(rho, x, s)))
 
     def b_field(self, x, y, z):
         """Compute the magnetic field given the position."""
@@ -329,14 +337,15 @@ class RealCoil(BaseCoil):
             return 0
 
         rho = abs(rho)
-        beta = lambda s: np.sqrt((rho + r) ** 2 + (x - s * self.length / 2) ** 2)
-        m = lambda s: 4 * r * rho / beta(s) ** 2
-        sum_element = lambda s: beta(s) / rho * ((2 - m(s)) * self._k(m(s)) - 2 * self._e(m(s)))
         prefac = 1e4 * self.MU_0 / (2 * np.pi) * self.n * self.current / self.length
 
-        return prefac * (sum_element(1) - sum_element(-1))
+        return prefac * (self.sum_element_rho(rho, x, s=1) - self.sum_element_rho(rho, x, s=-1))
 
-    def b_field_x(self, x, R, rho=0):
+    def sum_element_rho(self, rho, x, s):
+        return self.beta(rho, x, s) / rho \
+               * ((2 - self.m(rho, x, s)) * self._k(self.m(rho, x, s)) - 2 * self._e(self.m(rho, x, s)))
+
+    def b_field_x(self, x, r, rho=0):
         """
         # N = turns of winding, I = current (A), R = radius (m), l = length (m)
         # x für mich y
@@ -346,19 +355,15 @@ class RealCoil(BaseCoil):
 
         rho = abs(rho)  # symmetric
 
-        zeta = lambda s: x - s * self.length / 2.0
-
-        beta = lambda s: np.sqrt((rho + R) ** 2 + zeta(s) ** 2)
-
-        m = lambda s: 4.0 * R * rho / beta(s) ** 2
-
-        n = 4.0 * R * rho / (rho + R) ** 2
+        n = 4.0 * r * rho / (rho + r) ** 2
 
         prefac = 1e4 * self.MU_0 / (2 * np.pi) * self.n * self.current / self.length
 
-        sum_element = lambda s: zeta(s) / beta(s) * ((rho - R) / (rho + R) * self._p(n, m(s)) - self._k(m(s)))
+        return prefac * (-self.sum_element_x(n, rho, x, s=-1) + self.sum_element_x(n, rho, x, s=1))
 
-        return prefac * (-sum_element(-1) + sum_element(1))
+    def sum_element_x(self, n, rho, x, s):
+        return self.zeta(x, s) / self.beta(rho, x, s) \
+               * ((rho - self.r) / (rho + self.r) * self._p(n, self.m(rho, x, s)) - self._k(self.m(rho, x, s)))
 
     def b_field(self, x, y, z):
         """Compute the magnetic field given the position."""
@@ -368,9 +373,9 @@ class RealCoil(BaseCoil):
         # self.pbar.update(1)
         x_positions = np.arange(-(self.windings_x * self.wire_d / 2 - self.wire_d / 2),
                                 self.windings_x * self.wire_d / 2, self.wire_d)
-        print(len(x_positions))
+        # print(len(x_positions))
         rs = np.arange(self.r, self.r + self.wire_d * (self.windings_y - 0.5), self.wire_d)
-        print(len(rs))
+        # print(len(rs))
         for x0 in x_positions:
             for R in rs:
                 field_add = np.array((self.b_field_x(x + x0, R, r),

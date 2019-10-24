@@ -14,7 +14,7 @@ from setup_elements.setup import Setup
 class Mieze:
 
     def __init__(self, sample_distance, coils_dinstance, detector_distance, increment=0.001):
-        self.MIEZE_setup = Setup(increment, coil_type='real')
+        self.MIEZE_setup = Setup(increment, coil_type='simple')
         self.sample_distance = sample_distance
         self.detector_distance = detector_distance
         self.coil_distance = coils_dinstance
