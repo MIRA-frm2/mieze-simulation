@@ -4,10 +4,10 @@
 # Copyright (C) 2019 TUM.
 #
 # This is free software; you can redistribute it and/or modify it
-# under the terms of the MIT License; see LICENSE file for more details.
+# under the terms of the License; see LICENSE file for more details.
 
 
-"""Description """
+"""Individual magnetic elements (coils) for the setup."""
 
 import mpmath
 import numpy as np
@@ -212,20 +212,27 @@ class Coil(BaseCoil):
 
 class SquareCoil(BaseCoil):
 
-    # Todo: Standardize the prefactor for all coil clases.
-
     prefactor = 1e4 * MU_0 / (4 * pi)
 
     def create_coil(self, coil_mid_pos=0, length=0.1, windings=100, current=10, r=0.05, wire_d=0.006, angle_y=0,
                     angle_z=0):
         """Simulate physical geometry of the coil."""
+        self.coil_mid_pos = coil_mid_pos
+
         self.current = current
 
         self.a = length
         self.b = length
 
+        self.n = windings
+
+        self.r = r
+
+        self.angle_y = angle_y
+        self.angle_z = angle_z
+
     def b_field(self, x, y, z):
-        self.x = x
+        self.x = x - self.coil_mid_pos
         self.y = y
         self.z = z
 
@@ -235,14 +242,17 @@ class SquareCoil(BaseCoil):
 
     @property
     def b_field_x(self):
+        """Compute the B magnetic field in x direction."""
         return self.prefactor * self.current * self.eta_x
 
     @property
     def b_field_y(self):
+        """Compute the B magnetic field in y direction."""
         return self.prefactor * self.current * self.eta_y
 
     @property
     def b_field_z(self):
+        """Compute the B magnetic field in z direction."""
         return self.prefactor * self.current * self.eta_z
 
     @property

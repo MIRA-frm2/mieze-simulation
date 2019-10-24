@@ -1,11 +1,21 @@
 # -*- coding: utf-8 -*-
+#
+# This file is part of the E21 FRM2 Research Group.
+# Copyright (C) 2019 TUM.
+#
+# This is free software; you can redistribute it and/or modify it
+# under the terms of the License; see LICENSE file for more details.
 
-from setup_elements.elements import Coil, RealCoil, SquareCoil
-import numpy as np
+
+"""General setup allowing placement of different elements."""
+
+import itertools
 import matplotlib.pyplot as plt
 from multiprocessing import Pool
-import itertools
+import numpy as np
 from scipy.interpolate import interp1d
+
+from setup_elements.elements import Coil, RealCoil, SquareCoil
 
 
 class Setup:
@@ -72,14 +82,12 @@ class Setup:
 
     @staticmethod
     def _fix_numerical_error(field):
-        """Fix computational error.
+        """Fix computational error."""
 
-        ToDo: Investigate and fix numerical error"""
-
-        if field[0] > 0:
-            field[0] = 46.5 + 46.5 - field[0]
-        elif field[0] < 0:
-            field[0] = - field[0]
+        # if field[0] > 0:
+        #     field[0] = 46.5 + 46.5 - field[0]
+        # elif field[0] < 0:
+        #     field[0] = - field[0]
         return field
 
     def change_current(self, current):

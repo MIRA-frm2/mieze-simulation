@@ -4,7 +4,7 @@
 # Copyright (C) 2019 TUM.
 #
 # This is free software; you can redistribute it and/or modify it
-# under the terms of the MIT License; see LICENSE file for more details.
+# under the terms of the License; see LICENSE file for more details.
 
 """An implementation of the MIEZE setup."""
 
@@ -14,7 +14,7 @@ from setup_elements.setup import Setup
 class Mieze:
 
     def __init__(self, sample_distance, coils_dinstance, detector_distance, increment=0.001):
-        self.MIEZE_setup = Setup(increment, coil_type='simple')
+        self.MIEZE_setup = Setup(increment, coil_type='square')
         self.sample_distance = sample_distance
         self.detector_distance = detector_distance
         self.coil_distance = coils_dinstance
