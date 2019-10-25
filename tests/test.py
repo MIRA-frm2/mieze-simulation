@@ -1,4 +1,4 @@
-from numpy import sqrt, pi, array
+from numpy import sqrt, pi
 
 from unittest import TestCase
 
@@ -28,16 +28,3 @@ class TestReferenceValues(TestCase):
         assert abs(reference_value - test_value[0]) < numerical_error_acceptance
         assert test_value[1] == 0
         assert test_value[2] == 0
-
-    def test_infinity_value(self):
-        points = [(0.13, 0.0, 0.0), (-0.13, 0.0, 0.0), (-0.1299999999999999, 0.0, 0.0), (0.13000000000000034, 0.0, 0.0),
-                  (0.0885000000000003, 0.0, 0.0), (-0.08849999999999986, 0.0, 0.0)]
-
-        self.square_coil.create_coil(coil_mid_pos=0, length=0.1, windings=1000, current=10,  r=0.05, wire_d=0.006,
-                                     angle_y=0, angle_z=0)
-
-        for point in points:
-            point = self.square_coil.transform_cylindrical_to_cartesian(*point)
-            test_value = self.square_coil.b_field(*point)
-
-            print(test_value)

@@ -12,5 +12,5 @@ Contributors
 
 The list of contributors in alphabetical order:
 
-- [Daniel Prelipcean](daniel.prelipcean@.tum.de)
-- [Henrik Gabold](henrik.gabold@frm2.tum.de)
+- [Daniel Prelipcean](mailto:daniel.prelipcean@.tum.de?subject=[GitHub]%20MIEZE%20Simulation)
+- [Henrik Gabold](mailto:henrik.gabold@frm2.tum.de?subject=[GitHub]%20MIEZE%20Simulation)
