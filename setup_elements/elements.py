@@ -12,7 +12,8 @@
 import mpmath
 import numpy as np
 
-from physics_constants import MU_0
+from setup_elements.physics_constants import MU_0
+from setup_elements.helper_functions import transform_cylindrical_to_cartesian
 
 
 class BaseCoil:
@@ -90,22 +91,6 @@ class BaseCoil:
     def change_current(self, current):
         """Change the assigned current value."""
         self.current = current
-
-    @staticmethod
-    def transform_cartesian_to_cylindrical(x, y, z):
-        """Transform coordinates from cartesian to cylindrical."""
-        x = x
-        rho = np.sqrt(y ** 2 + z ** 2)
-        theta = np.arctan(y / z)
-        return x, rho, theta
-
-    @staticmethod
-    def transform_cylindrical_to_cartesian(x, rho, theta):
-        """Transform coordinates from cylindrical to cartesian."""
-        x = x
-        y = rho * np.cos(theta)
-        z = rho * np.sin(theta)
-        return x, y, z
 
     def zeta(self, x, s):
         return x - s * self.length / 2.0
@@ -219,6 +204,7 @@ class Coil(BaseCoil):
             field = self._rotate(field, self.angle_z, np.array([0, 0, 1]))
 
         return field
+        # return transform_cylindrical_to_cartesian(*field)
 
 
 class SquareCoil(BaseCoil):
@@ -259,7 +245,7 @@ class SquareCoil(BaseCoil):
         -------
         magnetic field in cartesian coordinates
         """
-        self.x, self.y, self.z = self.transform_cylindrical_to_cartesian(x, rho, theta)
+        self.x, self.y, self.z = transform_cylindrical_to_cartesian(x, rho, theta)
 
         self.x -= self.coil_mid_pos
 

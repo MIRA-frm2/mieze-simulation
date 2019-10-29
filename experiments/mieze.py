@@ -45,11 +45,8 @@ class Mieze:
         self._create_coil_set(current=i1)
         self._create_coil_set(current=i2, first_coil_pos=l1)
 
-    def plot_field_1d_abs(self, rho=0):
-        self.MIEZE_setup.plot_1d_abs(-0.25, self.sample_distance, rho)
+    def plot_field_1d_abs(self):
+        self.MIEZE_setup.plot_1d_abs()
 
-    def plot_field_1d_vec(self, rho=0):
-        self.MIEZE_setup.plot_1d_vector(-0.25, self.sample_distance, rho)
-
-    def plot_2d_vectormap(self, rho=0):
-        self.MIEZE_setup.plot_2d_vectormap(-0.25, self.sample_distance, rho)
+    def plot_field_2d_abs(self):
+        self.MIEZE_setup.plot_2d_map()

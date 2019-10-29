@@ -1,9 +1,9 @@
 from numpy import sqrt, pi
-
 from unittest import TestCase
 
 from setup_elements.elements import SquareCoil
-from physics_constants import MU_0
+
+from setup_elements.physics_constants import MU_0
 
 
 class TestReferenceValues(TestCase):
