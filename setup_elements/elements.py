@@ -13,7 +13,7 @@ import mpmath
 import numpy as np
 
 from setup_elements.physics_constants import MU_0
-from setup_elements.helper_functions import transform_cylindrical_to_cartesian
+from setup_elements.helper_functions import transform_cylindrical_to_cartesian, transform_cartesian_to_cylindrical
 
 
 class BaseCoil:
@@ -193,9 +193,13 @@ class Coil(BaseCoil):
             * ((rho - self.r) / (rho + self.r) * self._p(n, self.m(rho, x, s)) - self._k(self.m(rho, x, s)))
 
     def b_field(self, x, y, z):
-        """Compute the magnetic field given the position."""
-        r = np.sqrt(y ** 2 + z ** 2)
-        field = np.array((self.b_field_x(x, r), self.b_field_rho(x, y), self.b_field_rho(x, z)))
+        """Compute the magnetic field given the position in cylindrical coordinates."""
+        x, rho, phi = transform_cartesian_to_cylindrical(x, y, z)
+
+        # if np.sqrt(x ** 2 + y ** 2) - rho < 0.001:
+        #     return np.array([0, 0, 0])
+
+        field = np.array((self.b_field_x(x, y), self.b_field_rho(x, y), z))
 
         if self.angle_y != 0:
             field = self._rotate(field, self.angle_y, np.array([0, 1, 0]))
@@ -203,8 +207,7 @@ class Coil(BaseCoil):
         if self.angle_z != 0:
             field = self._rotate(field, self.angle_z, np.array([0, 0, 1]))
 
-        return field
-        # return transform_cylindrical_to_cartesian(*field)
+        return transform_cylindrical_to_cartesian(*field)
 
 
 class SquareCoil(BaseCoil):
@@ -222,6 +225,9 @@ class SquareCoil(BaseCoil):
 
         self.length = length
 
+        self.width = r
+        self.height = r
+
         self.a = r
         self.b = r
 
@@ -232,9 +238,9 @@ class SquareCoil(BaseCoil):
         self.angle_y = angle_y
         self.angle_z = angle_z
 
-        self.prefactor *= 1e4 / (4 * np.pi) * self.n * self.current / self.length
+        self.prefactor *= 1e-2 / (4 * np.pi) * self.n * self.current / self.length
 
-    def b_field(self, x, rho, theta):
+    def b_field(self, x, rho, theta, coordinate_system='cartesian'):
         """Compute the magnetic field.
 
         Parameters
@@ -245,7 +251,10 @@ class SquareCoil(BaseCoil):
         -------
         magnetic field in cartesian coordinates
         """
-        self.x, self.y, self.z = transform_cylindrical_to_cartesian(x, rho, theta)
+        if coordinate_system == 'cartesian':
+            self.x, self.y, self.z = x, rho, theta
+        else:
+            self.x, self.y, self.z = transform_cylindrical_to_cartesian(x, rho, theta)
 
         self.x -= self.coil_mid_pos
 

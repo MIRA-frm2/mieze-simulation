@@ -23,7 +23,7 @@ class TestReferenceValues(TestCase):
         self.square_coil.create_coil(coil_mid_pos=0, length=1, windings=1, current=current, r=side_length, wire_d=0.006)
         test_value = self.square_coil.b_field(0, 0, 0)
 
-        # print(test_value, reference_value)
+        print(test_value, reference_value)
 
         assert abs(reference_value - test_value[0]) < numerical_error_acceptance
         assert test_value[1] == 0

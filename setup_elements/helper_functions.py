@@ -5,7 +5,10 @@ def transform_cartesian_to_cylindrical(x, y, z):
     """Transform coordinates from cartesian to cylindrical."""
     x = x
     rho = np.sqrt(y ** 2 + z ** 2)
-    theta = np.arctan(y / z)
+    if z:
+        theta = np.arctan(y / z)
+    else:
+        theta = 0
     return x, rho, theta
 
 
