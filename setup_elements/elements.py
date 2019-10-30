@@ -21,20 +21,28 @@ class BaseCoil:
 
     def __init__(self):
         self.prefactor = MU_0
+
+        # Physical parameters
         self.coil_mid_pos = None
         self.length = None
         self.n = None
         self.windings_x = None
         self.windings_y = None
 
+        # For circular coils
         self.r = None
+
+        # For rectangular coils
+        self.width = None
+        self.height = None
+
+        self.width = None
+        self.height = None
+
         self.current = None
         self.wire_d = None
         self.angle_y = None
         self.angle_z = None
-
-        self.a = None
-        self.b = None
 
         self.x = None
         self.y = None
@@ -228,9 +236,6 @@ class SquareCoil(BaseCoil):
         self.width = r
         self.height = r
 
-        self.a = r
-        self.b = r
-
         self.n = windings
 
         self.r = r
@@ -350,25 +355,25 @@ class SquareCoil(BaseCoil):
 
     @property
     def c(self):
-        return np.array([self.a + self.y,
-                         self.a - self.y,
-                         -self.a + self.y,
-                         -self.a - self.y])
+        return np.array([self.height + self.z,
+                         self.height - self.z,
+                         -self.height + self.z,
+                         -self.height - self.z])
 
     @property
     def d(self):
-        return np.array([self.b + self.z,
-                         self.b + self.z,
-                         self.z - self.b,
-                         self.z - self.b])
+        return np.array([self.width + self.y,
+                         self.width + self.y,
+                         self.y - self.width,
+                         self.y - self.width])
 
     @property
     def r_values(self):
         return np.array([
-            np.sqrt((self.a + self.y) ** 2 + (self.b + self.z) ** 2 + self.x ** 2),
-            np.sqrt((self.a - self.y) ** 2 + (self.b + self.z) ** 2 + self.x ** 2),
-            np.sqrt((self.a - self.y) ** 2 + (self.b - self.z) ** 2 + self.x ** 2),
-            np.sqrt((self.a + self.y) ** 2 + (self.b - self.z) ** 2 + self.x ** 2)]
+            np.sqrt((self.width + self.y) ** 2 + (self.height + self.z) ** 2 + self.x ** 2),
+            np.sqrt((self.width - self.y) ** 2 + (self.height + self.z) ** 2 + self.x ** 2),
+            np.sqrt((self.width - self.y) ** 2 + (self.height - self.z) ** 2 + self.x ** 2),
+            np.sqrt((self.width + self.y) ** 2 + (self.height - self.z) ** 2 + self.x ** 2)]
         )
 
 

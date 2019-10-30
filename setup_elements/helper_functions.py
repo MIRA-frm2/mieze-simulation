@@ -21,6 +21,7 @@ def transform_cylindrical_to_cartesian(x, rho, theta):
 
 
 def save_data_to_file(data, file_name, extension='.csv'):
+    """Save data to file."""
     full_filename = f'{file_name}{extension}'
 
     with open(full_filename, 'w') as file:

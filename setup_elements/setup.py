@@ -101,15 +101,15 @@ class Setup:
             square_element = self._get_square_element()
 
             start = kwargs.pop('start', -0.5)
-            coil_distance = kwargs.pop('coil_distance', square_element.width/10)
+            # coil_distance = kwargs.pop('coil_distance', square_element.width/10)
 
             if self.b is None or self.setup_changed:
-                self.x_range = np.arange(start, square_element.length, self.increment)
-                self.y_range = np.arange(- square_element.width + coil_distance,
-                                         square_element.width - coil_distance,
+                self.x_range = np.arange(start, square_element.length + self.increment, self.increment)
+                self.y_range = np.arange(- square_element.width,
+                                         square_element.width + self.increment,
                                          self.increment)
-                self.z_range = np.arange(- square_element.height + coil_distance,
-                                         square_element.height - coil_distance,
+                self.z_range = np.arange(- square_element.height,
+                                         square_element.height + self.increment,
                                          self.increment)
 
                 # print(self.x_range, self.y_range, self.z_range)
@@ -245,13 +245,13 @@ class Setup:
             idx = self._find_nearest(self.y_range, plane_position)
         elif plane == 'yz':
             component = 0
-            print(self.x_range)
+            # print(self.x_range)
             idx = self._find_nearest(self.x_range, plane_position)
         else:
             component = None
             idx = None
 
-        b = np.array([[[self.b[(x, y, z)][component] for x in x_value] for y in y_value] for z in z_value])
+        b = np.array([[[self.b[(x, y, z)][component] for z in z_value] for y in y_value] for x in x_value])
         print(b.shape)
         return b[idx]
 
