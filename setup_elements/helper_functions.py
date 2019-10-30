@@ -20,6 +20,17 @@ def transform_cylindrical_to_cartesian(x, rho, theta):
     return x, y, z
 
 
+def get_phi(y, z):
+    """Compute the angle from two coordinates."""
+    if y:
+        return np.arctan(z/y)
+    else:
+        if z >= 0:
+            return np.pi / 2
+        else:
+            return np.pi * 3 / 2
+
+
 def save_data_to_file(data, file_name, extension='.csv'):
     """Save data to file."""
     full_filename = f'{file_name}{extension}'

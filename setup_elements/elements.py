@@ -13,7 +13,7 @@ import mpmath
 import numpy as np
 
 from setup_elements.physics_constants import MU_0
-from setup_elements.helper_functions import transform_cylindrical_to_cartesian, transform_cartesian_to_cylindrical
+from setup_elements.helper_functions import transform_cylindrical_to_cartesian, get_phi
 
 
 class BaseCoil:
@@ -202,12 +202,17 @@ class Coil(BaseCoil):
 
     def b_field(self, x, y, z):
         """Compute the magnetic field given the position in cylindrical coordinates."""
-        x, rho, phi = transform_cartesian_to_cylindrical(x, y, z)
+        r = np.sqrt(z ** 2 + y ** 2)
 
         # if np.sqrt(x ** 2 + y ** 2) - rho < 0.001:
         #     return np.array([0, 0, 0])
 
-        field = np.array((self.b_field_x(x, y), self.b_field_rho(x, y), z))
+        phi = get_phi(y, z)
+
+        field = np.array((self.b_field_x(x, r),
+                          self.b_field_rho(x, r) * np.cos(phi),
+                          self.b_field_rho(x, r) * np.sin(phi))
+                         )
 
         if self.angle_y != 0:
             field = self._rotate(field, self.angle_y, np.array([0, 1, 0]))
@@ -215,7 +220,7 @@ class Coil(BaseCoil):
         if self.angle_z != 0:
             field = self._rotate(field, self.angle_z, np.array([0, 0, 1]))
 
-        return transform_cylindrical_to_cartesian(*field)
+        return field
 
 
 class SquareCoil(BaseCoil):
