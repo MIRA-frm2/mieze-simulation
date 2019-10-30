@@ -1,9 +1,10 @@
 from setup_elements.setup import Setup
+from setup_elements.helper_functions import save_data_to_file
 
 
 def main():
     coil_type = 'simple'
-    setup = Setup(increment=0.01, coil_type=coil_type)
+    setup = Setup(increment=0.1, coil_type=coil_type)
 
     if coil_type == 'simple':
         coil_kwargs = {}
@@ -19,6 +20,8 @@ def main():
     setup.create_coil(**coil_kwargs)
 
     setup.calculate_b_field(**b_field_kwargs)
+
+    save_data_to_file(setup.b, '../../data/data')
 
     # setup.plot_1d_abs()
     setup.plot_2d_map(plane='yz')

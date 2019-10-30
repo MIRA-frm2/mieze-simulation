@@ -17,7 +17,7 @@ from multiprocessing import Pool
 import numpy as np
 
 from setup_elements.elements import Coil, RealCoil, SquareCoil
-from setup_elements.helper_functions import transform_cylindrical_to_cartesian
+from setup_elements.helper_functions import read_data_from_file
 
 
 class Setup:
@@ -169,7 +169,23 @@ class Setup:
             #     self.b.update(dict(zip(args, result)))
 
         self.setup_changed = False
-    #
+
+    def get_plot_data(self, plane, source='new'):
+        if source == 'storage':
+            b, extent = read_data_from_file()
+        else:
+            b = self.get_magnetic_field_value(plane, plane_position=0)
+
+            if plane == 'yz':
+                extent = (self.y_range.min(), self.y_range.max(), self.z_range.min(), self.z_range.max())
+            elif plane == 'xy':
+                extent = (self.x_range.min(), self.x_range.max(), self.x_range.min(), self.x_range.max())
+            elif plane == 'xz':
+                extent = (self.x_range.min(), self.x_range.max(), self.z_range.min(), self.z_range.max())
+            else:
+                extent = None
+        return b, extent
+
     # def return_1d_fi(self, start, end, rho=0):
     #     self.calculate_b_field(zero=start, meshsize=(end - start, rho, 0))
     #
@@ -208,17 +224,7 @@ class Setup:
         plt.show()
 
     def plot_2d_map(self, plane):
-        b = self.get_magnetic_field_value(plane, plane_position=0)
-        print(b)
-
-        if plane == 'yz':
-            extent = (self.y_range.min(), self.y_range.max(), self.z_range.min(), self.z_range.max())
-        elif plane == 'xy':
-            extent = (self.x_range.min(), self.x_range.max(), self.x_range.min(), self.x_range.max())
-        elif plane == 'xz':
-            extent = (self.x_range.min(), self.x_range.max(), self.z_range.min(), self.z_range.max())
-        else:
-            extent = None
+        b, extent = self.get_plot_data(plane)
 
         plt.imshow(b, aspect='auto', cmap=cm.magma, extent=extent)
 
