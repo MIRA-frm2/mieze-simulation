@@ -99,17 +99,18 @@ class Setup:
 
         if coordinate_system == 'cartesian':
             square_element = self._get_square_element()
+            zoom_factor = 2
 
             start = kwargs.pop('start', -0.5)
             # coil_distance = kwargs.pop('coil_distance', square_element.width/10)
 
             if self.b is None or self.setup_changed:
                 self.x_range = np.arange(start, square_element.length + self.increment, self.increment)
-                self.y_range = np.arange(- square_element.width,
-                                         square_element.width + self.increment,
+                self.y_range = np.arange(- zoom_factor * square_element.width - self.increment/2,
+                                         zoom_factor * square_element.width + self.increment/2,
                                          self.increment)
-                self.z_range = np.arange(- square_element.height,
-                                         square_element.height + self.increment,
+                self.z_range = np.arange(- zoom_factor * square_element.height - self.increment/2,
+                                         zoom_factor * square_element.height + self.increment/2,
                                          self.increment)
 
                 # print(self.x_range, self.y_range, self.z_range)
@@ -123,7 +124,7 @@ class Setup:
                 print('calculation finished')
 
                 self.b = dict(zip(args, result))
-                print(self.b)
+                # print(self.b)
 
         elif coordinate_system == 'cylindrical':
             start = kwargs.pop('start', 0)
@@ -179,7 +180,7 @@ class Setup:
             if plane == 'yz':
                 extent = (self.y_range.min(), self.y_range.max(), self.z_range.min(), self.z_range.max())
             elif plane == 'xy':
-                extent = (self.x_range.min(), self.x_range.max(), self.x_range.min(), self.x_range.max())
+                extent = (self.x_range.min(), self.x_range.max(), self.y_range.min(), self.y_range.max())
             elif plane == 'xz':
                 extent = (self.x_range.min(), self.x_range.max(), self.z_range.min(), self.z_range.max())
             else:
@@ -231,11 +232,8 @@ class Setup:
         plt.colorbar()
         plt.show()
 
-    def get_coordinates(self):
-        return self.x_range, self.y_range, self.z_range
-
     def get_magnetic_field_value(self, plane, plane_position):
-        x_value, y_value, z_value = self.get_coordinates()
+        """Return the magnetic field value at a given plane."""
 
         if plane == 'xy':
             component = 2
@@ -245,15 +243,23 @@ class Setup:
             idx = self._find_nearest(self.y_range, plane_position)
         elif plane == 'yz':
             component = 0
-            # print(self.x_range)
             idx = self._find_nearest(self.x_range, plane_position)
         else:
             component = None
             idx = None
 
-        b = np.array([[[self.b[(x, y, z)][component] for z in z_value] for y in y_value] for x in x_value])
+        print(component, idx)
+        print(self.b)
+        b = np.array([[[self.b[(x, y, z)][component] for z in self.z_range] for y in self.y_range] for x in self.x_range])
         print(b.shape)
-        return b[idx]
+        print(b)
+
+        if component == 0:
+            return b[idx]
+        elif component == 1:
+            return b[:, idx]
+        if component == 2:
+            return b[:, :, idx]
 
     def get_b(self, arg):
         # ToDo: why absolute values of y and z

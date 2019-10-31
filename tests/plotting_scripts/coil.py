@@ -3,7 +3,7 @@ from setup_elements.helper_functions import save_data_to_file
 
 
 def main():
-    coil_type = 'simple'
+    coil_type = 'square'
     setup = Setup(increment=0.05, coil_type=coil_type)
 
     if coil_type == 'simple':

@@ -226,7 +226,7 @@ class Coil(BaseCoil):
 class SquareCoil(BaseCoil):
     """Class that implements a square coil.
 
-    The coordinates from the reference paper are changed from (x, y, z) to (y, z, x), hence the change in the formulae.
+    The coordinates from the reference paper are changed from (x, y, z) to (z, y, x), hence the change in the formulae.
     """
 
     def create_coil(self, coil_mid_pos=0, length=0.1, windings=100, current=10, r=0.05, wire_d=0.006, angle_y=0,
@@ -238,17 +238,25 @@ class SquareCoil(BaseCoil):
 
         self.length = length
 
-        self.width = r
-        self.height = r
+        self.width = r * 2
+        self.height = r * 2
 
         self.n = windings
-
-        self.r = r
 
         self.angle_y = angle_y
         self.angle_z = angle_z
 
-        self.prefactor *= 1e-2 / (4 * np.pi) * self.n * self.current / self.length
+        self.prefactor *= 1e0 / (4 * np.pi) * self.n * self.current / self.length
+
+    def check_physical_coil_overlap(self):
+        # print(self.x, self.y, self.z, self.width, self.height)
+        numerical_error_acceptance = min(self.width, self.height) * 1e-4
+        if abs(self.y - self.width) < numerical_error_acceptance \
+                or abs(self.z - self.height) < numerical_error_acceptance:
+            return True
+        if abs(self.y + self.width) < numerical_error_acceptance \
+                or abs(self.z + self.height) < numerical_error_acceptance:
+            return True
 
     def b_field(self, x, rho, theta, coordinate_system='cartesian'):
         """Compute the magnetic field.
@@ -265,6 +273,9 @@ class SquareCoil(BaseCoil):
             self.x, self.y, self.z = x, rho, theta
         else:
             self.x, self.y, self.z = transform_cylindrical_to_cartesian(x, rho, theta)
+
+        if self.check_physical_coil_overlap():
+            return np.array([0, 0, 0])
 
         self.x -= self.coil_mid_pos
 
@@ -285,7 +296,7 @@ class SquareCoil(BaseCoil):
         """
 
         if any(np.isinf(field)) or any(np.isnan(field)):
-            field = np.array([0, 0, 0])
+            return np.array([0, 0, 0])
 
         return field
 

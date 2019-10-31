@@ -18,7 +18,7 @@ class TestReferenceValues(TestCase):
 
         reference_value = sqrt(2) * MU_0 * current / (pi * side_length)
 
-        numerical_error_acceptance = 1e-5
+        numerical_error_acceptance = 1e-8
 
         self.square_coil.create_coil(coil_mid_pos=0, length=1, windings=1, current=current, r=side_length, wire_d=0.006)
         test_value = self.square_coil.b_field(0, 0, 0)
