@@ -225,9 +225,7 @@ class Coil(BaseCoil):
 
 class RealCoil(BaseCoil):
     """Class that implements a coil with more realistic experimental parameters."""
-    MU_0 = 4e-7 * np.pi
 
-    # oc = Oct2Py()
     def create_coil(self, coil_mid_pos=0, length=0.1, windings=100, current=10, r=0.05, wire_d=0.006, angle_y=0,
                     angle_z=0):
         """Simulate physical geometry of the coil."""
@@ -307,16 +305,15 @@ class RealCoil(BaseCoil):
             * ((rho - self.r) / (rho + self.r) * self._p(n, self.m(rho, x, s)) - self._k(self.m(rho, x, s)))
 
     def b_field(self, x, y, z):
-        """Compute the magnetic field given the position."""
+        """Compute the magnetic field given the position in cartesian coordinates."""
         field = np.array((0., 0., 0.))
         r = np.sqrt(y ** 2 + z ** 2)
 
-        # self.pbar.update(1)
         x_positions = np.arange(-(self.windings_x * self.wire_d / 2 - self.wire_d / 2),
                                 self.windings_x * self.wire_d / 2, self.wire_d)
-        # print(len(x_positions))
+
         rs = np.arange(self.r, self.r + self.wire_d * (self.windings_y - 0.5), self.wire_d)
-        # print(len(rs))
+
         for x0 in x_positions:
             for R in rs:
                 field_add = np.array((self.b_field_x(x + x0, R, r),
