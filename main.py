@@ -1,5 +1,5 @@
-from experiments.mieze import Mieze
-import matplotlib.pyplot as plt
+from experiments.mieze.main import Mieze
+
 
 def main():
     Experiment = Mieze(sample_distance=1.5, coils_dinstance=0.53, detector_distance=2.503, increment=0.001)

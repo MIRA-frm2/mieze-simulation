@@ -8,7 +8,7 @@
 
 """An implementation of the MIEZE setup."""
 
-from setup_elements.setup import Setup
+from experiments.setup import Setup
 
 
 class Mieze:

@@ -1,5 +1,5 @@
-from setup_elements.setup import Setup
-from setup_elements.helper_functions import save_data_to_file
+from experiments.setup import Setup
+from utils.helper_functions import save_data_to_file
 
 
 def main():
@@ -25,8 +25,8 @@ def main():
 
     save_data_to_file(setup.b, '../../data/data')
 
-    setup.plot_1d_abs()
-    # setup.plot_2d_map(plane=plane)
+    # setup.plot_1d_abs()
+    setup.plot_2d_map(plane=plane)
 
 
 if __name__ == "__main__":

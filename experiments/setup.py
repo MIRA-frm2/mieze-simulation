@@ -16,8 +16,8 @@ import matplotlib.cm as cm
 from multiprocessing import Pool
 import numpy as np
 
-from setup_elements.elements import Coil, RealCoil, SquareCoil
-from setup_elements.helper_functions import read_data_from_file
+from elements.coils import Coil, RealCoil, SquareCoil
+from utils.helper_functions import read_data_from_file
 
 
 class Setup:

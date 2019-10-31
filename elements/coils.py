@@ -12,8 +12,8 @@
 import mpmath
 import numpy as np
 
-from setup_elements.physics_constants import MU_0
-from setup_elements.helper_functions import transform_cylindrical_to_cartesian, get_phi, adjust_field
+from utils.physics_constants import MU_0
+from utils.helper_functions import transform_cylindrical_to_cartesian, get_phi, adjust_field
 
 
 class BaseCoil:
