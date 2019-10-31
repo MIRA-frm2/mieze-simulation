@@ -31,6 +31,17 @@ def get_phi(y, z):
             return np.pi * 3 / 2
 
 
+def adjust_field(vector):
+    """
+
+    Parameters
+    ----------
+    vector: np.arry
+
+    """
+    return np.array([vector[2], vector[1], vector[0]])
+
+
 def save_data_to_file(data, file_name, extension='.csv'):
     """Save data to file."""
     full_filename = f'{file_name}{extension}'

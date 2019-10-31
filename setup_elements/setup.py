@@ -99,19 +99,32 @@ class Setup:
 
         if coordinate_system == 'cartesian':
             square_element = self._get_square_element()
+
             zoom_factor = 2
 
             start = kwargs.pop('start', -0.5)
+            plane = kwargs.pop('plane', True)
             # coil_distance = kwargs.pop('coil_distance', square_element.width/10)
 
             if self.b is None or self.setup_changed:
-                self.x_range = np.arange(start, square_element.length + self.increment, self.increment)
-                self.y_range = np.arange(- zoom_factor * square_element.width - self.increment/2,
-                                         zoom_factor * square_element.width + self.increment/2,
-                                         self.increment)
-                self.z_range = np.arange(- zoom_factor * square_element.height - self.increment/2,
-                                         zoom_factor * square_element.height + self.increment/2,
-                                         self.increment)
+                if plane == 'yz':
+                    self.x_range = np.arange(1)
+                else:
+                    self.x_range = np.arange(start, square_element.length + self.increment, self.increment)
+
+                if plane == 'xz':
+                    self.y_range = np.arange(1)
+                else:
+                    self.y_range = np.arange(- zoom_factor * square_element.width - self.increment/2,
+                                             zoom_factor * square_element.width + self.increment/2,
+                                             self.increment)
+
+                if plane == 'xy':
+                    self.z_range = np.arange(1)
+                else:
+                    self.z_range = np.arange(- zoom_factor * square_element.height - self.increment/2,
+                                             zoom_factor * square_element.height + self.increment/2,
+                                             self.increment)
 
                 # print(self.x_range, self.y_range, self.z_range)
                 args = list(itertools.product(self.x_range, self.y_range, self.z_range))
@@ -130,10 +143,25 @@ class Setup:
             start = kwargs.pop('start', 0)
             end = kwargs.pop('end', 0)
             rho = kwargs.pop('rho', 0)
+            plane = kwargs.pop('plane', True)
 
-            self.x_range = np.arange(start, end - start, self.increment)
-            self.y_range = np.arange(- rho, rho, self.increment)
-            self.z_range = np.arange(- rho, rho, self.increment)
+            resolution_factor = 1.125
+            compute_range = resolution_factor * rho
+
+            if plane == 'yz':
+                self.x_range = np.arange(1)
+            else:
+                self.x_range = np.arange(start, end - start, self.increment)
+
+            if plane == 'xz':
+                self.y_range = np.arange(1)
+            else:
+                self.y_range = np.arange(- compute_range, compute_range, self.increment)
+
+            if plane == 'xy':
+                self.z_range = np.arange(1)
+            else:
+                self.z_range = np.arange(- compute_range, compute_range, self.increment)
 
             args = list(itertools.product(self.x_range, self.y_range, self.z_range))
 
@@ -203,23 +231,21 @@ class Setup:
     #     return sum(y_values)*self.increment
 
     def plot_1d_abs(self):
-        x_values, y_values, z_values = self.get_coordinates()
 
-        # x_index_start = np.where(self.x_range == self._find_nearest(self.x_range, self.start))
-        # x_index_end = np.where(self.x_range == self._find_nearest(self.x_range, self.end))
-        #
-        # x_values = self.x_range[int(x_index_start[0]):int(x_index_end[0]) + 1]
+        # if self.rho != 0:
+        #     y_values = [[[np.linalg.norm(self.get_b_abs((x, y, z))) for x in self.x_range] for y in self.y_range] for z in self.z_range][0][0]
+        # else:
+        #     try:
+        #         y_values = [self.b[(x, 0, 0)][0] for x in self.x_range]
+        #     except KeyError:
+        #         # Todo: How to plot b field for non-zero y and z values?
+        #         y_values = None
 
-        if self.rho != 0:
-            y_values = [[[np.linalg.norm(self.get_b_abs((x, y, z))) for x in x_values] for y in y_values] for z in z_values][0][0]
-        else:
-            try:
-                y_values = [self.b[(x, 0, 0)][0] for x in x_values]
-            except KeyError:
-                # Todo: How to plot b field for non-zero y and z values?
-                y_values = None
+        y_values = [[[np.linalg.norm(self.get_b_abs((x, y, z))) for x in self.x_range] for y in self.y_range] for z in
+                    self.z_range][0][0]
 
-        # print(self.b)
+        print(self.x_range)
+        print(y_values)
 
         plt.plot(self.x_range, y_values)
         plt.show()
@@ -248,11 +274,7 @@ class Setup:
             component = None
             idx = None
 
-        print(component, idx)
-        print(self.b)
         b = np.array([[[self.b[(x, y, z)][component] for z in self.z_range] for y in self.y_range] for x in self.x_range])
-        print(b.shape)
-        print(b)
 
         if component == 0:
             return b[idx]

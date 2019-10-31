@@ -13,7 +13,7 @@ import mpmath
 import numpy as np
 
 from setup_elements.physics_constants import MU_0
-from setup_elements.helper_functions import transform_cylindrical_to_cartesian, get_phi
+from setup_elements.helper_functions import transform_cylindrical_to_cartesian, get_phi, adjust_field
 
 
 class BaseCoil:
@@ -249,37 +249,49 @@ class SquareCoil(BaseCoil):
         self.prefactor *= 1e0 / (4 * np.pi) * self.n * self.current / self.length
 
     def check_physical_coil_overlap(self):
+        """Deal with divison by 0.
+
+        If the magnetic field has to be numerically computed at the position of the coil, this implies a division by
+        0 leading to numerical errors. This function is used to handle such cases by setting the magnetic field to 0.
+        """
         # print(self.x, self.y, self.z, self.width, self.height)
         numerical_error_acceptance = min(self.width, self.height) * 1e-4
         if abs(self.y - self.width) < numerical_error_acceptance \
                 or abs(self.z - self.height) < numerical_error_acceptance:
-            return True
+            return np.array([0, 0, 0])
         if abs(self.y + self.width) < numerical_error_acceptance \
                 or abs(self.z + self.height) < numerical_error_acceptance:
-            return True
+            return np.array([0, 0, 0])
 
-    def b_field(self, x, rho, theta, coordinate_system='cartesian'):
+    def b_field(self, x, y, z, coordinate_system='cartesian'):
         """Compute the magnetic field.
 
-        Parameters
-        ----------
-        position in cylindrical coordinates
+        Note that the x and z components are reversed.
+
 
         Returns
         -------
         magnetic field in cartesian coordinates
         """
         if coordinate_system == 'cartesian':
-            self.x, self.y, self.z = x, rho, theta
+            # Note that the xz coordinates are reversed.
+            self.z, self.y, self.x = x, y, z
         else:
-            self.x, self.y, self.z = transform_cylindrical_to_cartesian(x, rho, theta)
+            # self.x, self.y, self.z = transform_cylindrical_to_cartesian(x, y, z)
+            pass
 
-        if self.check_physical_coil_overlap():
-            return np.array([0, 0, 0])
+        field = self.check_physical_coil_overlap()
+        if field:
+            return field
 
-        self.x -= self.coil_mid_pos
+        self.z -= self.coil_mid_pos
 
         field = self.prefactor * np.array([self.sum_element_x, self.sum_element_y, self.sum_element_z])
+
+        field = adjust_field(field)
+
+        if field[1] != 0 or field[2] != 0:
+            print(f'Bfield {field} at Position ({self.x}, {self.y}, {self.z})')
 
         return self.sanitize_output(field)
 
@@ -316,8 +328,8 @@ class SquareCoil(BaseCoil):
     #     return  self.eta_z
 
     @property
-    def sum_element_x(self):
-        """Compute the summation for the x direction.
+    def sum_element_z(self):
+        """Compute the summation for the z direction.
 
         Returns
         -------
@@ -325,6 +337,7 @@ class SquareCoil(BaseCoil):
         """
         _eta = 0
         for alpha in np.arange(1, 5):
+            # Python indexing starts from 0, so whenever alpha is used as an array index it has to be subtracted by 1
             alpha_index = alpha - 1
 
             t1 = ((-1) ** alpha) * self.d[alpha_index] / \
@@ -353,8 +366,8 @@ class SquareCoil(BaseCoil):
         return _eta
 
     @property
-    def sum_element_z(self):
-        """Compute the summation for the z direction.
+    def sum_element_x(self):
+        """Compute the summation for the x direction.
 
         Returns
         -------
@@ -371,25 +384,25 @@ class SquareCoil(BaseCoil):
 
     @property
     def c(self):
-        return np.array([self.height + self.z,
-                         self.height - self.z,
-                         -self.height + self.z,
-                         -self.height - self.z])
+        return np.array([self.height + self.x,
+                         self.height - self.x,
+                         -self.height + self.x,
+                         -self.height - self.x])
 
     @property
     def d(self):
-        return np.array([self.width + self.y,
-                         self.width + self.y,
+        return np.array([self.y + self.width,
+                         self.y + self.width,
                          self.y - self.width,
                          self.y - self.width])
 
     @property
     def r_values(self):
         return np.array([
-            np.sqrt((self.width + self.y) ** 2 + (self.height + self.z) ** 2 + self.x ** 2),
-            np.sqrt((self.width - self.y) ** 2 + (self.height + self.z) ** 2 + self.x ** 2),
-            np.sqrt((self.width - self.y) ** 2 + (self.height - self.z) ** 2 + self.x ** 2),
-            np.sqrt((self.width + self.y) ** 2 + (self.height - self.z) ** 2 + self.x ** 2)]
+            np.sqrt((self.width + self.y) ** 2 + (self.height + self.x) ** 2 + self.z ** 2),
+            np.sqrt((self.width + self.y) ** 2 + (self.height - self.x) ** 2 + self.z ** 2),
+            np.sqrt((self.width - self.y) ** 2 + (self.height - self.x) ** 2 + self.z ** 2),
+            np.sqrt((self.width - self.y) ** 2 + (self.height + self.x) ** 2 + self.z ** 2)]
         )
 
 
