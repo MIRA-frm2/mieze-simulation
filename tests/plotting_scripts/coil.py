@@ -6,14 +6,14 @@ def main():
     coil_type = 'simple'
     plane = 'yz'
 
-    setup = Setup(increment=0.05, coil_type=coil_type)
+    setup = Setup(increment=0.05)
 
     if coil_type == 'simple':
         coil_kwargs = {}
-        b_field_kwargs = {'coordinate_system': 'cylindrical', 'plane': plane, 'rho': 0.25, 'start': -0.25, 'end': 1.5}
+        b_field_kwargs = {'coordinate_system': 'cylindrical', 'coil_type':coil_type, 'plane': plane, 'rho': 0.25, 'start': -0.25, 'end': 1.5}
     elif coil_type == 'square':
         coil_kwargs = {'r': 0.2, 'length': 0.35}
-        b_field_kwargs = {'coordinate_system': 'cartesian', 'start': -0.25, 'plane': plane}
+        b_field_kwargs = {'coordinate_system': 'cartesian', 'coil_type': coil_type, 'start': -0.25, 'plane': plane}
 
     else:
         coil_kwargs = None
@@ -26,7 +26,7 @@ def main():
     save_data_to_file(setup.b, '../../data/data')
 
     # setup.plot_1d_abs()
-    setup.plot_2d_map(plane=plane)
+    setup.plot_field_2d_abs(plane=plane)
 
 
 if __name__ == "__main__":

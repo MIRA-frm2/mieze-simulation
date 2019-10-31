@@ -13,7 +13,7 @@ import mpmath
 import numpy as np
 
 from utils.physics_constants import MU_0
-from utils.helper_functions import transform_cylindrical_to_cartesian, get_phi, adjust_field
+from utils.helper_functions import get_phi, adjust_field
 
 
 class BaseCoil:
@@ -223,6 +223,116 @@ class Coil(BaseCoil):
         return field
 
 
+class RealCoil(BaseCoil):
+    """Class that implements a coil with more realistic experimental parameters."""
+    MU_0 = 4e-7 * np.pi
+
+    # oc = Oct2Py()
+    def create_coil(self, coil_mid_pos=0, length=0.1, windings=100, current=10, r=0.05, wire_d=0.006, angle_y=0,
+                    angle_z=0):
+        """Simulate physical geometry of the coil."""
+        self.coil_mid_pos = coil_mid_pos
+        self.length = length
+        self.n = windings
+        self.windings_x = round(length / wire_d)
+        self.windings_y = windings / self.windings_x
+        self.r = r
+        self.current = current
+        self.wire_d = wire_d
+        self.angle_y = angle_y
+        self.angle_z = angle_z
+
+        self.prefactor *= 1e4 / (2 * np.pi) * self.n * self.current / self.length
+
+    def b_field_rho(self, x, r, axis_point):
+        """Compute the magnetic field in rho (radial) direction.
+
+
+        Parameters
+        ----------
+        x: float
+            Value on the x axis, along the coil.
+        r: float
+            Radius value.
+        axis_point: float
+            Value on the y or z axis.
+        """
+        x -= self.coil_mid_pos
+        if axis_point == 0:
+            return 0
+
+        if r:
+            # ToDo: is the radius really not playing a role?
+            pass
+
+        rho = abs(axis_point)
+
+        return self.prefactor * (self.sum_element_rho(rho, x, s=1) - self.sum_element_rho(rho, x, s=-1))
+
+    def sum_element_rho(self, rho, x, s):
+        """Compute the summation for the rho direction."""
+        return self.beta(rho, x, s) \
+            / rho * ((2 - self.m(rho, x, s)) * self._k(self.m(rho, x, s)) - 2 * self._e(self.m(rho, x, s)))
+
+    def b_field_x(self, x, r, rho=0):
+        """Compute the magnetic field in the x direction.
+
+        # N = turns of winding, I = current (A), R = radius (m), l = length (m)
+        # x für mich y
+
+        """
+        x -= self.coil_mid_pos
+
+        rho = abs(rho)  # symmetric
+
+        n = 4.0 * r * rho / (rho + r) ** 2
+
+        return self.prefactor * (-self.sum_element_x(n, rho, x, s=-1) + self.sum_element_x(n, rho, x, s=1))
+
+    def sum_element_x(self, n, rho, x, s):
+        """Compute the summation for the x direction.
+
+        Parameters
+        ----------
+        n: int
+            Winding number
+        rho: float
+            Radius value.
+        x: float
+            Position on the x axis along the coil.
+        s: [-1, 1]
+            Boundary values for hte elliptical functions
+        """
+        return self.zeta(x, s) / self.beta(rho, x, s) \
+            * ((rho - self.r) / (rho + self.r) * self._p(n, self.m(rho, x, s)) - self._k(self.m(rho, x, s)))
+
+    def b_field(self, x, y, z):
+        """Compute the magnetic field given the position."""
+        field = np.array((0., 0., 0.))
+        r = np.sqrt(y ** 2 + z ** 2)
+
+        # self.pbar.update(1)
+        x_positions = np.arange(-(self.windings_x * self.wire_d / 2 - self.wire_d / 2),
+                                self.windings_x * self.wire_d / 2, self.wire_d)
+        # print(len(x_positions))
+        rs = np.arange(self.r, self.r + self.wire_d * (self.windings_y - 0.5), self.wire_d)
+        # print(len(rs))
+        for x0 in x_positions:
+            for R in rs:
+                field_add = np.array((self.b_field_x(x + x0, R, r),
+                                      self.b_field_rho(x + x0, R, y),
+                                      self.b_field_rho(x + x0, R, z)))
+                field = np.add(field, field_add, out=field)
+
+        if self.angle_y != 0:
+            field = self._rotate(field, self.angle_y, np.array([0, 1, 0]))
+
+        if self.angle_z != 0:
+            field = self._rotate(field, self.angle_z, np.array([0, 0, 1]))
+
+        return field
+
+
 class SquareCoil(BaseCoil):
     """Class that implements a square coil.
 
@@ -404,113 +514,3 @@ class SquareCoil(BaseCoil):
             np.sqrt((self.width - self.y) ** 2 + (self.height - self.x) ** 2 + self.z ** 2),
             np.sqrt((self.width - self.y) ** 2 + (self.height + self.x) ** 2 + self.z ** 2)]
         )
-
-
-class RealCoil(BaseCoil):
-    """Class that implements a coil with more realistic experimental parameters."""
-    MU_0 = 4e-7 * np.pi
-
-    # oc = Oct2Py()
-    def create_coil(self, coil_mid_pos=0, length=0.1, windings=100, current=10, r=0.05, wire_d=0.006, angle_y=0,
-                    angle_z=0):
-        """Simulate physical geometry of the coil."""
-        self.coil_mid_pos = coil_mid_pos
-        self.length = length
-        self.n = windings
-        self.windings_x = round(length / wire_d)
-        self.windings_y = windings / self.windings_x
-        self.r = r
-        self.current = current
-        self.wire_d = wire_d
-        self.angle_y = angle_y
-        self.angle_z = angle_z
-
-        self.prefactor *= 1e4 / (2 * np.pi) * self.n * self.current / self.length
-
-    def b_field_rho(self, x, r, axis_point):
-        """Compute the magnetic field in rho (radial) direction.
-
-
-        Parameters
-        ----------
-        x: float
-            Value on the x axis, along the coil.
-        r: float
-            Radius value.
-        axis_point: float
-            Value on the y or z axis.
-        """
-        x -= self.coil_mid_pos
-        if axis_point == 0:
-            return 0
-
-        if r:
-            # ToDo: is the radius really not playing a role?
-            pass
-
-        rho = abs(axis_point)
-
-        return self.prefactor * (self.sum_element_rho(rho, x, s=1) - self.sum_element_rho(rho, x, s=-1))
-
-    def sum_element_rho(self, rho, x, s):
-        """Compute the summation for the rho direction."""
-        return self.beta(rho, x, s) \
-            / rho * ((2 - self.m(rho, x, s)) * self._k(self.m(rho, x, s)) - 2 * self._e(self.m(rho, x, s)))
-
-    def b_field_x(self, x, r, rho=0):
-        """Compute the magnetic field in the x direction.
-
-        # N = turns of winding, I = current (A), R = radius (m), l = length (m)
-        # x für mich y
-
-        """
-        x -= self.coil_mid_pos
-
-        rho = abs(rho)  # symmetric
-
-        n = 4.0 * r * rho / (rho + r) ** 2
-
-        return self.prefactor * (-self.sum_element_x(n, rho, x, s=-1) + self.sum_element_x(n, rho, x, s=1))
-
-    def sum_element_x(self, n, rho, x, s):
-        """Compute the summation for the x direction.
-
-        Parameters
-        ----------
-        n: int
-            Winding number
-        rho: float
-            Radius value.
-        x: float
-            Position on the x axis along the coil.
-        s: [-1, 1]
-            Boundary values for hte elliptical functions
-        """
-        return self.zeta(x, s) / self.beta(rho, x, s) \
-            * ((rho - self.r) / (rho + self.r) * self._p(n, self.m(rho, x, s)) - self._k(self.m(rho, x, s)))
-
-    def b_field(self, x, y, z):
-        """Compute the magnetic field given the position."""
-        field = np.array((0., 0., 0.))
-        r = np.sqrt(y ** 2 + z ** 2)
-
-        # self.pbar.update(1)
-        x_positions = np.arange(-(self.windings_x * self.wire_d / 2 - self.wire_d / 2),
-                                self.windings_x * self.wire_d / 2, self.wire_d)
-        # print(len(x_positions))
-        rs = np.arange(self.r, self.r + self.wire_d * (self.windings_y - 0.5), self.wire_d)
-        # print(len(rs))
-        for x0 in x_positions:
-            for R in rs:
-                field_add = np.array((self.b_field_x(x + x0, R, r),
-                                      self.b_field_rho(x + x0, R, y),
-                                      self.b_field_rho(x + x0, R, z)))
-                field = np.add(field, field_add, out=field)
-
-        if self.angle_y != 0:
-            field = self._rotate(field, self.angle_y, np.array([0, 1, 0]))
-
-        if self.angle_z != 0:
-            field = self._rotate(field, self.angle_z, np.array([0, 0, 1]))
-
-        return field

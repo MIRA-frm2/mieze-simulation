@@ -8,7 +8,7 @@ def main():
     rho = 0.02
     start = -0.25
     end = Experiment.sample_distance
-    Experiment.MIEZE_setup.calculate_b_field(start, end, rho=rho)
+    Experiment.calculate_b_field(start, end, rho=rho)
 
     # Experiment.plot_field_1d_abs()
     Experiment.plot_field_2d_abs()

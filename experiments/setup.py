@@ -22,31 +22,33 @@ from utils.helper_functions import read_data_from_file
 
 class Setup:
     """Class that simulates a physical setup."""
-    def __init__(self, increment, coil_type='simple'):
+    def __init__(self, increment):
         self.elements = []
         self.b = None
         self.b_cartesian = None
 
         self.setup_changed = False
+
+        # Computational discretized space
         self.x_range = None
         self.y_range = None
         self.z_range = None
-        self.current = None
-        self.increment = increment
-        self.coil_type = coil_type
 
         self.start = None
         self.end = None
         self.rho = None
 
-    def create_coil(self, coil_mid_pos=0, length=0.1, windings=1000, current=10,  r=0.05, wire_d=0.006, angle_y=0,
-                    angle_z=0):
+        self.current = None
+        self.increment = increment
+
+    def create_coil(self, coil_type='simple', coil_mid_pos=0, length=0.1, windings=1000, current=10,  r=0.05,
+                    wire_d=0.006, angle_y=0, angle_z=0):
         """Create the physical geometry of the coils."""
-        if self.coil_type == 'simple':
+        if coil_type == 'simple':
             element = Coil()
-        elif self.coil_type == 'square':
+        elif coil_type == 'square':
             element = SquareCoil()
-        elif self.coil_type == 'real':
+        elif coil_type == 'real':
             element = RealCoil()
         else:
             raise Exception('Coil type not recognized.')
@@ -177,7 +179,8 @@ class Setup:
                 self.b = dict(zip(args, result))
                 print(self.b)
 
-            # if meshsize[0]-1 > max(self.x_range) or meshsize[1]-1 > max(self.y_range) or meshsize[2]-1 > max(self.z_range):
+            # if meshsize[0]-1 > max(self.x_range) or meshsize[1]-1 > max(self.y_range)
+            # or meshsize[2]-1 > max(self.z_range):
             #
             #     self.x_range = np.arange(zero, meshsize[0] + zero, self.increment)
             #     self.y_range = np.arange(-meshsize[1], meshsize[1], self.increment)
@@ -233,7 +236,8 @@ class Setup:
     def plot_1d_abs(self):
 
         # if self.rho != 0:
-        #     y_values = [[[np.linalg.norm(self.get_b_abs((x, y, z))) for x in self.x_range] for y in self.y_range] for z in self.z_range][0][0]
+        #     y_values = [[[np.linalg.norm(self.get_b_abs((x, y, z))) for x in self.x_range] for y in self.y_range]
+        #     for z in self.z_range][0][0]
         # else:
         #     try:
         #         y_values = [self.b[(x, 0, 0)][0] for x in self.x_range]
@@ -250,7 +254,7 @@ class Setup:
         plt.plot(self.x_range, y_values)
         plt.show()
 
-    def plot_2d_map(self, plane):
+    def plot_field_2d_abs(self, plane):
         b, extent = self.get_plot_data(plane)
 
         plt.imshow(b, aspect='auto', cmap=cm.magma, extent=extent)
@@ -274,7 +278,8 @@ class Setup:
             component = None
             idx = None
 
-        b = np.array([[[self.b[(x, y, z)][component] for z in self.z_range] for y in self.y_range] for x in self.x_range])
+        b = np.array([[[self.b[(x, y, z)][component] for z in self.z_range]
+                       for y in self.y_range] for x in self.x_range])
 
         if component == 0:
             return b[idx]

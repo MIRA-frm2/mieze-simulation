@@ -11,10 +11,11 @@
 from experiments.setup import Setup
 
 
-class Mieze:
-
+class Mieze(Setup):
     def __init__(self, sample_distance, coils_dinstance, detector_distance, increment=0.001):
-        self.MIEZE_setup = Setup(increment, coil_type='square')
+
+        super(Mieze, self).__init__(increment=increment)
+
         self.sample_distance = sample_distance
         self.detector_distance = detector_distance
         self.coil_distance = coils_dinstance
@@ -27,10 +28,10 @@ class Mieze:
         r_in = 0.177 / 2.
         r_out = 0.13
 
-        self.MIEZE_setup.create_coil(first_coil_pos, length=l_out, windings=n_out, current=-current, r=r_out)
-        self.MIEZE_setup.create_coil(first_coil_pos + 0.073, length=l_in, windings=n_in, current=current, r=r_in)
-        self.MIEZE_setup.create_coil(first_coil_pos + 0.187, length=l_in, windings=n_in, current=current, r=r_in)
-        self.MIEZE_setup.create_coil(first_coil_pos + 0.26, length=l_out, windings=n_out, current=-current, r=r_out)
+        self.create_coil(first_coil_pos, length=l_out, windings=n_out, current=-current, r=r_out)
+        self.create_coil(first_coil_pos + 0.073, length=l_in, windings=n_in, current=current, r=r_in)
+        self.create_coil(first_coil_pos + 0.187, length=l_in, windings=n_in, current=current, r=r_in)
+        self.create_coil(first_coil_pos + 0.26, length=l_out, windings=n_out, current=-current, r=r_out)
 
     def create_mieze(self, current, l1=None, l2=None):
         if not l1:
@@ -44,9 +45,3 @@ class Mieze:
 
         self._create_coil_set(current=i1)
         self._create_coil_set(current=i2, first_coil_pos=l1)
-
-    def plot_field_1d_abs(self):
-        self.MIEZE_setup.plot_1d_abs()
-
-    def plot_field_2d_abs(self):
-        self.MIEZE_setup.plot_2d_map()
