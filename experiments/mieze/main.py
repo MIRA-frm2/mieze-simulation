@@ -20,6 +20,8 @@ class Mieze(Setup):
         self.detector_distance = detector_distance
         self.coil_distance = coils_dinstance
 
+        self.coil_type = 'simple'
+
     def _create_coil_set(self, first_coil_pos=0, current=5):
         l_in = 0.086
         l_out = 0.05
@@ -28,10 +30,10 @@ class Mieze(Setup):
         r_in = 0.177 / 2.
         r_out = 0.13
 
-        self.create_coil(first_coil_pos, length=l_out, windings=n_out, current=-current, r=r_out)
-        self.create_coil(first_coil_pos + 0.073, length=l_in, windings=n_in, current=current, r=r_in)
-        self.create_coil(first_coil_pos + 0.187, length=l_in, windings=n_in, current=current, r=r_in)
-        self.create_coil(first_coil_pos + 0.26, length=l_out, windings=n_out, current=-current, r=r_out)
+        self.create_coil(coil_type=self.coil_type, coil_mid_pos=first_coil_pos, length=l_out, windings=n_out, current=-current, r=r_out)
+        self.create_coil(coil_type=self.coil_type, coil_mid_pos=first_coil_pos + 0.073, length=l_in, windings=n_in, current=current, r=r_in)
+        self.create_coil(coil_type=self.coil_type, coil_mid_pos=first_coil_pos + 0.187, length=l_in, windings=n_in, current=current, r=r_in)
+        self.create_coil(coil_type=self.coil_type, coil_mid_pos=first_coil_pos + 0.26, length=l_out, windings=n_out, current=-current, r=r_out)
 
     def create_mieze(self, current, l1=None, l2=None):
         if not l1:

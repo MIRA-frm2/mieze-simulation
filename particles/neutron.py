@@ -13,7 +13,7 @@ cwd = os.getcwd()
 
 
 class Neutrons:
-    """Implements netrons and its properties."""
+    """Implements neutrons and its properties."""
 
     def __init__(self, number_of_neutrons, velocity = 3956/4.5, incrementsize=0.001, totalflightlength=3, beamsize=0.02):
         self.neutrons = []
@@ -34,12 +34,14 @@ class Neutrons:
         
             self.neutrons.append(neutron)
 
-    def save_obj(self, obj, name ):
-        with open('obj/'+ name + '.pkl', 'wb') as f:
+    @staticmethod
+    def save_obj(obj, name):
+        with open(f'obj/{name}.pkl', 'wb') as f:
             pickle.dump(obj, f, pickle.HIGHEST_PROTOCOL)
 
-    def load_obj(self, name ):
-        with open('obj/' + name + '.pkl', 'rb') as f:
+    @staticmethod
+    def load_obj(name):
+        with open(f'obj/{name}.pkl', 'rb') as f:
             return pickle.load(f)
 
     def _timeInField(self, velocity):
@@ -95,18 +97,24 @@ class Neutrons:
     
     def simulate_neutrons(self):
         toberemoved = []
-        
-        Bmap = self.load_obj('B_map')
+
+        try:
+            Bmap = self.load_obj('B_map')
+        except FileNotFoundError:
+            # ToDo: Compute new B field map
+            pass
+
         for neutron in self.neutrons:
             #check if it is in the calculated beamprofile (y,z plane)
             if not (0,neutron['beampositiony'], neutron['beampositionz']) in Bmap:
                 toberemoved.append(neutron)
                 continue
-            
+
             for ii in range(round(self.totalflightlength/self.incrementsize)):
                 i = round(ii*self.incrementsize, ndigits=3)
                 neutron['polarisation'] = self._polarisationChange(neutron, Bmap[(i,neutron['beampositiony'], neutron['beampositionz'])], self.incrementsize)
-                
+
+
         for neutron in toberemoved:
             self.neutrons.remove(neutron)
                 

@@ -1,6 +1,6 @@
-from positions import Positions
+from experiments.mieze.parameters import polarizer_position
 import numpy as np
-#from scipy.optimize import curve_fit
+# from scipy.optimize import curve_fit
 
 
 class polariser:
@@ -8,21 +8,21 @@ class polariser:
 
     def __init__(self):
         pass
-    c = 0.05 #shift polarisator position
-    m = np.array((0, 90, 0)) # magnetic dipol moment Polarisator; both obtained by real measurements and data analysis
+    c = 0.05  # shift polarisator position
+    m = np.array((0, 90, 0))  # magnetic dipol moment Polarisator; both obtained by real measurements and data analysis
 
 
     @classmethod
-    def B_field(cls, x, y, z, zero=Positions.get_position_polariser()):
-        x -=  zero
-        r_vec = np.array((x+cls.c,y,z))
+    def B_field(cls, x, y, z, zero=polarizer_position):
+        x -= zero
+        r_vec = np.array((x+cls.c, y, z))
         r = np.linalg.norm(r_vec)
         B = (cls.MU_0/(4*np.pi*r**2))*((3*r_vec*np.linalg.norm(cls.m*r_vec) - cls.m*r**2) / r**3)
-        #print()
-        #B = cls.MU_0/(4*np.pi*(r+cls.c)**3)*cls.m
-        #B = (1e-7)*cls.m/(x+cls.c)**3
+        # print()
+        # B = cls.MU_0/(4*np.pi*(r+cls.c)**3)*cls.m
+        # B = (1e-7)*cls.m/(x+cls.c)**3
         return B*1e4
-        #return 1e3*(cls.MU_0/4*np.pi)*cls.m / (x+cls.c)**3
+        # return 1e3*(cls.MU_0/4*np.pi)*cls.m / (x+cls.c)**3
 
 
 # =============================================================================

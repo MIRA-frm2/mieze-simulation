@@ -44,6 +44,7 @@ class Setup:
     def create_coil(self, coil_type='simple', coil_mid_pos=0, length=0.1, windings=1000, current=10,  r=0.05,
                     wire_d=0.006, angle_y=0, angle_z=0):
         """Create the physical geometry of the coils."""
+        # print(f'Coil type is: {coil_type}')
         if coil_type == 'simple':
             element = Coil()
         elif coil_type == 'square':
@@ -233,7 +234,7 @@ class Setup:
     #
     #     return sum(y_values)*self.increment
 
-    def plot_1d_abs(self):
+    def plot_field_1d_abs(self):
 
         # if self.rho != 0:
         #     y_values = [[[np.linalg.norm(self.get_b_abs((x, y, z))) for x in self.x_range] for y in self.y_range]

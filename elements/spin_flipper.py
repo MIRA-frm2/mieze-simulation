@@ -1,14 +1,16 @@
 import numpy as np
-from positions import Positions
+from experiments.mieze.parameters import SpinFlipper_position
 
-class Spin_Flipper:
-    MU_0 = 4e-7 * np.pi #N/A, vacuum permeability
+
+class SpinFlipper:
+    MU_0 = 4e-7 * np.pi  # N/A, vacuum permeability
     N = 100
-    LENGTH = 13e-2 #m, winding length of the coil
-    THICKNESS = 1e-2 #m, thickness of the coil
-    def __init__(self):
-        pass
-    
+    LENGTH = 13e-2  # m, winding length of the coil
+    THICKNESS = 1e-2  # m, thickness of the coil
+
+    def __init__(self, position):
+        self.position = position
+
     @classmethod
     def _sf_th(cls, current, position):
         x0 = cls.LENGTH / 2.0
