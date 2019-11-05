@@ -8,44 +8,52 @@
 
 """An implementation of the Spin Flipper."""
 
-import numpy as np
-# from experiments.mieze.parameters import SpinFlipper_position
+from experiments.mieze.parameters import SpinFlipper_position1, SpinFlipper_position2
+from numpy import arctan
+
+from elements.base import BasicElement
+
+from utils.physics_constants import MU_0, pi
 
 
-class SpinFlipper:
-    MU_0 = 4e-7 * np.pi  # N/A, vacuum permeability
-    N = 100
-    LENGTH = 13e-2  # m, winding length of the coil
-    THICKNESS = 1e-2  # m, thickness of the coil
+class SpinFlipper(BasicElement):
 
-    def __init__(self, position):
-        self.position = position
+    def __init__(self):
+        super(SpinFlipper, self).__init__()
 
-    @classmethod
-    def _sf_th(cls, current, position):
-        x0 = cls.LENGTH / 2.0
-        n = cls.N / cls.LENGTH
+        self.windings = None
+        self.length = None
+        self.thickness = None
+        self.current = None
 
-        B_eff = n * cls.MU_0 * current / np.pi * np.arctan(x0 / position)
-        return B_eff
+    def create_element(self, position=None, *args, **kwargs):
+        self.windings = kwargs.get('windings', 100)
+        self.length = kwargs.get('length', 13e-2)  # [m], winding length of the coil
+        self.thickness = kwargs.get('thickness', 1e-2)  # [m], thickness of the coil
+        self.current = kwargs.get('current', 1.0)  # [A], coil currents
+
+    def _sf_th(self, current, position):
+        x0 = self.length / 2.0
+        n = self.windings / self.length
+
+        b_eff = n * MU_0 * current / pi * arctan(x0 / position)
+        return b_eff
     
-    @classmethod
-    def sf(cls, sf_name:str, current:float, z_position):
+    def sf(self, sf_name: str, z_position):
     
         if sf_name == 'sf1':
-            zero = Positions.get_position_sf1()
+            zero = SpinFlipper_position1
         elif sf_name == 'sf2':
-            zero = Positions.get_position_sf2()
+            zero = SpinFlipper_position2
         else:
             raise RuntimeError('Wrong name for sf given.')
 
         y = z_position - zero
 
-        B1 = cls._sf_th(current, y + cls.THICKNESS / 2.0)
-        B2 = -cls._sf_th(current, y - cls.THICKNESS / 2.0)
-        return (B1 + B2) * 1e4
+        b1 = self._sf_th(self.current, y + self.thickness / 2.0)
+        b2 = -self._sf_th(self.current, y - self.thickness / 2.0)
+        return (b1 + b2) * 1e4
 
-
-
-        
-
+    def b_field(self, x, y, z):
+        # ToDo: refactor sf methods into b_field
+        raise NotImplementedError

@@ -12,5 +12,8 @@ step = 0.001  # absolute_y_position[1] - absolute_y_position[0] #m
 
 polarizer_position = 0
 HelmholtzSpinFlipper_position_HSF1 = 0
-SpinFlipper_position = 0
+
+# SpinFlipper positions
+SpinFlipper_position1 = 0
+SpinFlipper_position2 = 0
 
