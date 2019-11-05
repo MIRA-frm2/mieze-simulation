@@ -17,3 +17,18 @@ HelmholtzSpinFlipper_position_HSF1 = 0
 SpinFlipper_position1 = 0
 SpinFlipper_position2 = 0
 
+# MIEZE coil set values
+L_IN = 0.086
+L_OUT = 0.05
+N_IN = 168
+N_OUT = 48
+R_IN = 0.177 / 2.
+R_OUT = 0.13
+
+DISTANCE_2ND_COIL = 0.073
+DISTANCE_3RD_COIL = 0.187
+DISTANCE_4TH_COIL = 0.260
+
+# Square coil Parameters
+SQUARE_COIL_POSITION_1ST = 0
+SQUARE_COIL_POSITION_2ND = 0

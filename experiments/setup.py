@@ -40,8 +40,11 @@ class Setup:
         self.current = None
         self.increment = increment
 
+    def create_setup(self, current, l1=None, l2=None):
+        raise NotImplementedError
+
     def create_element(self, coil_type='simple', coil_mid_pos=0, length=0.1, windings=1000, current=10,  r=0.05,
-                    wire_d=0.006, angle_y=0, angle_z=0):
+                       wire_d=0.006, angle_y=0, angle_z=0):
         """Create the physical geometry of the coils."""
         # print(f'Coil type is: {coil_type}')
         if coil_type == 'simple':

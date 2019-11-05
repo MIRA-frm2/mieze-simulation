@@ -397,8 +397,8 @@ class SquareCoil(BaseCoil):
 
         field = adjust_field(field)
 
-        if field[1] != 0 or field[2] != 0:
-            print(f'Bfield {field} at Position ({self.x}, {self.y}, {self.z})')
+        # if field[1] != 0 or field[2] != 0:
+        #     print(f'Bfield {field} at Position ({self.x}, {self.y}, {self.z})')
 
         return self.sanitize_output(field)
 

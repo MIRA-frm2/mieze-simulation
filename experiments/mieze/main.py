@@ -9,41 +9,46 @@
 """An implementation of the MIEZE setup."""
 
 from experiments.setup import Setup
+from experiments.mieze.parameters import (DISTANCE_2ND_COIL, DISTANCE_3RD_COIL, DISTANCE_4TH_COIL,
+                                          L_IN, L_OUT, N_IN, N_OUT, R_IN, R_OUT,
+                                          SQUARE_COIL_POSITION_1ST, SQUARE_COIL_POSITION_2ND)
 
 
 class Mieze(Setup):
-    def __init__(self, sample_distance, coils_dinstance, detector_distance, increment=0.001):
+    def __init__(self, sample_distance, coil_distance, detector_distance, increment=0.001):
 
         super(Mieze, self).__init__(increment=increment)
 
         self.sample_distance = sample_distance
         self.detector_distance = detector_distance
-        self.coil_distance = coils_dinstance
+        self.coil_distance = coil_distance
 
         self.coil_type = 'simple'
 
     def _create_coil_set(self, first_coil_pos=0, current=5):
-        l_in = 0.086
-        l_out = 0.05
-        n_in = 168
-        n_out = 48
-        r_in = 0.177 / 2.
-        r_out = 0.13
+        """Crate the magnetic coil sets."""
+        self.create_element(coil_type=self.coil_type, coil_mid_pos=first_coil_pos, length=L_OUT,
+                            windings=N_OUT, current=-current, r=R_OUT)
+        self.create_element(coil_type=self.coil_type, coil_mid_pos=first_coil_pos + DISTANCE_2ND_COIL,
+                            length=L_IN, windings=N_IN, current=current, r=R_IN)
+        self.create_element(coil_type=self.coil_type, coil_mid_pos=first_coil_pos + DISTANCE_3RD_COIL,
+                            length=L_IN, windings=N_IN, current=current, r=R_IN)
+        self.create_element(coil_type=self.coil_type, coil_mid_pos=first_coil_pos + DISTANCE_4TH_COIL,
+                            length=L_OUT, windings=N_OUT, current=-current, r=R_OUT)
 
-        self.create_element(coil_type=self.coil_type, coil_mid_pos=first_coil_pos, length=l_out, windings=n_out, current=-current, r=r_out)
-        self.create_element(coil_type=self.coil_type, coil_mid_pos=first_coil_pos + 0.073, length=l_in, windings=n_in, current=current, r=r_in)
-        self.create_element(coil_type=self.coil_type, coil_mid_pos=first_coil_pos + 0.187, length=l_in, windings=n_in, current=current, r=r_in)
-        self.create_element(coil_type=self.coil_type, coil_mid_pos=first_coil_pos + 0.26, length=l_out, windings=n_out, current=-current, r=r_out)
-
-    def create_mieze(self, current, l1=None, l2=None):
+    def create_setup(self, current, l1=None, l2=None):
         if not l1:
             l1 = self.coil_distance
         
         if not l2:
             l2 = self.detector_distance - self.coil_distance
         
-        i1 = current
-        i2 = current*(l1+l2)/l2
+        current1 = current
+        current2 = current * (l1+l2)/l2
 
-        self._create_coil_set(current=i1)
-        self._create_coil_set(current=i2, first_coil_pos=l1)
+        self.create_element(coil_type='square', coil_mid_pos=SQUARE_COIL_POSITION_1ST)
+
+        self._create_coil_set(current=current1)
+        self._create_coil_set(current=current2, first_coil_pos=l1)
+
+        self.create_element(coil_type='square', coil_mid_pos=SQUARE_COIL_POSITION_2ND)
