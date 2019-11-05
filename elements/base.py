@@ -14,8 +14,12 @@ from abc import abstractmethod
 class BasicElement(object):
 
     def __init__(self):
-        pass
+        self.position = None
 
     @abstractmethod
     def create_element(self, position, *args, **kwargs):
+        raise NotImplementedError
+
+    @abstractmethod
+    def b_field(self, x, y, z):
         raise NotImplementedError

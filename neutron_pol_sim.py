@@ -10,7 +10,7 @@
 
 # import numpy as np
 
-from elements.polariser import polariser
+from elements.polariser import Polariser
 from elements.helmholtz_spin_flipper import HelmholtzSpinFlipper
 from particles.neutron import Neutrons
 # from extra_helmholtz import Extra_Helmholtz
@@ -31,7 +31,7 @@ def b_function(vec):
     flipper = HelmholtzSpinFlipper()
     flipper.create_element(position=0.1, current=I_hsf1)
 
-    return flipper.hsf(x, y, z) + polariser.B_field(x, y, z) + earth_field
+    return flipper.hsf(x, y, z) + Polariser.B_field(x, y, z) + earth_field
 
 
 def main():

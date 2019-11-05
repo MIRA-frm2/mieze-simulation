@@ -11,23 +11,24 @@
 from numpy import array
 from unittest import TestCase
 
-from elements.helmholtz_spin_flipper import HelmholtzSpinFlipper
+from elements.polariser import Polariser
 
 
 class Test(TestCase):
 
     def setUp(self) -> None:
-        self.helmholtz_spin_flipper = HelmholtzSpinFlipper()
-        self.helmholtz_spin_flipper.create_element()
+        self.polariser = Polariser()
+        self.polariser.create_element()
 
     def test_zero_position(self):
         """Test for known reference values."""
 
-        test_data = {(0, 0, 0): (305.41894054708865, 0., 0.)}
+        test_data = {(0, 0, 0): (0., -719.9999999999998, 0.)}
 
         for position, reference_value in test_data.items():
             # Evaluate
-            b_field_value = self.helmholtz_spin_flipper.hsf(*position)
+            b_field_value = self.polariser.b_field(*position)
+            print(b_field_value)
 
             # Assert tests
             # Assert data type

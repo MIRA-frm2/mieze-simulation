@@ -13,11 +13,8 @@ from experiments.mieze.parameters import HelmholtzSpinFlipper_position_HSF1
 from elements.base import BasicElement
 from elements.coils import RealCoil
 
-from utils.physics_constants import MU_0
-
 
 class HelmholtzSpinFlipper(BasicElement):
-    MU_0 = MU_0  # N/A, vacuum permeability
 
     def __init__(self):
         """Inherit init from base class and define additional parameters."""
