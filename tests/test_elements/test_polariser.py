@@ -18,7 +18,6 @@ class Test(TestCase):
 
     def setUp(self) -> None:
         self.polariser = Polariser()
-        self.polariser.create_element()
 
     def test_zero_position(self):
         """Test for known reference values."""

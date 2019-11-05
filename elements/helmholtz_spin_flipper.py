@@ -16,15 +16,10 @@ from elements.coils import RealCoil
 
 class HelmholtzSpinFlipper(BasicElement):
 
-    def __init__(self):
+    def __init__(self, position=HelmholtzSpinFlipper_position_HSF1, **kwargs):
         """Inherit init from base class and define additional parameters."""
         super(HelmholtzSpinFlipper, self).__init__()
 
-        self.coil1 = None
-        self.coil2 = None
-
-    def create_element(self, position=HelmholtzSpinFlipper_position_HSF1, current=1.6, **kwargs):
-        """Create the physical element."""
         mid_pos = position
 
         length = kwargs.get('length',  0.01)  # length of each coil
@@ -36,13 +31,11 @@ class HelmholtzSpinFlipper(BasicElement):
         pos1 = mid_pos - coil_distance / 2.0
         pos2 = mid_pos + coil_distance / 2.0
 
-        self.coil1 = RealCoil()
-        self.coil1.create_element(coil_mid_pos=pos1, length=length, windings=windings, r=radius, current=current)
+        self.coil1 = RealCoil(coil_mid_pos=pos1, length=length, windings=windings, r=radius, current=current)
 
-        self.coil2 = RealCoil()
-        self.coil2.create_element(coil_mid_pos=pos2, length=length, windings=windings, r=radius, current=current)
+        self.coil2 = RealCoil(coil_mid_pos=pos2, length=length, windings=windings, r=radius, current=current)
 
-    def hsf(self, x, y, z):
+    def b_field(self, x, y, z):
         """Compute the magnetic field given the position."""
         b1 = self.coil2.b_field(x, y, z)
         b2 = self.coil2.b_field(x, y, z)

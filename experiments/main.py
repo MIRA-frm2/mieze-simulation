@@ -9,10 +9,11 @@
 """Main script that computes the magnetic field for a given experiment."""
 
 from experiments.mieze.main import Mieze
+from elements.coils import Coil
 
 
 def main():
-    experiment = Mieze(sample_distance=1.5, coil_distance=0.53, detector_distance=2.503, increment=0.01)
+    experiment = Mieze(coil_type=Coil, sample_distance=1.5, coil_distance=0.53, detector_distance=2.503, increment=0.05)
     experiment.create_setup(current=5)
 
     # rho = 0.02

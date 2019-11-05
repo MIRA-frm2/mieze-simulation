@@ -18,7 +18,6 @@ class Test(TestCase):
 
     def setUp(self) -> None:
         self.spin_flipper = SpinFlipper()
-        self.spin_flipper.create_element()
 
     def test_zero_position(self):
         """Test for known reference values."""

@@ -19,13 +19,9 @@ from utils.physics_constants import MU_0
 
 class Polariser(BasicElement):
 
-    def __init__(self):
+    def __init__(self, position=polarizer_position, *args, **kwargs):
+
         super(Polariser, self).__init__()
-
-        self.c = None
-        self.m = None
-
-    def create_element(self, position=polarizer_position, *args, **kwargs):
 
         self.position = position
 

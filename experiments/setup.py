@@ -43,21 +43,10 @@ class Setup:
     def create_setup(self, current, l1=None, l2=None):
         raise NotImplementedError
 
-    def create_element(self, coil_type='simple', coil_mid_pos=0, length=0.1, windings=1000, current=10,  r=0.05,
+    def create_element(self, coil_type, coil_mid_pos=0, length=0.1, windings=1000, current=10,  r=0.05,
                        wire_d=0.006, angle_y=0, angle_z=0):
         """Create the physical geometry of the coils."""
-        # print(f'Coil type is: {coil_type}')
-        if coil_type == 'simple':
-            element = Coil()
-        elif coil_type == 'square':
-            element = SquareCoil()
-        elif coil_type == 'real':
-            element = RealCoil()
-        else:
-            raise Exception('Coil type not recognized.')
-
-        element.create_element(coil_mid_pos, length, windings, current,  r, wire_d, angle_y, angle_z)
-        self.elements.append(element)
+        self.elements.append(coil_type(coil_mid_pos, length, windings, current,  r, wire_d, angle_y, angle_z))
         self.setup_changed = True
 
     @staticmethod

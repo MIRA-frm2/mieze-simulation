@@ -18,15 +18,9 @@ from utils.physics_constants import MU_0, pi
 
 class SpinFlipper(BasicElement):
 
-    def __init__(self):
+    def __init__(self, position=None, *args, **kwargs):
         super(SpinFlipper, self).__init__()
 
-        self.windings = None
-        self.length = None
-        self.thickness = None
-        self.current = None
-
-    def create_element(self, position=None, *args, **kwargs):
         self.windings = kwargs.get('windings', 100)
         self.length = kwargs.get('length', 13e-2)  # [m], winding length of the coil
         self.thickness = kwargs.get('thickness', 1e-2)  # [m], thickness of the coil

@@ -15,7 +15,7 @@ from experiments.mieze.parameters import (DISTANCE_2ND_COIL, DISTANCE_3RD_COIL, 
 
 
 class Mieze(Setup):
-    def __init__(self, sample_distance, coil_distance, detector_distance, increment=0.001):
+    def __init__(self, coil_type, sample_distance, coil_distance, detector_distance, increment=0.001):
 
         super(Mieze, self).__init__(increment=increment)
 
@@ -23,7 +23,7 @@ class Mieze(Setup):
         self.detector_distance = detector_distance
         self.coil_distance = coil_distance
 
-        self.coil_type = 'simple'
+        self.coil_type = coil_type
 
     def _create_coil_set(self, first_coil_pos=0, current=5):
         """Crate the magnetic coil sets."""
@@ -46,9 +46,9 @@ class Mieze(Setup):
         current1 = current
         current2 = current * (l1+l2)/l2
 
-        self.create_element(coil_type='square', coil_mid_pos=SQUARE_COIL_POSITION_1ST)
+        self.create_element(coil_type=self.coil_type, coil_mid_pos=SQUARE_COIL_POSITION_1ST)
 
         self._create_coil_set(current=current1)
         self._create_coil_set(current=current2, first_coil_pos=l1)
 
-        self.create_element(coil_type='square', coil_mid_pos=SQUARE_COIL_POSITION_2ND)
+        self.create_element(coil_type=self.coil_type, coil_mid_pos=SQUARE_COIL_POSITION_2ND)

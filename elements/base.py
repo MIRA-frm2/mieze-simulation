@@ -17,9 +17,5 @@ class BasicElement(object):
         self.position = None
 
     @abstractmethod
-    def create_element(self, position, *args, **kwargs):
-        raise NotImplementedError
-
-    @abstractmethod
     def b_field(self, x, y, z):
         raise NotImplementedError

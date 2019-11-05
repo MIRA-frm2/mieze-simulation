@@ -18,7 +18,6 @@ class Test(TestCase):
 
     def setUp(self) -> None:
         self.helmholtz_spin_flipper = HelmholtzSpinFlipper()
-        self.helmholtz_spin_flipper.create_element()
 
     def test_zero_position(self):
         """Test for known reference values."""
@@ -27,7 +26,7 @@ class Test(TestCase):
 
         for position, reference_value in test_data.items():
             # Evaluate
-            b_field_value = self.helmholtz_spin_flipper.hsf(*position)
+            b_field_value = self.helmholtz_spin_flipper.b_field(*position)
 
             # Assert tests
             # Assert data type

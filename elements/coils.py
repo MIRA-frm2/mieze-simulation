@@ -109,13 +109,19 @@ class BaseCoil(BasicElement):
     def m(self, rho, x, s):
         return 4.0 * self.r * rho / self.beta(rho, x, s) ** 2
 
+    def b_field(self, x, y, z):
+        raise NotImplementedError
+
 
 class Coil(BaseCoil):
     """Class that implements an ideal circular coil."""
 
-    def create_element(self, coil_mid_pos=0, length=0.1, windings=100, current=10, r=0.05, wire_d=0.006, angle_y=0,
-                       angle_z=0):
+    def __init__(self, coil_mid_pos=0, length=0.1, windings=100, current=10, r=0.05, wire_d=0.006, angle_y=0,
+                 angle_z=0):
         """Simulate physical geometry of the coil."""
+
+        super(Coil, self).__init__()
+
         self.coil_mid_pos = coil_mid_pos
         self.length = length
         self.n = windings
@@ -226,9 +232,12 @@ class Coil(BaseCoil):
 class RealCoil(BaseCoil):
     """Class that implements a coil with more realistic experimental parameters."""
 
-    def create_element(self, coil_mid_pos=0, length=0.1, windings=100, current=10, r=0.05, wire_d=0.006, angle_y=0,
-                       angle_z=0):
+    def __init__(self, coil_mid_pos=0, length=0.1, windings=100, current=10, r=0.05, wire_d=0.006, angle_y=0,
+                 angle_z=0):
         """Simulate physical geometry of the coil."""
+
+        super(RealCoil, self).__init__()
+
         self.coil_mid_pos = coil_mid_pos
         self.length = length
         self.n = windings
@@ -336,9 +345,12 @@ class SquareCoil(BaseCoil):
     The coordinates from the reference paper are changed from (x, y, z) to (z, y, x), hence the change in the formulae.
     """
 
-    def create_element(self, coil_mid_pos=0, length=0.1, windings=100, current=10, r=0.05, wire_d=0.006, angle_y=0,
-                    angle_z=0):
+    def __init__(self, coil_mid_pos=0, length=0.1, windings=100, current=10, r=0.05, wire_d=0.006, angle_y=0,
+                 angle_z=0):
         """Simulate physical geometry of the coil."""
+
+        super(SquareCoil, self).__init__()
+
         self.coil_mid_pos = coil_mid_pos
 
         self.current = current
