@@ -27,7 +27,11 @@ def b_function(vec):
     x = vec[0]
     y = vec[1]
     z = vec[2]
-    return HelmholtzSpinFlipper.hsf(x, y, z, current=I_hsf1, mid_pos=0.1) + polariser.B_field(x, y, z) + earth_field
+
+    flipper = HelmholtzSpinFlipper()
+    flipper.create_element(position=0.1, current=I_hsf1)
+
+    return flipper.hsf(x, y, z) + polariser.B_field(x, y, z) + earth_field
 
 
 def main():

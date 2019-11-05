@@ -9,32 +9,44 @@
 """An implementation of the Helmholtz Spin Flipper."""
 
 from experiments.mieze.parameters import HelmholtzSpinFlipper_position_HSF1
-import numpy as np
+
+from elements.base import BasicElement
 from elements.coils import RealCoil
 
+from utils.physics_constants import MU_0
 
-class HelmholtzSpinFlipper:
-    MU_0 = 4e-7 * np.pi  # N/A, vacuum permeability
-    R = 0.055  # Positions.R_HSF # Radius of each coil
-    N = 33  # Windigs
-    l = 0.01  # length of each coil
-    d = 0.045  # coil distance
+
+class HelmholtzSpinFlipper(BasicElement):
+    MU_0 = MU_0  # N/A, vacuum permeability
 
     def __init__(self):
-        pass
+        """Inherit init from base class and define additional parameters."""
+        super(HelmholtzSpinFlipper, self).__init__()
 
-    @classmethod
-    def hsf(cls, x, y, z, mid_pos=HelmholtzSpinFlipper_position_HSF1, current=1.6):
-        pos1 = mid_pos - cls.d/2.0
-        pos2 = mid_pos + cls.d/2.0
+        self.coil1 = None
+        self.coil2 = None
 
-        coil1 = RealCoil()
-        coil1.create_element(coil_mid_pos=pos1, length=cls.l, windings=cls.N, r=cls.R)
+    def create_element(self, position=HelmholtzSpinFlipper_position_HSF1, current=1.6, **kwargs):
+        """Create the physical element."""
+        mid_pos = position
 
-        coil2 = RealCoil()
-        coil2.create_element(coil_mid_pos=pos2, length=cls.l, windings=cls.N, r=cls.R)
+        length = kwargs.get('length',  0.01)  # length of each coil
+        coil_distance = kwargs.get('coil_distance',  0.045)
+        windings = kwargs.get('windings', 33)
+        radius = kwargs.get('radius', 0.055)  # Positions.R_HSF # Radius of each coil
+        current = kwargs.get('current', 1.6)
 
-        B1 = coil2.b_field(x, y, z)
-        B2 = coil2.b_field(x, y, z)
+        pos1 = mid_pos - coil_distance / 2.0
+        pos2 = mid_pos + coil_distance / 2.0
 
-        return B1 + B2
+        self.coil1 = RealCoil()
+        self.coil1.create_element(coil_mid_pos=pos1, length=length, windings=windings, r=radius, current=current)
+
+        self.coil2 = RealCoil()
+        self.coil2.create_element(coil_mid_pos=pos2, length=length, windings=windings, r=radius, current=current)
+
+    def hsf(self, x, y, z):
+        """Compute the magnetic field given the position."""
+        b1 = self.coil2.b_field(x, y, z)
+        b2 = self.coil2.b_field(x, y, z)
+        return b1 + b2

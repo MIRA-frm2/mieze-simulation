@@ -8,11 +8,14 @@
 
 """Base element class."""
 
+from abc import abstractmethod
+
 
 class BasicElement(object):
 
     def __init__(self):
         pass
 
-    def create_element(self):
+    @abstractmethod
+    def create_element(self, position, *args, **kwargs):
         raise NotImplementedError

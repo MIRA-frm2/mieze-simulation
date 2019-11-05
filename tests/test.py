@@ -23,6 +23,8 @@ class TestReferenceValues(TestCase):
 
     def test_square_coil_center_value(self):
         """Test for a reference value in the center of a square coil."""
+
+        # Setup
         current = 10
         side_length = 1
 
@@ -31,12 +33,14 @@ class TestReferenceValues(TestCase):
         numerical_error_acceptance = 1e-8
 
         self.square_coil.create_element(coil_mid_pos=0, length=1, windings=1, current=current, r=side_length/2,
-                                     wire_d=0.006)
+                                       wire_d=0.006)
 
+        # Evaluate
         test_value = self.square_coil.b_field(0, 0, 0)
 
-        print(test_value, reference_value)
+        # print(test_value, reference_value)
 
+        # Assert
         assert abs(reference_value - test_value[0]) < numerical_error_acceptance
         assert test_value[1] == 0
         assert test_value[2] == 0
