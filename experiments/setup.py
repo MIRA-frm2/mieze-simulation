@@ -40,7 +40,7 @@ class Setup:
         self.current = None
         self.increment = increment
 
-    def create_coil(self, coil_type='simple', coil_mid_pos=0, length=0.1, windings=1000, current=10,  r=0.05,
+    def create_element(self, coil_type='simple', coil_mid_pos=0, length=0.1, windings=1000, current=10,  r=0.05,
                     wire_d=0.006, angle_y=0, angle_z=0):
         """Create the physical geometry of the coils."""
         # print(f'Coil type is: {coil_type}')
@@ -53,7 +53,7 @@ class Setup:
         else:
             raise Exception('Coil type not recognized.')
 
-        element.create_coil(coil_mid_pos, length, windings, current,  r, wire_d, angle_y, angle_z)
+        element.create_element(coil_mid_pos, length, windings, current,  r, wire_d, angle_y, angle_z)
         self.elements.append(element)
         self.setup_changed = True
 

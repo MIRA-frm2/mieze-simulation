@@ -30,7 +30,7 @@ class TestReferenceValues(TestCase):
 
         numerical_error_acceptance = 1e-8
 
-        self.square_coil.create_coil(coil_mid_pos=0, length=1, windings=1, current=current, r=side_length/2,
+        self.square_coil.create_element(coil_mid_pos=0, length=1, windings=1, current=current, r=side_length/2,
                                      wire_d=0.006)
 
         test_value = self.square_coil.b_field(0, 0, 0)

@@ -11,14 +11,19 @@
 import mpmath
 import numpy as np
 
-from utils.physics_constants import MU_0
+from elements.base import BasicElement
+
 from utils.helper_functions import get_phi, adjust_field
+from utils.physics_constants import MU_0
 
 
-class BaseCoil:
+class BaseCoil(BasicElement):
     """Class that implements basic method and attributes for a coil."""
 
     def __init__(self):
+
+        super(BaseCoil, self).__init__()
+
         self.prefactor = MU_0
 
         # Physical parameters
@@ -46,10 +51,6 @@ class BaseCoil:
         self.x = None
         self.y = None
         self.z = None
-
-    def create_coil(self):
-        """Simulate physical geometry of the coil."""
-        raise NotImplementedError
 
     @staticmethod
     def _k(m):
@@ -112,8 +113,8 @@ class BaseCoil:
 class Coil(BaseCoil):
     """Class that implements an ideal circular coil."""
 
-    def create_coil(self, coil_mid_pos=0, length=0.1, windings=100, current=10, r=0.05, wire_d=0.006, angle_y=0,
-                    angle_z=0):
+    def create_element(self, coil_mid_pos=0, length=0.1, windings=100, current=10, r=0.05, wire_d=0.006, angle_y=0,
+                       angle_z=0):
         """Simulate physical geometry of the coil."""
         self.coil_mid_pos = coil_mid_pos
         self.length = length
@@ -225,8 +226,8 @@ class Coil(BaseCoil):
 class RealCoil(BaseCoil):
     """Class that implements a coil with more realistic experimental parameters."""
 
-    def create_coil(self, coil_mid_pos=0, length=0.1, windings=100, current=10, r=0.05, wire_d=0.006, angle_y=0,
-                    angle_z=0):
+    def create_element(self, coil_mid_pos=0, length=0.1, windings=100, current=10, r=0.05, wire_d=0.006, angle_y=0,
+                       angle_z=0):
         """Simulate physical geometry of the coil."""
         self.coil_mid_pos = coil_mid_pos
         self.length = length
@@ -335,7 +336,7 @@ class SquareCoil(BaseCoil):
     The coordinates from the reference paper are changed from (x, y, z) to (z, y, x), hence the change in the formulae.
     """
 
-    def create_coil(self, coil_mid_pos=0, length=0.1, windings=100, current=10, r=0.05, wire_d=0.006, angle_y=0,
+    def create_element(self, coil_mid_pos=0, length=0.1, windings=100, current=10, r=0.05, wire_d=0.006, angle_y=0,
                     angle_z=0):
         """Simulate physical geometry of the coil."""
         self.coil_mid_pos = coil_mid_pos

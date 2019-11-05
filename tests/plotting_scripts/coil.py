@@ -21,7 +21,7 @@ def main():
         coil_kwargs = None
         b_field_kwargs = None
 
-    setup.create_coil(**coil_kwargs)
+    setup.create_element(**coil_kwargs)
 
     setup.calculate_b_field(**b_field_kwargs)
 

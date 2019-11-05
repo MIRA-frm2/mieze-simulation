@@ -29,10 +29,10 @@ class HelmholtzSpinFlipper:
         pos2 = mid_pos + cls.d/2.0
 
         coil1 = RealCoil()
-        coil1.create_coil(coil_mid_pos=pos1, length=cls.l, windings=cls.N, r=cls.R)
+        coil1.create_element(coil_mid_pos=pos1, length=cls.l, windings=cls.N, r=cls.R)
 
         coil2 = RealCoil()
-        coil2.create_coil(coil_mid_pos=pos2, length=cls.l, windings=cls.N, r=cls.R)
+        coil2.create_element(coil_mid_pos=pos2, length=cls.l, windings=cls.N, r=cls.R)
 
         B1 = coil2.b_field(x, y, z)
         B2 = coil2.b_field(x, y, z)
