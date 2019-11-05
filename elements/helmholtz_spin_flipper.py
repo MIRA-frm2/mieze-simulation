@@ -16,11 +16,15 @@ class HelmholtzSpinFlipper:
     @classmethod
     def hsf(cls, x, y, z, mid_pos=HelmholtzSpinFlipper_position_HSF1, current=1.6):
         pos1 = mid_pos - cls.d/2.0
-
         pos2 = mid_pos + cls.d/2.0
 
-        B1 = RealCoil.B_field(x, y, z, pos1, l=cls.l, N=cls.N, R=cls.R)
+        coil1 = RealCoil()
+        coil1.create_coil(coil_mid_pos=pos1, length=cls.l, windings=cls.N, r=cls.R)
 
-        B2 = RealCoil.B_field(x, y, z, pos2, l=cls.l, N=cls.N, R=cls.R)
+        coil2 = RealCoil()
+        coil2.create_coil(coil_mid_pos=pos2, length=cls.l, windings=cls.N, r=cls.R)
+
+        B1 = coil2.b_field(x, y, z)
+        B2 = coil2.b_field(x, y, z)
 
         return B1 + B2

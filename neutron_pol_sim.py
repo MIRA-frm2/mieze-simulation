@@ -38,7 +38,7 @@ def main():
     # simulation.reset_pol()
 
     print(simulation.get_pol())
-    # simulation.create_B_map(B_function, (0.001, 0.001))
+    simulation.create_B_map(b_function, (0.001, 0.001))
     simulation.simulate_neutrons()
     print(simulation.get_pol())
 

@@ -1,5 +1,3 @@
-
-
 import itertools
 from multiprocessing import Pool
 import numpy as np
@@ -101,8 +99,8 @@ class Neutrons:
         try:
             Bmap = self.load_obj('B_map')
         except FileNotFoundError:
-            # ToDo: Compute new B field map
-            pass
+
+            self.create_B_map(b_function, (0.001, 0.001))
 
         for neutron in self.neutrons:
             #check if it is in the calculated beamprofile (y,z plane)
