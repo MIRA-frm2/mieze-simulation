@@ -1,22 +1,24 @@
-#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-Created on Tue Dec 11 12:37:37 2018
+#
+# This file is part of MIEZE simulation.
+# Copyright (C) 2019 TUM FRM2 E21 Research Group.
+#
+# This is free software; you can redistribute it and/or modify it
+# under the terms of the MIT License; see LICENSE file for more details.
 
-@author: henrik
-"""
+"""Main script that computes the flow of the particles through the magnetic field."""
 
-import numpy as np
+# import numpy as np
 
 from elements.polariser import polariser
 from elements.helmholtz_spin_flipper import HelmholtzSpinFlipper
 from particles.neutron import Neutrons
-#from extra_helmholtz import Extra_Helmholtz
-#from single_coil import Single_Coil
-#from long_coil import Long_Coil
-from elements.coils import RealCoil
+# from extra_helmholtz import Extra_Helmholtz
+# from single_coil import Single_Coil
+# from long_coil import Long_Coil
+# from elements.coils import RealCoil
 
-from experiments.mieze.parameters import I_hsf1, I_real_coil, step, endpoint
+from experiments.mieze.parameters import I_hsf1, step, endpoint  # , I_real_coil
 
 from utils.physics_constants import earth_field
 
@@ -25,7 +27,7 @@ def b_function(vec):
     x = vec[0]
     y = vec[1]
     z = vec[2]
-    return HelmholtzSpinFlipper.hsf(x, y, z, current=I_hsf1, mid_pos=0.1) + polariser.B_field(x,y,z) + earth_field
+    return HelmholtzSpinFlipper.hsf(x, y, z, current=I_hsf1, mid_pos=0.1) + polariser.B_field(x, y, z) + earth_field
 
 
 def main():
