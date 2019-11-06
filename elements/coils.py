@@ -137,7 +137,7 @@ class Coil(BaseCoil):
         self.angle_y = angle_y
         self.angle_z = angle_z
 
-        self.prefactor *= 1e4 / (2 * np.pi) * self.n * self.current / self.length
+        self.prefactor *= 1e3 / (2 * np.pi) * self.n * self.current / self.length
 
     def b_field_rho(self, x, rho):
         """Computes radial magnetic field
@@ -249,7 +249,7 @@ class RealCoil(BaseCoil):
         self.angle_y = angle_y
         self.angle_z = angle_z
 
-        self.prefactor *= 1e4 / (2 * np.pi) * self.n * self.current / self.length
+        self.prefactor *= 1e3 / (2 * np.pi) * self.n * self.current / self.length
 
     def b_field_rho(self, x, r, axis_point):
         """Compute the magnetic field in rho (radial) direction.
@@ -345,8 +345,8 @@ class SquareCoil(BaseCoil):
     The coordinates from the reference paper are changed from (x, y, z) to (z, y, x), hence the change in the formulae.
     """
 
-    def __init__(self, coil_mid_pos=0, length=0.1, windings=100, current=10, r=0.05, wire_d=0.006, angle_y=0,
-                 angle_z=0):
+    def __init__(self, coil_mid_pos=0, length=0.1, windings=100, current=10, r=0.05, wire_d=0.006,
+                 angle_y=0, angle_z=0):
         """Simulate physical geometry of the coil."""
 
         super(SquareCoil, self).__init__()
@@ -354,13 +354,13 @@ class SquareCoil(BaseCoil):
         self.coil_mid_pos = coil_mid_pos
 
         self.current = current
-
         self.length = length
 
         self.width = r * 2
         self.height = r * 2
 
         self.n = windings
+        self.wire_d = wire_d
 
         self.angle_y = angle_y
         self.angle_z = angle_z
@@ -368,7 +368,7 @@ class SquareCoil(BaseCoil):
         self.prefactor *= 1e0 / (4 * np.pi) * self.n * self.current / self.length
 
     def check_physical_coil_overlap(self):
-        """Deal with divison by 0.
+        """Deal with division by 0.
 
         If the magnetic field has to be numerically computed at the position of the coil, this implies a division by
         0 leading to numerical errors. This function is used to handle such cases by setting the magnetic field to 0.
@@ -376,11 +376,15 @@ class SquareCoil(BaseCoil):
         # print(self.x, self.y, self.z, self.width, self.height)
         numerical_error_acceptance = min(self.width, self.height) * 1e-4
         if abs(self.y - self.width) < numerical_error_acceptance \
-                or abs(self.z - self.height) < numerical_error_acceptance:
-            return np.array([0, 0, 0])
-        if abs(self.y + self.width) < numerical_error_acceptance \
-                or abs(self.z + self.height) < numerical_error_acceptance:
-            return np.array([0, 0, 0])
+                or abs(self.y + self.width) < numerical_error_acceptance\
+                or abs(self.x - self.height) < numerical_error_acceptance\
+                or abs(self.x + self.height) < numerical_error_acceptance:
+            return True
+
+    @staticmethod
+    def _reverse_coordinates(x, y, z):
+        # print(x, y, z)
+        return np.array([z, y, x])
 
     def b_field(self, x, y, z, coordinate_system='cartesian'):
         """Compute the magnetic field.
@@ -394,16 +398,16 @@ class SquareCoil(BaseCoil):
         """
         if coordinate_system == 'cartesian':
             # Note that the xz coordinates are reversed.
-            self.z, self.y, self.x = x, y, z
+            self.x, self.y, self.z = x, y, z
         else:
             # self.x, self.y, self.z = transform_cylindrical_to_cartesian(x, y, z)
             pass
 
         field = self.check_physical_coil_overlap()
         if field:
-            return field
+            return np.array([0, 0, 0])
 
-        self.z -= self.coil_mid_pos
+        self.x -= self.coil_mid_pos
 
         field = self.prefactor * np.array([self.sum_element_x, self.sum_element_y, self.sum_element_z])
 
@@ -413,6 +417,7 @@ class SquareCoil(BaseCoil):
         #     print(f'Bfield {field} at Position ({self.x}, {self.y}, {self.z})')
 
         return self.sanitize_output(field)
+        # return self._reverse_coordinates(*self.sanitize_output(field))
 
     @staticmethod
     def sanitize_output(field):

@@ -11,9 +11,11 @@
 from experiments.mieze.main import Mieze
 from elements.coils import Coil
 
+from experiments.mieze.parameters import L1, L2
+
 
 def main():
-    experiment = Mieze(coil_type=Coil, sample_distance=1.5, coil_distance=0.53, detector_distance=2.503, increment=0.05)
+    experiment = Mieze(coil_type=Coil, sample_distance=1.5, coil_distance=L1, detector_distance=L2-L1, increment=0.05)
     experiment.create_setup(current=5)
 
     # rho = 0.02

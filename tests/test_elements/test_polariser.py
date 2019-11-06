@@ -27,7 +27,7 @@ class Test(TestCase):
         for position, reference_value in test_data.items():
             # Evaluate
             b_field_value = self.polariser.b_field(*position)
-            print(b_field_value)
+            # print(b_field_value)
 
             # Assert tests
             # Assert data type

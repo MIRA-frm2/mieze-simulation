@@ -30,5 +30,21 @@ DISTANCE_3RD_COIL = 0.187
 DISTANCE_4TH_COIL = 0.260
 
 # Square coil Parameters
-SQUARE_COIL_POSITION_1ST = 0
-SQUARE_COIL_POSITION_2ND = 0
+# ToDo: What are these values
+SQUARE_COIL_POSITION_1ST = 0.1
+SQUARE_COIL_POSITION_2ND = 1
+
+R_HSF = 5.38e-2  # [m], radius of helmholtz coils at the spin flippers; achieved by fitting real magnetic field
+WIDTH_CBOX = 2 * (50 + 86) * 1e-3  # [m], width of one group of coils
+L1 = 0.53  # [m], coil group A to B
+L2 = 2.58  # [m], coil group B to detector
+Ls = L2 - 0.62  # [m], sample to detector
+POLARISER_HSF1 = 10e-2  # [m], distance between polariser and first coil of hsf1
+
+POLARISATOR = 0.0
+HSF1 = POLARISATOR + POLARISER_HSF1 + R_HSF / 2.0
+SF1 = HSF1
+COIL_A = HSF1 + R_HSF / 2.0
+COIL_B = COIL_A + L1
+HSF2 = COIL_B + R_HSF / 2.0
+SF2 = HSF2

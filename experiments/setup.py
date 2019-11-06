@@ -15,7 +15,6 @@ import matplotlib.cm as cm
 from multiprocessing import Pool
 import numpy as np
 
-from elements.coils import Coil, RealCoil, SquareCoil
 from utils.helper_functions import read_data_from_file
 
 
@@ -40,13 +39,16 @@ class Setup:
         self.current = None
         self.increment = increment
 
-    def create_setup(self, current, l1=None, l2=None):
+        self.x_ticks = None
+        self.x_ticks_labels = None
+
+    def create_setup(self, current):
         raise NotImplementedError
 
-    def create_element(self, coil_type, coil_mid_pos=0, length=0.1, windings=1000, current=10,  r=0.05,
+    def create_element(self, element_class, coil_mid_pos=0, length=0.1, windings=1000, current=10,  r=0.05,
                        wire_d=0.006, angle_y=0, angle_z=0):
         """Create the physical geometry of the coils."""
-        self.elements.append(coil_type(coil_mid_pos, length, windings, current,  r, wire_d, angle_y, angle_z))
+        self.elements.append(element_class(coil_mid_pos, length, windings, current,  r, wire_d, angle_y, angle_z))
         self.setup_changed = True
 
     @staticmethod
@@ -94,9 +96,9 @@ class Setup:
         if coordinate_system == 'cartesian':
             square_element = self._get_square_element()
 
-            zoom_factor = 2
+            zoom_factor = 4
 
-            start = kwargs.pop('start', -0.5)
+            start = kwargs.pop('start', 0)
             plane = kwargs.pop('plane', True)
             # coil_distance = kwargs.pop('coil_distance', square_element.width/10)
 
@@ -104,7 +106,7 @@ class Setup:
                 if plane == 'yz':
                     self.x_range = np.arange(1)
                 else:
-                    self.x_range = np.arange(start, square_element.length + self.increment, self.increment)
+                    self.x_range = np.arange(zoom_factor * start, zoom_factor * square_element.length + self.increment, self.increment)
 
                 if plane == 'xz':
                     self.y_range = np.arange(1)
@@ -194,7 +196,7 @@ class Setup:
 
         self.setup_changed = False
 
-    def get_plot_data(self, plane, source='new'):
+    def get_2d_abs_plot_data(self, plane, source='new'):
         if source == 'storage':
             b, extent = read_data_from_file()
         else:
@@ -225,6 +227,11 @@ class Setup:
     #
     #     return sum(y_values)*self.increment
 
+    def get_1d_b_values(self):
+        return [[[np.linalg.norm(self.get_b_abs((x, y, z)))
+                  for x in self.x_range] for y in self.y_range] for z in self.z_range
+                ][0][0]
+
     def plot_field_1d_abs(self):
 
         # if self.rho != 0:
@@ -237,21 +244,47 @@ class Setup:
         #         # Todo: How to plot b field for non-zero y and z values?
         #         y_values = None
 
-        y_values = [[[np.linalg.norm(self.get_b_abs((x, y, z))) for x in self.x_range] for y in self.y_range] for z in
-                    self.z_range][0][0]
+        y_values = self.get_1d_b_values()
 
         print(self.x_range)
-        print(y_values)
+        # print(y_values)
+        fig = plt.figure()
+        ax = fig.add_axes([0.1, 0.1, 0.8, 0.8])  # main axes
 
-        plt.plot(self.x_range, y_values)
+        ax.plot(self.x_range, y_values)
+
+        if self.x_ticks and self.x_ticks_labels:
+            ax.set_xticks(self.x_ticks)
+            ax.set_xticklabels(self.x_ticks_labels)
+
         plt.show()
 
+        # plt.plot(self.x_range, y_values)
+        # plt.show()
+
     def plot_field_2d_abs(self, plane):
-        b, extent = self.get_plot_data(plane)
+        b, extent = self.get_2d_abs_plot_data(plane)
 
         plt.imshow(b, aspect='auto', cmap=cm.magma, extent=extent)
 
         plt.colorbar()
+        plt.show()
+
+    def get_2d_vec_plot_data(self):
+        by = np.array([[[self.b[(x, y, z)][0] for z in self.z_range]
+                       for y in self.y_range] for x in self.x_range])[:, 0]
+
+        bz = np.array([[[self.b[(x, y, z)][1] for z in self.z_range]
+                       for y in self.y_range] for x in self.x_range])[:, :, 0]
+        return by, bz
+
+    def plot_field_2d_vec(self):
+        by, bz = self.get_2d_vec_plot_data()
+
+        plt.quiver(self.y_range, self.z_range, by, bz)
+        plt.xlim(-1, 1)
+        plt.ylim(-1, 1)
+
         plt.show()
 
     def get_magnetic_field_value(self, plane, plane_position):
