@@ -19,7 +19,7 @@ from utils.physics_constants import MU_0
 class TestReferenceValues(TestCase):
 
     def setUp(self) -> None:
-        self.square_coil = SquareCoil()
+        self.square_coil = SquareCoil(coil_mid_pos=0, length=1, windings=1, wire_d=0.006)
 
     def test_square_coil_center_value(self):
         """Test for a reference value in the center of a square coil."""
@@ -32,8 +32,8 @@ class TestReferenceValues(TestCase):
 
         numerical_error_acceptance = 1e-8
 
-        self.square_coil.create_element(coil_mid_pos=0, length=1, windings=1, current=current, r=side_length/2,
-                                       wire_d=0.006)
+        self.square_coil.current = current
+        self.square_coil.r = side_length/2
 
         # Evaluate
         test_value = self.square_coil.b_field(0, 0, 0)

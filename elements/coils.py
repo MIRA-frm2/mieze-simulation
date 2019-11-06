@@ -10,11 +10,15 @@
 
 import mpmath
 import numpy as np
-
+import warnings
 from elements.base import BasicElement
 
 from utils.helper_functions import get_phi, adjust_field
 from utils.physics_constants import MU_0
+
+# Set the warning filter to errors such that one can catch them as they were errors
+# This is used to handle divisions by numerical 0
+warnings.filterwarnings('error')
 
 
 class BaseCoil(BasicElement):
@@ -137,7 +141,7 @@ class Coil(BaseCoil):
         self.angle_y = angle_y
         self.angle_z = angle_z
 
-        self.prefactor *= 1e3 / (2 * np.pi) * self.n * self.current / self.length
+        self.prefactor *= 1e0 / (2 * np.pi) * self.n * self.current / self.length
 
     def b_field_rho(self, x, rho):
         """Computes radial magnetic field
@@ -210,9 +214,6 @@ class Coil(BaseCoil):
         """Compute the magnetic field given the position in cylindrical coordinates."""
         r = np.sqrt(z ** 2 + y ** 2)
 
-        # if np.sqrt(x ** 2 + y ** 2) - rho < 0.001:
-        #     return np.array([0, 0, 0])
-
         phi = get_phi(y, z)
 
         field = np.array((self.b_field_x(x, r),
@@ -249,7 +250,7 @@ class RealCoil(BaseCoil):
         self.angle_y = angle_y
         self.angle_z = angle_z
 
-        self.prefactor *= 1e3 / (2 * np.pi) * self.n * self.current / self.length
+        self.prefactor *= 1e0 / (2 * np.pi) * self.n * self.current / self.length
 
     def b_field_rho(self, x, r, axis_point):
         """Compute the magnetic field in rho (radial) direction.
@@ -365,7 +366,7 @@ class SquareCoil(BaseCoil):
         self.angle_y = angle_y
         self.angle_z = angle_z
 
-        self.prefactor *= 1e0 / (4 * np.pi) * self.n * self.current / self.length
+        self.prefactor *= 1e-1 / (4 * np.pi) * self.n * self.current / self.length
 
     def check_physical_coil_overlap(self):
         """Deal with division by 0.
@@ -379,7 +380,7 @@ class SquareCoil(BaseCoil):
                 or abs(self.y + self.width) < numerical_error_acceptance\
                 or abs(self.x - self.height) < numerical_error_acceptance\
                 or abs(self.x + self.height) < numerical_error_acceptance:
-            return True
+            return False
 
     @staticmethod
     def _reverse_coordinates(x, y, z):
@@ -464,13 +465,20 @@ class SquareCoil(BaseCoil):
             # Python indexing starts from 0, so whenever alpha is used as an array index it has to be subtracted by 1
             alpha_index = alpha - 1
 
-            t1 = ((-1) ** alpha) * self.d[alpha_index] / \
-                 (self.r_values[alpha_index] * (self.r_values[alpha_index]
-                                                + (-1) ** (alpha + 1) * self.c[alpha_index]))
-            t2 = self.c[alpha_index] / (self.r_values[alpha_index] * (self.r_values[alpha_index] + self.d[alpha_index]))
+            try:
+                t1 = ((-1) ** alpha) * self.d[alpha_index] / \
+                     (self.r_values[alpha_index] * (self.r_values[alpha_index]
+                                                    + (-1) ** (alpha + 1) * self.c[alpha_index]))
+            except RuntimeWarning:
+                t1 = 0
+
+            try:
+                t2 = self.c[alpha_index] \
+                     / (self.r_values[alpha_index] * (self.r_values[alpha_index] + self.d[alpha_index]))
+            except RuntimeWarning:
+                t2 = 0
 
             _eta += t1 - t2
-
         return _eta
 
     @property
@@ -501,9 +509,11 @@ class SquareCoil(BaseCoil):
         for alpha in np.arange(1, 5):
             alpha_index = alpha - 1
 
-            _eta += ((-1) ** (alpha + 1)) * self.z / (
-                        self.r_values[alpha_index] * (self.r_values[alpha_index] + self.d[alpha_index]))
-
+            try:
+                _eta += ((-1) ** (alpha + 1)) * self.z / (
+                            self.r_values[alpha_index] * (self.r_values[alpha_index] + self.d[alpha_index]))
+            except RuntimeWarning:
+                _eta = 0
         return _eta
 
     @property

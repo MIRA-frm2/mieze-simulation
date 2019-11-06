@@ -1,7 +1,7 @@
 from elements.coils import Coil, SquareCoil
 
 plot_parameters = {
-    'coil_simple_1d_abs_xy': {
+    'coil_simple_1d_abs': {
         'element': Coil,
         'plot_dimension': '1d',
         'plot_type': 'abs',

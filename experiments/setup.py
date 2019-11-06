@@ -246,7 +246,7 @@ class Setup:
 
         y_values = self.get_1d_b_values()
 
-        print(self.x_range)
+        # print(self.x_range)
         # print(y_values)
         fig = plt.figure()
         ax = fig.add_axes([0.1, 0.1, 0.8, 0.8])  # main axes
