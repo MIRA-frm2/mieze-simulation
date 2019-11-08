@@ -133,8 +133,6 @@ class Setup:
                                              zoom_factor * square_element.height + self.increment/2,
                                              self.increment)
         elif coordinate_system == 'cylindrical':
-            start = kwargs.pop('start', 0)
-            end = kwargs.pop('end', 0)
             rho = kwargs.pop('rho', 0)
             plane = kwargs.pop('plane', True)
 
@@ -172,147 +170,14 @@ class Setup:
         self.b = dict(zip(args, result))
         # print(self.b)
 
-        # Legacy: 2019.11.08
-        # if self.b is None or self.setup_changed:
-        #     print(len(args), " calculations")
-        #     print('calculate')
-        #
-        #     with Pool(4) as p:
-        #         result = p.map(self.b_field, args)
-        #
-        #     print('calculation finished')
-        #
-        #     self.b = dict(zip(args, result))
-        #     print(self.b)
-
-        # if meshsize[0]-1 > max(self.x_range) or meshsize[1]-1 > max(self.y_range)
-        # or meshsize[2]-1 > max(self.z_range):
-        #
-        #     self.x_range = np.arange(zero, meshsize[0] + zero, self.increment)
-        #     self.y_range = np.arange(-meshsize[1], meshsize[1], self.increment)
-        #     self.z_range = np.arange(-meshsize[2], meshsize[2], self.increment)
-        #     args = list(itertools.product(self.x_range, self.y_range, self.z_range))
-        #
-        #     for key in self.b.keys():
-        #         if key in args:
-        #             args.remove(key)
-        #
-        #     print('calculate extension')
-        #
-        #     with Pool(4) as p:
-        #         result = p.map(self.b_field, args)
-        #
-        #     print('calculation finished')
-        #
-        #     self.b.update(dict(zip(args, result)))
-
         self.setup_changed = False
 
-    def get_2d_abs_plot_data(self, plane, source='new'):
-        if source == 'storage':
-            b, extent = read_data_from_file()
-        else:
-            b = self.get_magnetic_field_value(plane, plane_position=0)
+    def get_b_vec(self):
+        bx = [self.b[x, 0, 0][0] for x in self.x_range]
+        by = [self.b[x, 0, 0][1] for x in self.x_range]
+        bz = [self.b[x, 0, 0][2] for x in self.x_range]
+        return bx, by, bz
 
-            if plane == 'yz':
-                extent = (self.y_range.min(), self.y_range.max(), self.z_range.min(), self.z_range.max())
-            elif plane == 'xy':
-                extent = (self.x_range.min(), self.x_range.max(), self.y_range.min(), self.y_range.max())
-            elif plane == 'xz':
-                extent = (self.x_range.min(), self.x_range.max(), self.z_range.min(), self.z_range.max())
-            else:
-                extent = None
-        return b, extent
-
-    # def return_1d_fi(self, start, end, rho=0):
-    #     self.calculate_b_field(zero=start, meshsize=(end - start, rho, 0))
-    #
-    #     x_index_start = np.where(self.x_range == self._find_nearest(self.x_range, start))
-    #     x_index_end = np.where(self.x_range == self._find_nearest(self.x_range, end))
-    #
-    #     x_values = self.x_range[int(x_index_start[0]):int(x_index_end[0])+1]
-    #
-    #     if rho != 0:
-    #         y_values = [np.linalg.norm(self.b[(x, rho, 0)]) for x in x_values]
-    #     else:
-    #         y_values = [self.b[(x, 0, 0)][0] for x in x_values]
-    #
-    #     return sum(y_values)*self.increment
-
-    def get_1d_b_values(self):
-        return [[[np.linalg.norm(self.get_b_abs((x, y, z)))
-                  for x in self.x_range] for y in self.y_range] for z in self.z_range
-                ][0][0]
-
-    def plot_field_1d_abs(self):
-
-        # if self.rho != 0:
-        #     y_values = [[[np.linalg.norm(self.get_b_abs((x, y, z))) for x in self.x_range] for y in self.y_range]
-        #     for z in self.z_range][0][0]
-        # else:
-        #     try:
-        #         y_values = [self.b[(x, 0, 0)][0] for x in self.x_range]
-        #     except KeyError:
-        #         # Todo: How to plot b field for non-zero y and z values?
-        #         y_values = None
-
-        y_values = self.get_1d_b_values()
-
-        # print(self.x_range)
-        # print(y_values)
-        fig = plt.figure()
-        ax = fig.add_axes([0.1, 0.1, 0.8, 0.8])  # main axes
-
-        ax.plot(self.x_range, y_values)
-
-        if self.x_ticks and self.x_ticks_labels:
-            ax.set_xticks(self.x_ticks)
-            ax.set_xticklabels(self.x_ticks_labels)
-
-        plt.show()
-
-        # plt.plot(self.x_range, y_values)
-        # plt.show()
-
-    def plot_field_1d_vec(self):
-
-
-        soa = np.array([[0, 0, 1, 1, -2, 0], [0, 0, 2, 1, 1, 0],
-                        [0, 0, 3, 2, 1, 0], [0, 0, 4, 0.5, 0.7, 0]])
-
-        X, Y, Z, U, V, W = zip(*soa)
-        print(X, Y, Z, U, V, W)
-        fig = plt.figure()
-        ax = fig.add_subplot(111, projection='3d')
-        ax.quiver(X, Y, Z, U, V, W)
-        ax.set_xlim([-1, 0.5])
-        ax.set_ylim([-1, 1.5])
-        ax.set_zlim([-1, 8])
-        plt.show()
-    def plot_field_2d_abs(self, plane):
-        b, extent = self.get_2d_abs_plot_data(plane)
-
-        plt.imshow(b, aspect='auto', cmap=cm.magma, extent=extent)
-
-        plt.colorbar()
-        plt.show()
-
-    def get_2d_vec_plot_data(self):
-        by = np.array([[[self.b[(x, y, z)][0] for z in self.z_range]
-                       for y in self.y_range] for x in self.x_range])[:, 0]
-
-        bz = np.array([[[self.b[(x, y, z)][1] for z in self.z_range]
-                       for y in self.y_range] for x in self.x_range])[:, :, 0]
-        return by, bz
-
-    def plot_field_2d_vec(self):
-        by, bz = self.get_2d_vec_plot_data()
-
-        plt.quiver(self.y_range, self.z_range, by, bz)
-        plt.xlim(-1, 1)
-        plt.ylim(-1, 1)
-
-        plt.show()
 
     def get_magnetic_field_value(self, plane, plane_position):
         """Return the magnetic field value at a given plane."""
@@ -367,3 +232,106 @@ class Setup:
         # print(self.b)
         local_b = self.b[arg]
         return np.linalg.norm(local_b)
+
+
+    def get_2d_abs_plot_data(self, plane, source='new'):
+        if source == 'storage':
+            b, extent = read_data_from_file()
+        else:
+            b = self.get_magnetic_field_value(plane, plane_position=0)
+
+            if plane == 'yz':
+                extent = (self.y_range.min(), self.y_range.max(), self.z_range.min(), self.z_range.max())
+            elif plane == 'xy':
+                extent = (self.x_range.min(), self.x_range.max(), self.y_range.min(), self.y_range.max())
+            elif plane == 'xz':
+                extent = (self.x_range.min(), self.x_range.max(), self.z_range.min(), self.z_range.max())
+            else:
+                extent = None
+        return b, extent
+
+
+    def get_1d_b_values(self):
+        return self.get_magnetic_field_value(plane='xz', plane_position=0)
+
+    def plot_field_1d_abs(self):
+        y_values = self.get_1d_b_values()
+
+        fig = plt.figure()
+        ax = fig.add_axes([0.1, 0.1, 0.8, 0.8])  # main axes
+
+        ax.plot(self.x_range, y_values)
+
+        if self.x_ticks and self.x_ticks_labels:
+            ax.set_xticks(self.x_ticks)
+            ax.set_xticklabels(self.x_ticks_labels)
+
+        plt.show()
+
+
+    def plot_field_1d_vec(self, type='3d'):
+        # Redefine plot ranges
+        # y = len(self.x_range) * [0]
+        # z = len(self.x_range) * [0]
+        #
+        # bx, by, bz = self.get_b_vec()
+        # print(f'bx:{bx}\nby:{by}\nbz_{bz}')
+        # x, y, z = np.meshgrid(self.x_range, self.y_range, self.z_range)
+
+        if type == '3d':
+            fig = plt.figure()
+
+            ax = fig.add_subplot(111, projection='3d')
+
+            for x in self.x_range:
+                v = self.b[x, 0, 0]
+                print(v)
+                vlength = np.linalg.norm(v)
+                ax.quiver(x, 0, 0,
+                          v[0], v[1], v[2],
+                          pivot='tip', length=vlength, arrow_length_ratio=0.3/vlength
+                          )
+
+            ax.set_xlim([min(self.x_range), max(self.x_range)/3])
+            ax.set_ylim([-0.01, 0.01])
+            ax.set_zlim([-0.0025, 0.0025])
+
+            ax.set_xlabel('x')
+            ax.set_ylabel('y')
+            ax.set_zlabel('z')
+
+        elif type == '2d':
+            xi, yi = np.meshgrid(self.x_range, 0, indexing='ij')
+            for x in self.x_range:
+                v = self.b[x, 0, 0]
+                print(v)
+                # plt.axes([0.065, 0.065, 0.9, 0.9])
+                plt.quiver(xi, yi, v[0], v[2], alpha=.5)
+                plt.quiver(xi, yi, v[0], v[2], edgecolor='k', facecolor='none', linewidth=.5)
+
+        plt.show()
+
+    def plot_field_2d_abs(self, plane):
+        b, extent = self.get_2d_abs_plot_data(plane)
+
+        plt.imshow(b, aspect='auto', cmap=cm.magma, extent=extent)
+
+        plt.colorbar()
+        plt.show()
+
+    def get_2d_vec_plot_data(self):
+        by = np.array([[[self.b[(x, y, z)][0] for z in self.z_range]
+                       for y in self.y_range] for x in self.x_range])[:, 0]
+
+        bz = np.array([[[self.b[(x, y, z)][1] for z in self.z_range]
+                       for y in self.y_range] for x in self.x_range])[:, :, 0]
+        return by, bz
+
+    def plot_field_2d_vec(self):
+        by, bz = self.get_2d_vec_plot_data()
+
+        plt.quiver(self.y_range, self.z_range, by, bz)
+        plt.xlim(-1, 1)
+        plt.ylim(-1, 1)
+
+        plt.show()
