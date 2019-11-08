@@ -13,9 +13,14 @@ class Plot:
         self.setup.create_element(element_class=params['element'])
 
     def plot(self):
-        self.setup.calculate_b_field(**self.params['b_field_args'])
-        if self.params['plot_dimension'] == '1d' and self.params['plot_type'] == 'abs':
-            self.setup.plot_field_1d_abs()
+        self.setup.initialize_computational_space(**self.params['b_field_args'])
+        self.setup.calculate_b_field()
+
+        if self.params['plot_dimension'] == '1d':
+            if self.params['plot_type'] == 'abs':
+                self.setup.plot_field_1d_abs()
+            elif self.params['plot_type'] == 'vec':
+                self.setup.plot_field_1d_vec()
         elif self.params['plot_dimension'] == '2d' and self.params['plot_type'] == 'abs':
             self.setup.plot_field_2d_abs(self.params['b_field_args']['plane'])
 
@@ -78,7 +83,7 @@ class Plot:
 
 
 if __name__ == "__main__":
-    name = 'coil_square_1d_abs'
+    name = 'coil_simple_1d_vec_beam'
 
     plot = Plot(params=plot_parameters[name])
     plot.plot()

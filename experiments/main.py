@@ -24,7 +24,8 @@ def main():
 
     b_field_kwargs = {'coordinate_system': 'cylindrical', 'plane': 'xy', 'rho': 0.25,
                       'start': -0.25, 'end': 1.5}
-    experiment.calculate_b_field(**b_field_kwargs)
+    experiment.initialize_computational_space(**b_field_kwargs)
+    experiment.calculate_b_field()
 
     experiment.plot_field_1d_abs()
     # experiment.plot_field_2d_abs()

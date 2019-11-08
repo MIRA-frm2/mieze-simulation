@@ -11,7 +11,7 @@
 import itertools
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
-
+from mpl_toolkits.mplot3d import Axes3D  # Needed for 3d plotting
 from multiprocessing import Pool
 import numpy as np
 
@@ -90,15 +90,24 @@ class Setup:
     def _get_square_element(self):
         return self.elements[0]
 
-    def calculate_b_field(self, coordinate_system='cartesian', **kwargs):
-        """Calculate the magnetic field."""
+    def initialize_computational_space(self, coordinate_system='cartesian', **kwargs):
+        """Initialize the 3d discretized computational space."""
+        start = kwargs.pop('start', 0)
+        end = kwargs.pop('end', 1)
+        zoom_factor = kwargs.pop('zoom_factor', 2)
 
-        if coordinate_system == 'cartesian':
+        if coordinate_system == 'beamline':
+            # Create just a line centered at (y,z)=(0,0).
+
+            self.x_range = np.arange(zoom_factor * start,
+                                     zoom_factor * end + self.increment,
+                                     self.increment)
+            self.y_range = np.arange(1)
+            self.z_range = np.arange(1)
+
+        elif coordinate_system == 'cartesian':
             square_element = self._get_square_element()
 
-            zoom_factor = 4
-
-            start = kwargs.pop('start', 0)
             plane = kwargs.pop('plane', True)
             # coil_distance = kwargs.pop('coil_distance', square_element.width/10)
 
@@ -106,7 +115,9 @@ class Setup:
                 if plane == 'yz':
                     self.x_range = np.arange(1)
                 else:
-                    self.x_range = np.arange(zoom_factor * start, zoom_factor * square_element.length + self.increment, self.increment)
+                    self.x_range = np.arange(zoom_factor * start,
+                                             zoom_factor * end + self.increment,
+                                             self.increment)
 
                 if plane == 'xz':
                     self.y_range = np.arange(1)
@@ -121,20 +132,6 @@ class Setup:
                     self.z_range = np.arange(- zoom_factor * square_element.height - self.increment/2,
                                              zoom_factor * square_element.height + self.increment/2,
                                              self.increment)
-
-                # print(self.x_range, self.y_range, self.z_range)
-                args = list(itertools.product(self.x_range, self.y_range, self.z_range))
-                print(len(args), " calculations")
-                print('calculate')
-
-                with Pool(4) as p:
-                    result = p.map(self.b_field, args)
-
-                print('calculation finished')
-
-                self.b = dict(zip(args, result))
-                # print(self.b)
-
         elif coordinate_system == 'cylindrical':
             start = kwargs.pop('start', 0)
             end = kwargs.pop('end', 0)
@@ -159,40 +156,55 @@ class Setup:
             else:
                 self.z_range = np.arange(- compute_range, compute_range, self.increment)
 
-            args = list(itertools.product(self.x_range, self.y_range, self.z_range))
+    def calculate_b_field(self):
+        """Calculate the magnetic field."""
 
-            if self.b is None or self.setup_changed:
-                print(len(args), " calculations")
-                print('calculate')
+        # print(self.x_range, self.y_range, self.z_range)
+        args = list(itertools.product(self.x_range, self.y_range, self.z_range))
+        print(len(args), " calculations")
+        print('calculate')
 
-                with Pool(4) as p:
-                    result = p.map(self.b_field, args)
+        with Pool(4) as p:
+            result = p.map(self.b_field, args)
 
-                print('calculation finished')
+        print('calculation finished')
 
-                self.b = dict(zip(args, result))
-                print(self.b)
+        self.b = dict(zip(args, result))
+        # print(self.b)
 
-            # if meshsize[0]-1 > max(self.x_range) or meshsize[1]-1 > max(self.y_range)
-            # or meshsize[2]-1 > max(self.z_range):
-            #
-            #     self.x_range = np.arange(zero, meshsize[0] + zero, self.increment)
-            #     self.y_range = np.arange(-meshsize[1], meshsize[1], self.increment)
-            #     self.z_range = np.arange(-meshsize[2], meshsize[2], self.increment)
-            #     args = list(itertools.product(self.x_range, self.y_range, self.z_range))
-            #
-            #     for key in self.b.keys():
-            #         if key in args:
-            #             args.remove(key)
-            #
-            #     print('calculate extension')
-            #
-            #     with Pool(4) as p:
-            #         result = p.map(self.b_field, args)
-            #
-            #     print('calculation finished')
-            #
-            #     self.b.update(dict(zip(args, result)))
+        # Legacy: 2019.11.08
+        # if self.b is None or self.setup_changed:
+        #     print(len(args), " calculations")
+        #     print('calculate')
+        #
+        #     with Pool(4) as p:
+        #         result = p.map(self.b_field, args)
+        #
+        #     print('calculation finished')
+        #
+        #     self.b = dict(zip(args, result))
+        #     print(self.b)
+
+        # if meshsize[0]-1 > max(self.x_range) or meshsize[1]-1 > max(self.y_range)
+        # or meshsize[2]-1 > max(self.z_range):
+        #
+        #     self.x_range = np.arange(zero, meshsize[0] + zero, self.increment)
+        #     self.y_range = np.arange(-meshsize[1], meshsize[1], self.increment)
+        #     self.z_range = np.arange(-meshsize[2], meshsize[2], self.increment)
+        #     args = list(itertools.product(self.x_range, self.y_range, self.z_range))
+        #
+        #     for key in self.b.keys():
+        #         if key in args:
+        #             args.remove(key)
+        #
+        #     print('calculate extension')
+        #
+        #     with Pool(4) as p:
+        #         result = p.map(self.b_field, args)
+        #
+        #     print('calculation finished')
+        #
+        #     self.b.update(dict(zip(args, result)))
 
         self.setup_changed = False
 
@@ -262,6 +274,21 @@ class Setup:
         # plt.plot(self.x_range, y_values)
         # plt.show()
 
+    def plot_field_1d_vec(self):
+
+
+        soa = np.array([[0, 0, 1, 1, -2, 0], [0, 0, 2, 1, 1, 0],
+                        [0, 0, 3, 2, 1, 0], [0, 0, 4, 0.5, 0.7, 0]])
+
+        X, Y, Z, U, V, W = zip(*soa)
+        print(X, Y, Z, U, V, W)
+        fig = plt.figure()
+        ax = fig.add_subplot(111, projection='3d')
+        ax.quiver(X, Y, Z, U, V, W)
+        ax.set_xlim([-1, 0.5])
+        ax.set_ylim([-1, 1.5])
+        ax.set_zlim([-1, 8])
+        plt.show()
     def plot_field_2d_abs(self, plane):
         b, extent = self.get_2d_abs_plot_data(plane)
 
