@@ -178,44 +178,44 @@ class Setup:
         bz = [self.b[x, 0, 0][2] for x in self.x_range]
         return bx, by, bz
 
+    def _get_plane(self, plane, plane_position):
+        if plane == 'xy':
+            component = 2
+            plane_idx = self._find_nearest(self.z_range, plane_position)
+        elif plane == 'xz':
+            component = 1
+            plane_idx = self._find_nearest(self.y_range, plane_position)
+        elif plane == 'yz':
+            component = 0
+            plane_idx = self._find_nearest(self.x_range, plane_position)
+        else:
+            component = None
+            plane_idx = None
+        return component, plane_idx
+
+    @staticmethod
+    def _get_b_field_values_from_plane(b, component, plane_idx):
+        if component == 0:
+            return b[plane_idx]
+        elif component == 1:
+            return b[:, plane_idx]
+        if component == 2:
+            return b[:, :, plane_idx]
+
+    def _get_b_field_values_component(self, component):
+        return np.array([[[self.b[(x, y, z)][component] for z in self.z_range]
+                        for y in self.y_range] for x in self.x_range])
 
     def get_magnetic_field_value(self, plane, plane_position):
         """Return the magnetic field value at a given plane."""
 
-        if plane == 'xy':
-            component = 2
-            idx = self._find_nearest(self.z_range, plane_position)
-        elif plane == 'xz':
-            component = 1
-            idx = self._find_nearest(self.y_range, plane_position)
-        elif plane == 'yz':
-            component = 0
-            idx = self._find_nearest(self.x_range, plane_position)
-        else:
-            component = None
-            idx = None
+        component, plane_idx = self._get_plane(plane, plane_position)
 
-        b = np.array([[[self.b[(x, y, z)][component] for z in self.z_range]
-                       for y in self.y_range] for x in self.x_range])
+        b = self._get_b_field_values_component(component)
 
-        if component == 0:
-            return b[idx]
-        elif component == 1:
-            return b[:, idx]
-        if component == 2:
-            return b[:, :, idx]
+        return self._get_b_field_values_from_plane(b, component, plane_idx)
 
     def get_b(self, arg):
-        # ToDo: why absolute values of y and z
-        # Legacy:
-        # x, y, z = arg
-        # b = np.zeros(3)
-        # print(self.b)
-        # local_b = self.b[(x, abs(y), abs(z))]
-        # b[0] = local_b[0]
-        # b[1] = np.sign(y)*local_b[1]
-        # b[2] = np.sign(z)*local_b[2]
-        # return b
         x, y, z = arg
         local_b = self.b[(x, y, z)]
         return local_b
@@ -233,7 +233,6 @@ class Setup:
         local_b = self.b[arg]
         return np.linalg.norm(local_b)
 
-
     def get_2d_abs_plot_data(self, plane, source='new'):
         if source == 'storage':
             b, extent = read_data_from_file()
@@ -249,7 +248,6 @@ class Setup:
             else:
                 extent = None
         return b, extent
-
 
     def get_1d_b_values(self):
         return self.get_magnetic_field_value(plane='xz', plane_position=0)
@@ -268,8 +266,7 @@ class Setup:
 
         plt.show()
 
-
-    def plot_field_1d_vec(self, type='3d'):
+    def plot_field_1d_vec(self, _type='3d'):
         # Redefine plot ranges
         # y = len(self.x_range) * [0]
         # z = len(self.x_range) * [0]
@@ -278,7 +275,7 @@ class Setup:
         # print(f'bx:{bx}\nby:{by}\nbz_{bz}')
         # x, y, z = np.meshgrid(self.x_range, self.y_range, self.z_range)
 
-        if type == '3d':
+        if _type == '3d':
             fig = plt.figure()
 
             ax = fig.add_subplot(111, projection='3d')
@@ -300,7 +297,7 @@ class Setup:
             ax.set_ylabel('y')
             ax.set_zlabel('z')
 
-        elif type == '2d':
+        elif _type == '2d':
             xi, yi = np.meshgrid(self.x_range, 0, indexing='ij')
             for x in self.x_range:
                 v = self.b[x, 0, 0]
