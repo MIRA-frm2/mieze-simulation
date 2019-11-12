@@ -205,12 +205,26 @@ class Plotter:
 
         plt.show()
 
-    def plot_field_2d(self):
+    def plot_field_2d(self, plane='xy'):
         fig = plt.figure()
         ax = fig.gca()
         # Plot the magnetic field
-        ax.quiver(self.x_range, self.y_range,
-                  self.bx, self.by,
+        if plane == 'xy':
+            x = self.x_range
+            y = self.y_range
+
+            fx = self.bx
+            fy = self.by
+        elif plane == 'yz':
+            x = self.y_range
+            y = self.z_range
+
+            fx = self.bx
+            fy = self.bz
+
+
+        print(x,y,fx,fy)
+        ax.quiver(x, y, fx, fy,
                   color='b')
 
         # plt.title('Magnetic field of a straight wire')
@@ -237,4 +251,4 @@ class Plotter:
 
 if __name__ == "__main__":
     plotter = Plotter()
-    plotter.plot_field_3d()
+    plotter.plot_field_2d(plane='yz')

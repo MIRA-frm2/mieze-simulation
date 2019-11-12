@@ -89,26 +89,32 @@ class Setup:
 
     def initialize_computational_space(self, **kwargs):
         """Initialize the 3d discretized computational space."""
-        start = kwargs.pop('start', 0)
-        end = kwargs.pop('end', 1)
-        zoom_factor = kwargs.pop('zoom_factor', 2)
+        x_start = kwargs.pop('x_start', 0)
+        x_end = kwargs.pop('x_end', 1)
+
+        y_start = kwargs.pop('y_start', 0)
+        y_end = kwargs.pop('y_end', 1)
+
+        z_start = kwargs.pop('z_start', 0)
+        z_end = kwargs.pop('z_end', 1)
+
         rho = kwargs.pop('rho', 0)
 
-        self.x_range = np.arange(zoom_factor * start,
-                                 zoom_factor * end + self.increment,
+        self.x_range = np.arange(x_start,
+                                 x_end + self.increment,
                                  self.increment)
 
-        if not rho:
-            # Create just a line centered at (y,z)=(0,0).
-            self.y_range = np.arange(1)
-            self.z_range = np.arange(1)
-        else:
-            self.y_range = np.arange(- zoom_factor * rho,
-                                     zoom_factor * rho + self.increment,
-                                     self.increment)
-            self.z_range = np.arange(- zoom_factor * rho,
-                                     zoom_factor * rho + self.increment,
-                                     self.increment)
+        # if not rho:
+        #     # Create just a line centered at (y,z)=(0,0).
+        #     self.y_range = np.arange(1)
+        #     self.z_range = np.arange(1)
+        # else:
+        self.y_range = np.arange(y_start,
+                                 y_end + self.increment,
+                                 self.increment)
+        self.z_range = np.arange(z_start,
+                                 z_end + self.increment,
+                                 self.increment)
 
         # elif coordinate_system == 'cartesian':
         #     square_element = self._get_square_element()
