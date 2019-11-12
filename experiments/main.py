@@ -15,20 +15,19 @@ from experiments.mieze.parameters import L1, L2
 
 
 def main():
-    experiment = Mieze(coil_type=Coil, sample_distance=1.5, coil_distance=L1, detector_distance=L2-L1, increment=0.05)
+    experiment = Mieze(coil_type=Coil, sample_distance=1.5, coil_distance=L1, detector_distance=L2-L1, increment=0.01)
     experiment.create_setup(current=5)
 
     # rho = 0.02
     # start = -0.25
     # end = experiment.sample_distance
 
-    b_field_kwargs = {'coordinate_system': 'cylindrical', 'plane': 'xy', 'rho': 0.25,
-                      'start': -0.25, 'end': 1.5}
+    b_field_kwargs = {'start': -0.25, 'end': 1.0, 'rho': 0.0}
     experiment.initialize_computational_space(**b_field_kwargs)
     experiment.calculate_b_field()
 
-    experiment.plot_field_1d_abs()
-    # experiment.plot_field_2d_abs()
+    # experiment.plot_field_1d_scalar(component='x')
+    experiment.plot_field_2d_abs(plane='xy')
     # experiment.plot_field_1d_vec()
     # experiment.plot_2d_vectormap()
 

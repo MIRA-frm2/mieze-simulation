@@ -38,20 +38,21 @@ class Mieze(Setup):
         self.create_element(element_class=self.coil_type, coil_mid_pos=first_coil_pos + DISTANCE_4TH_COIL,
                             length=L_OUT, windings=N_OUT, current=-current, r=R_OUT)
 
-    def set_plot_ticks(self):
-        self.x_ticks = [0, self.coil_distance, SQUARE_COIL_POSITION_1ST, SQUARE_COIL_POSITION_2ND]
-        self.x_ticks_labels = ['1st Coil Set', '2nd Coil Set', '1st Square Coil ', '2nd Square Coil']
+    def set_plot_ticks(self, set_ticks=False):
+        if set_ticks:
+            self.x_ticks = [0, self.coil_distance, SQUARE_COIL_POSITION_1ST, SQUARE_COIL_POSITION_2ND]
+            self.x_ticks_labels = ['1st Coil Set', '2nd Coil Set', '1st Square Coil ', '2nd Square Coil']
 
     def create_setup(self, current):
 
         current1 = current
         current2 = current * self.detector_distance / (self.detector_distance - self.coil_distance)
 
-        self.create_element(element_class=SquareCoil, coil_mid_pos=SQUARE_COIL_POSITION_1ST)
+        # self.create_element(element_class=SquareCoil, coil_mid_pos=SQUARE_COIL_POSITION_1ST)
 
         self._create_coil_set(current=current1)
         self._create_coil_set(current=current2, first_coil_pos=self.coil_distance)
 
-        self.create_element(element_class=SquareCoil, coil_mid_pos=SQUARE_COIL_POSITION_2ND)
+        # self.create_element(element_class=SquareCoil, coil_mid_pos=SQUARE_COIL_POSITION_2ND)
 
         self.set_plot_ticks()
