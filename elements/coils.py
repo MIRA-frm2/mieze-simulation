@@ -493,8 +493,12 @@ class SquareCoil(BaseCoil):
         for alpha in np.arange(1, 5):
             alpha_index = alpha - 1
 
-            _eta += ((-1)**(alpha+1)) * self.z / (self.r_values[alpha_index] * (self.r_values[alpha_index]
-                                                  + ((-1) ** (alpha+1)) * self.c[alpha_index]))
+            try:
+                _eta += ((-1)**(alpha+1)) * self.z / (self.r_values[alpha_index] * (self.r_values[alpha_index]
+                                                      + ((-1) ** (alpha+1)) * self.c[alpha_index]))
+            except RuntimeWarning:
+                _eta = 0
+
         return _eta
 
     @property

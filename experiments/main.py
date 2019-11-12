@@ -26,8 +26,8 @@ def main():
     experiment.initialize_computational_space(**b_field_kwargs)
     experiment.calculate_b_field()
 
-    # experiment.plot_field_1d_scalar(component='x')
-    experiment.plot_field_2d_abs(plane='xy')
+    experiment.plot_field_1d_scalar(component='x')
+    # experiment.plot_field_2d_abs(plane='xy')
     # experiment.plot_field_1d_vec()
     # experiment.plot_2d_vectormap()
 

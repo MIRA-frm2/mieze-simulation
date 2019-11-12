@@ -41,6 +41,7 @@ plot_parameters = {
         'plot_dimension': '2d',
         'plot_type': 'abs',
         'coil_args': {'r': 0.2, 'length': 0.35},
+        'grid_size': {'start': 0, 'end': 1, 'rho': 0.2, 'zoom_factor': 2},
         'b_field_args': {'coordinate_system': 'cartesian', 'plane': 'yz'}
     },
     'coil_square_2d_abs_xy': {

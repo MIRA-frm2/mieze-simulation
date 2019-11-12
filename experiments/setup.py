@@ -9,11 +9,12 @@
 """General setup allowing placement of different elements."""
 
 import itertools
+from multiprocessing import Pool
+import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 from mpl_toolkits.mplot3d import Axes3D  # Needed for 3d plotting
-from multiprocessing import Pool
-import numpy as np
+
 
 from utils.helper_functions import read_data_from_file
 
@@ -52,12 +53,6 @@ class Setup:
         """Create the physical geometry of the coils."""
         self.elements.append(element_class(coil_mid_pos, length, windings, current,  r, wire_d, angle_y, angle_z))
         self.setup_changed = True
-
-    @staticmethod
-    def _find_nearest(array, value):
-        array = np.asarray(array)
-        idx = (np.abs(array - value).argmin())
-        return idx
 
     def b_x(self, x, rho=0):
         """Compute magnetic field in x direction."""
@@ -182,13 +177,13 @@ class Setup:
         # print(self.b)
 
         # self.setup_changed = False
-    #
-    # def get_b_vec(self):
-    #     bx = [self.b[x, 0, 0][0] for x in self.x_range]
-    #     by = [self.b[x, 0, 0][1] for x in self.x_range]
-    #     bz = [self.b[x, 0, 0][2] for x in self.x_range]
-    #     return bx, by, bz
-    #
+
+    def get_b_vec(self):
+        bx = [self.b[x, 0, 0][0] for x in self.x_range]
+        by = [self.b[x, 0, 0][1] for x in self.x_range]
+        bz = [self.b[x, 0, 0][2] for x in self.x_range]
+        return bx, by, bz
+
     def _get_plane_position(self, component, plane_position):
         if component == 'z':
             component = 2
@@ -203,6 +198,12 @@ class Setup:
             component = 'abs'
             plane_idx = self._find_nearest(self.y_range, plane_position)
         return component, plane_idx
+
+    @staticmethod
+    def _find_nearest(array, value):
+        array = np.asarray(array)
+        idx = (np.abs(array - value).argmin())
+        return idx
 
     @staticmethod
     def _get_b_field_values_from_plane(b, component, plane_idx):
