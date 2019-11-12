@@ -23,7 +23,7 @@ def compute_bfield(params):
 
 
 if __name__ == "__main__":
-    name = 'coil_simple_2d_yz'
+    name = 'coil_simple_3d_xz_plane'
 
     compute_bfield(params=plot_parameters[name])
 
