@@ -48,11 +48,11 @@ class Mieze(Setup):
         current1 = current
         current2 = current * self.detector_distance / (self.detector_distance - self.coil_distance)
 
-        self.create_element(element_class=SquareCoil, coil_mid_pos=SQUARE_COIL_POSITION_1ST)
-
+        # self.create_element(element_class=SquareCoil, coil_mid_pos=SQUARE_COIL_POSITION_1ST)
+        #
         # self._create_coil_set(current=current1)
         # self._create_coil_set(current=current2, first_coil_pos=self.coil_distance)
 
-        # self.create_element(element_class=SquareCoil, coil_mid_pos=SQUARE_COIL_POSITION_2ND)
+        self.create_element(element_class=SquareCoil, coil_mid_pos=SQUARE_COIL_POSITION_2ND)
 
         self.set_plot_ticks()

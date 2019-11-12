@@ -399,7 +399,7 @@ class SquareCoil(BaseCoil):
         """
         if coordinate_system == 'cartesian':
             # Note that the xz coordinates are reversed.
-            self.x, self.y, self.z = x, y, z
+            self.x, self.y, self.z = x, y, y
         else:
             # self.x, self.y, self.z = transform_cylindrical_to_cartesian(x, y, z)
             pass
@@ -433,6 +433,8 @@ class SquareCoil(BaseCoil):
         """
 
         if any(np.isinf(field)) or any(np.isnan(field)):
+            return np.array([0, 0, 0])
+        if any(field) > 1e2:
             return np.array([0, 0, 0])
 
         return field

@@ -13,23 +13,22 @@ from elements.coils import Coil
 
 from experiments.mieze.parameters import L1, L2
 
+from utils.helper_functions import save_data_to_file
+
 
 def main():
-    experiment = Mieze(coil_type=Coil, sample_distance=1.5, coil_distance=L1, detector_distance=L2-L1, increment=0.01)
+    experiment = Mieze(coil_type=Coil, sample_distance=1.5, coil_distance=L1, detector_distance=L2-L1,
+                       increment=0.05)
     experiment.create_setup(current=5)
 
     # rho = 0.02
     # start = -0.25
     # end = experiment.sample_distance
 
-    b_field_kwargs = {'start': -0.25, 'end': 1.0, 'rho': 0.0}
-    experiment.initialize_computational_space(**b_field_kwargs)
+    grid_size = {'x_start': -0.2, 'x_end': 1.2, 'y_start': -0.0, 'y_end': 0.0, 'z_start': -0.0, 'z_end': 0.0}
+    experiment.initialize_computational_space(**grid_size)
     experiment.calculate_b_field()
-
-    experiment.plot_field_1d_scalar(component='x')
-    # experiment.plot_field_2d_abs(plane='xy')
-    # experiment.plot_field_1d_vec()
-    # experiment.plot_2d_vectormap()
+    save_data_to_file(experiment.b, file_name='./data/data')
 
 
 if __name__ == "__main__":

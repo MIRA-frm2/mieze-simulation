@@ -5,7 +5,7 @@ from utils.helper_functions import save_data_to_file
 
 
 def compute_bfield(params):
-    setup = Setup(increment=0.05)
+    setup = Setup(increment=0.01)
     setup.create_element(element_class=params['element'])
 
     setup.initialize_computational_space(**params['grid_size'])
@@ -23,7 +23,7 @@ def compute_bfield(params):
 
 
 if __name__ == "__main__":
-    name = 'coil_simple_3d_xz_plane'
+    name = 'coil_square_1d_x'
 
     compute_bfield(params=plot_parameters[name])
 

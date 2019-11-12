@@ -22,7 +22,7 @@ class Test(TestCase):
     def test_zero_position(self):
         """Test for known reference values."""
 
-        test_data = {(0, 0, 0): (305.41894054708865, 0., 0.)}
+        test_data = {(0, 0, 0): (0.030541894054708862, 0., 0.)}
 
         for position, reference_value in test_data.items():
             # Evaluate

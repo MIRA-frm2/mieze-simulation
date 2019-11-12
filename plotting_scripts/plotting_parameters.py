@@ -1,6 +1,13 @@
 from elements.coils import Coil, SquareCoil
 
 plot_parameters = {
+    'coil_simple_1d_x': {
+        'element': Coil,
+        'plot_dimension': '1d',
+        'plot_args': {'type': 'scalar', 'component': 'x'},
+        'grid_size': {'x_start': -0.2, 'x_end': 0.2, 'y_start': -0.0, 'y_end': 0.0, 'z_start': -0.0, 'z_end': 0.0},
+        'coil_args': None,
+    },
     'coil_simple_2d_xy': {
         'element': Coil,
         'plot_dimension': '2d',
@@ -31,6 +38,13 @@ plot_parameters = {
         'plot_args': {'type': 'scalar', 'component': 'x'},
         'grid_size': {'x_start': -0.2, 'x_end': 0.2, 'y_start': -0.0, 'y_end': 0.0, 'z_start': -0.0, 'z_end': 0.0,
                       'zoom_factor': 1},
+        'coil_args': None,
+    },
+    'coil_square_1d_x': {
+        'element': SquareCoil,
+        'plot_dimension': '1d',
+        'plot_args': {'type': 'scalar', 'component': 'x'},
+        'grid_size': {'x_start': -0.2, 'x_end': 0.2, 'y_start': -0.0, 'y_end': 0.0, 'z_start': -0.0, 'z_end': 0.0},
         'coil_args': None,
     },
     'coil_square_3d': {
