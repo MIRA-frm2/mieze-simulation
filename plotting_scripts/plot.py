@@ -251,4 +251,5 @@ class Plotter:
 
 if __name__ == "__main__":
     plotter = Plotter()
-    plotter.plot_field_2d(plane='yz')
+    # plotter.plot_field_2d(plane='yz')
+    plotter.plot_field_3d()

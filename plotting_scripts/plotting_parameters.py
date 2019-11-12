@@ -8,7 +8,6 @@ plot_parameters = {
         'grid_size': {'x_start': -0.2, 'x_end': 0.2, 'y_start': -0.2, 'y_end': 0.2, 'z_start': -0.0, 'z_end': 0.0,
                       'rho': 0.2, 'zoom_factor': 1},
         'coil_args': None,
-        'b_field_args': {'start': -0.25, 'end': 1.5}
     },
     'coil_simple_2d_yz': {
         'element': Coil,
@@ -17,7 +16,14 @@ plot_parameters = {
         'grid_size': {'x_start': -0.0, 'x_end': 0.0, 'y_start': -0.2, 'y_end': 0.2, 'z_start': -0.2, 'z_end': 0.2,
                       'rho': 0.2, 'zoom_factor': 1},
         'coil_args': None,
-        'b_field_args': {'start': -0.25, 'end': 1.5}
+    },
+    'coil_simple_3d': {
+        'element': Coil,
+        'plot_dimension': '3d',
+        'plot_args': {'type': 'scalar', 'component': 'x'},
+        'grid_size': {'x_start': -0.2, 'x_end': 0.2, 'y_start': -0.2, 'y_end': 0.2, 'z_start': -0.2, 'z_end': 0.2,
+                      'zoom_factor': 1},
+        'coil_args': None,
     }
 }
 
