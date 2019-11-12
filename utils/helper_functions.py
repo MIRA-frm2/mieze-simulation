@@ -69,5 +69,29 @@ def save_data_to_file(data, file_name, extension='.csv'):
             csv_writer.writerow(row)
 
 
-def read_data_from_file():
-    pass
+def read_data_from_file(file_name='../data/data.csv'):
+    x = list()
+    y = list()
+    z = list()
+
+    bx = list()
+    by = list()
+    bz = list()
+
+    with open(file_name) as csv_file:
+        csv_reader = csv.reader(csv_file, delimiter=',')
+        line_count = 0
+        for row in csv_reader:
+            if line_count == 0:
+                print(f'Column names are {", ".join(row)}')
+                line_count += 1
+            else:
+                x.append(float(row[0]))
+                y.append(float(row[1]))
+                z.append(float(row[2]))
+
+                bx.append(float(row[3]))
+                by.append(float(row[4]))
+                bz.append(float(row[5]))
+
+    return x, y, z, bx, by, bz

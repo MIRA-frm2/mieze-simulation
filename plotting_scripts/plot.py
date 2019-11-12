@@ -8,7 +8,6 @@
 
 """Plotting scripts from data file."""
 
-import csv
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 from mpl_toolkits.mplot3d import Axes3D  # Needed for 3d plotting
@@ -18,40 +17,12 @@ from scipy.interpolate import griddata
 from utils.helper_functions import read_data_from_file
 
 
-def read_data(file_name='../data/data.csv'):
-    x = list()
-    y = list()
-    z = list()
-
-    bx = list()
-    by = list()
-    bz = list()
-
-    with open(file_name) as csv_file:
-        csv_reader = csv.reader(csv_file, delimiter=',')
-        line_count = 0
-        for row in csv_reader:
-            if line_count == 0:
-                print(f'Column names are {", ".join(row)}')
-                line_count += 1
-            else:
-                x.append(float(row[0]))
-                y.append(float(row[1]))
-                z.append(float(row[2]))
-
-                bx.append(float(row[3]))
-                by.append(float(row[4]))
-                bz.append(float(row[5]))
-
-    return x, y, z, bx, by, bz
-
-
 class Plotter:
 
     def __init__(self):
-        self.x_range, self.y_range, self.z_range, self.bx, self.by, self.bz = read_data()
+        self.x_range, self.y_range, self.z_range, self.bx, self.by, self.bz = read_data_from_file()
 
-        self.b = np.array([[[(x, y, z) for z in self.bz] for y in self.by] for x in self.bx])
+        # self.b = np.array([[[(x, y, z) for z in self.bz] for y in self.by] for x in self.bx])
 
     @staticmethod
     def _find_nearest(array, value):
@@ -84,8 +55,7 @@ class Plotter:
             return b[:, :, plane_idx]
 
     def _get_b_field_values(self):
-        return np.array([[[self.b[(x, y, z)] for z in self.z_range]
-                        for y in self.y_range] for x in self.x_range])
+        return self.b
 
     def get_magnetic_field_value(self, component, plane_position):
         """Return the magnetic field value at a given plane."""
@@ -235,7 +205,36 @@ class Plotter:
 
         plt.show()
 
+    def plot_field_2d(self):
+        fig = plt.figure()
+        ax = fig.gca()
+        # Plot the magnetic field
+        ax.quiver(self.x_range, self.y_range,
+                  self.bx, self.by,
+                  color='b')
+
+        # plt.title('Magnetic field of a straight wire')
+        plt.xlabel('x')
+        plt.ylabel('y')
+
+        plt.show()
+
+    def plot_field_3d(self):
+        # 3d figure
+        fig = plt.figure()
+        ax = fig.gca(projection='3d')
+        # Plot the magnetic field
+        ax.quiver(self.x_range, self.y_range, self.z_range,
+                  self.bx, self.by, self.bz,
+                  color='b')
+
+        # plt.title('Magnetic field of a straight wire')
+        plt.xlabel('x')
+        plt.ylabel('y')
+
+        plt.show()
+
 
 if __name__ == "__main__":
     plotter = Plotter()
-    plotter.plot_field_2d_abs()
+    plotter.plot_field_3d()
