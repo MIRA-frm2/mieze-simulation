@@ -12,7 +12,7 @@ import numpy as np
 # from scipy.optimize import curve_fit2
 
 from elements.base import BasicElement
-from experiments.mieze.parameters import polarizer_position
+from experiments.mieze.parameters import polarizer_position, unit
 
 from utils.physics_constants import MU_0
 
@@ -25,15 +25,23 @@ class Polariser(BasicElement):
 
         self.position = position
 
-        self.c = kwargs.get('c', 0.05)  # shift polarisator position
+        self.c = kwargs.get('c', 0.05 * unit.m)  # shift polarisator position
         # magnetic dipol moment Polarisator; both obtained by real measurements and data analysis
-        self.m = kwargs.get('m', np.array((0, 90, 0)))
+        self.m = kwargs.get('m', np.array((0 * unit.m, 90 * unit.m, 0 * unit.m)))
 
     def b_field(self, x, y, z):
+        x *= unit.m
+        y *= unit.m
+        z *= unit.m
+
         x -= self.position
-        r_vec = np.array((x+self.c, y, z))
+        r_vec = np.array((x + self.c, y, z))
         r = np.linalg.norm(r_vec)
-        b = (MU_0/(4*np.pi*r**2))*((3*r_vec*np.linalg.norm(self.m*r_vec) - self.m*r**2) / r**3)
+
+        prefactor = (MU_0 / (4 * np.pi * r**2))
+        elem1 = 3 * r_vec * np.linalg.norm(self.m * r_vec)
+        elem2 = self.m * r**2
+        b = prefactor * (elem1 - elem2) / r**3
 
         # print()
         # B = cls.MU_0/(4*np.pi*(r+cls.c)**3)*cls.m
