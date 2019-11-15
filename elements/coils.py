@@ -13,7 +13,7 @@ import numpy as np
 import warnings
 from elements.base import BasicElement
 
-from utils.helper_functions import get_phi, adjust_field
+from utils.helper_functions import get_phi, adjust_field, sanitize_output
 from utils.physics_constants import MU_0
 
 # Set the warning filter to errors such that one can catch them as they were errors
@@ -105,12 +105,15 @@ class BaseCoil(BasicElement):
         self.current = current
 
     def zeta(self, x, s):
+        """Compute zeta function."""
         return x - s * self.length / 2.0
 
     def beta(self, rho, x, s):
+        """Compute beta function."""
         return np.sqrt((rho + self.r) ** 2 + self.zeta(x=x, s=s) ** 2)
 
     def m(self, rho, x, s):
+        """Compute m function."""
         return 4.0 * self.r * rho / self.beta(rho, x, s) ** 2
 
     def b_field(self, x, y, z):
@@ -143,6 +146,7 @@ class Coil(BaseCoil):
 
         self.prefactor *= 1e0 / (2 * np.pi) * self.n * self.current / self.length
 
+    @sanitize_output
     def b_field_rho(self, x, rho):
         """Computes radial magnetic field
 
@@ -175,6 +179,7 @@ class Coil(BaseCoil):
         return self.beta(rho, x, s) / rho \
             * ((2 - self.m(rho, x, s)) * self._k(self.m(rho, x, s)) - 2 * self._e(self.m(rho, x, s)))
 
+    @sanitize_output
     def b_field_x(self, x, rho=0):
         """Compute the magnetic field in x direction.
 
@@ -375,7 +380,7 @@ class SquareCoil(BaseCoil):
         0 leading to numerical errors. This function is used to handle such cases by setting the magnetic field to 0.
         """
         # print(self.x, self.y, self.z, self.width, self.height)
-        numerical_error_acceptance = min(self.width, self.height) * 1e-4
+        numerical_error_acceptance = min(self.width, self.height) * 1e-2
         if abs(self.y - self.width) < numerical_error_acceptance \
                 or abs(self.y + self.width) < numerical_error_acceptance\
                 or abs(self.x - self.height) < numerical_error_acceptance\
@@ -384,25 +389,17 @@ class SquareCoil(BaseCoil):
 
     @staticmethod
     def _reverse_coordinates(x, y, z):
-        # print(x, y, z)
+        """Fix coordinates for the equations that have the coordinate axes reversed."""
         return np.array([z, y, x])
 
-    def b_field(self, x, y, z, coordinate_system='cartesian'):
+    def b_field(self, x, y, z):
         """Compute the magnetic field.
-
-        Note that the x and z components are reversed.
-
 
         Returns
         -------
         magnetic field in cartesian coordinates
         """
-        if coordinate_system == 'cartesian':
-            # Note that the xz coordinates are reversed.
-            self.x, self.y, self.z = x, y, y
-        else:
-            # self.x, self.y, self.z = transform_cylindrical_to_cartesian(x, y, z)
-            pass
+        self.x, self.y, self.z = self._reverse_coordinates(x, y, z)
 
         field = self.check_physical_coil_overlap()
         if field:
@@ -414,11 +411,7 @@ class SquareCoil(BaseCoil):
 
         field = adjust_field(field)
 
-        # if field[1] != 0 or field[2] != 0:
-        #     print(f'Bfield {field} at Position ({self.x}, {self.y}, {self.z})')
-
-        return self.sanitize_output(field)
-        # return self._reverse_coordinates(*self.sanitize_output(field))
+        return self._reverse_coordinates(*self.sanitize_output(field))
 
     @staticmethod
     def sanitize_output(field):
@@ -434,25 +427,10 @@ class SquareCoil(BaseCoil):
 
         if any(np.isinf(field)) or any(np.isnan(field)):
             return np.array([0, 0, 0])
-        if any(field) > 1e2:
+        if any(field) > 1e10 or any(field) < -1e10:
             return np.array([0, 0, 0])
 
         return field
-
-    # @property
-    # def b_field_x(self):
-    #     """Compute the B magnetic field in x direction."""
-    #     return self.eta_x
-    #
-    # @property
-    # def b_field_y(self):
-    #     """Compute the B magnetic field in y direction."""
-    #     return self.eta_y
-    #
-    # @property
-    # def b_field_z(self):
-    #     """Compute the B magnetic field in z direction."""
-    #     return  self.eta_z
 
     @property
     def sum_element_z(self):
@@ -481,6 +459,7 @@ class SquareCoil(BaseCoil):
                 t2 = 0
 
             _eta += t1 - t2
+
         return _eta
 
     @property
@@ -524,6 +503,7 @@ class SquareCoil(BaseCoil):
 
     @property
     def c(self):
+        """Compute height parameter from the actual coil"""
         return np.array([self.height + self.x,
                          self.height - self.x,
                          -self.height + self.x,
@@ -531,6 +511,7 @@ class SquareCoil(BaseCoil):
 
     @property
     def d(self):
+        """Compute width parameter from the actual coil."""
         return np.array([self.y + self.width,
                          self.y + self.width,
                          self.y - self.width,
@@ -538,6 +519,7 @@ class SquareCoil(BaseCoil):
 
     @property
     def r_values(self):
+        """Compute the distance from the actual coil."""
         return np.array([
             np.sqrt((self.width + self.y) ** 2 + (self.height + self.x) ** 2 + self.z ** 2),
             np.sqrt((self.width + self.y) ** 2 + (self.height - self.x) ** 2 + self.z ** 2),

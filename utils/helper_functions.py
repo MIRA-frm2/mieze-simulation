@@ -103,3 +103,12 @@ def find_list_length_of_different_items(x):
         if item not in xx:
             xx.append(item)
     return len(xx)
+
+
+def sanitize_output(func):
+    def wrapper_sanitize_output(*args, **kwargs):
+        value = func(*args, **kwargs)
+        if abs(value) > 10e4:
+            value = 0
+        return value
+    return wrapper_sanitize_output
