@@ -47,6 +47,22 @@ plot_parameters = {
         'grid_size': {'x_start': -0.2, 'x_end': 0.2, 'y_start': -0.0, 'y_end': 0.0, 'z_start': -0.0, 'z_end': 0.0},
         'coil_args': None,
     },
+    'coil_square_2d_yz': {
+        'element': SquareCoil,
+        'plot_dimension': '2d',
+        'plot_args': {'type': 'scalar', 'component': 'x'},
+        'grid_size': {'x_start': -0.0, 'x_end': 0.0, 'y_start': -0.2, 'y_end': 0.2, 'z_start': -0.2, 'z_end': 0.2,
+                      'rho': 0.2, 'zoom_factor': 1},
+        'coil_args': None,
+    },
+    'coil_square_2d_xy': {
+        'element': SquareCoil,
+        'plot_dimension': '2d',
+        'plot_args': {'type': 'scalar', 'component': 'x'},
+        'grid_size': {'x_start': -0.2, 'x_end': 0.2, 'y_start': -0.2, 'y_end': 0.2, 'z_start': -0.0, 'z_end': 0.0,
+                      'rho': 0.2, 'zoom_factor': 1},
+        'coil_args': None,
+    },
     'coil_square_3d': {
         'element': SquareCoil,
         'plot_dimension': '3d',

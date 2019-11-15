@@ -14,7 +14,7 @@ from mpl_toolkits.mplot3d import Axes3D  # Needed for 3d plotting
 import numpy as np
 from scipy.interpolate import griddata
 
-from utils.helper_functions import read_data_from_file
+from utils.helper_functions import read_data_from_file, find_list_length_of_different_items
 
 
 class Plotter:
@@ -49,7 +49,7 @@ class Plotter:
             x = self.y_range
             y = self.z_range
 
-            fx = self.bx
+            fx = self.bz
             fy = self.bz
         elif plane == 'xz':
             x = self.x_range
@@ -60,8 +60,22 @@ class Plotter:
         else:
             x, y, fx, fy = None, None, None, None
 
-        ax.quiver(x, y, fx, fy,
-                  color='b')
+        lenx = find_list_length_of_different_items(x)
+        leny = find_list_length_of_different_items(y)
+
+        # print(lenx, leny, len(fx))
+        b = [leny * [0] for i in range(lenx)]
+
+        for i in range(lenx):
+            for j in range(leny):
+                b[i][j] = fx[j * lenx + i] + fy[j * lenx + i]
+
+        plt.imshow(b, aspect='auto', extent=[min(x), max(x), min(y), max(y)])
+        plt.colorbar()
+
+        for j in range(len(x)):
+            f = np.sqrt(fx[j] ** 2 + fy[j] ** 2)
+            ax.quiver(x[j], y[j], fx[j]/f, fy[j]/f, color='b', scale=100)
 
         # plt.title('Magnetic field of a straight wire')
         plt.xlabel('x')
@@ -271,6 +285,6 @@ class Plotter:
 if __name__ == "__main__":
     plotter = Plotter()
 
-    plotter.plot_field_1d_scalar()
-    # plotter.plot_field_2d(plane='xz')
+    # plotter.plot_field_1d_scalar()
+    plotter.plot_field_2d(plane='xy')
     # plotter.plot_field_3d()

@@ -95,3 +95,11 @@ def read_data_from_file(file_name='../data/data.csv'):
                 bz.append(float(row[5]))
 
     return x, y, z, bx, by, bz
+
+
+def find_list_length_of_different_items(x):
+    xx = list()
+    for item in x:
+        if item not in xx:
+            xx.append(item)
+    return len(xx)
