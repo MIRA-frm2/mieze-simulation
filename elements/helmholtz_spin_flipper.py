@@ -24,7 +24,7 @@ class HelmholtzSpinFlipper(BasicElement):
 
         length = kwargs.get('length',  0.01 * unit.m)  # length of each coil
         coil_distance = kwargs.get('coil_distance',  0.045 * unit.m)
-        windings = kwargs.get('windings', 33 * unit.m)
+        windings = kwargs.get('windings', 33)
         radius = kwargs.get('radius', 0.055 * unit.m)  # Positions.R_HSF # Radius of each coil
         current = kwargs.get('current', 1.6 * unit.m)
 

@@ -117,3 +117,10 @@ def sanitize_output(func):
             value = 0
         return value
     return wrapper_sanitize_output
+
+
+def get_vector_norm(vector):
+    norm = 0
+    for item in vector:
+        norm += item ** 2
+    return np.sqrt(norm)

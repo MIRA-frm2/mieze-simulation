@@ -8,13 +8,19 @@
 
 """An implementation of the polariser."""
 
+import logging
 import numpy as np
 # from scipy.optimize import curve_fit2
 
 from elements.base import BasicElement
-from experiments.mieze.parameters import polarizer_position, unit
+from experiments.mieze.parameters import polarizer_position
 
-from utils.physics_constants import MU_0
+from utils.physics_constants import MU_0, unit
+from utils.helper_functions import get_vector_norm
+
+
+# Create a custom logger
+logger = logging.getLogger(__name__)
 
 
 class Polariser(BasicElement):
@@ -25,28 +31,25 @@ class Polariser(BasicElement):
 
         self.position = position
 
-        self.c = kwargs.get('c', 0.05 * unit.m)  # shift polarisator position
+        self.c = kwargs.get('c', 0.05)  # shift polarisator position
         # magnetic dipol moment Polarisator; both obtained by real measurements and data analysis
-        self.m = kwargs.get('m', np.array((0 * unit.m, 90 * unit.m, 0 * unit.m)))
+        self.m = kwargs.get('m', np.array((0, 90, 0)))
 
     def b_field(self, x, y, z):
-        x *= unit.m
-        y *= unit.m
-        z *= unit.m
-
         x -= self.position
+        x /= unit.m
         r_vec = np.array((x + self.c, y, z))
-        r = np.linalg.norm(r_vec)
+        r = get_vector_norm(r_vec)
 
         prefactor = (MU_0 / (4 * np.pi * r**2))
-        elem1 = 3 * r_vec * np.linalg.norm(self.m * r_vec)
+        elem1 = 3 * r_vec * get_vector_norm(self.m * r_vec)
         elem2 = self.m * r**2
-        b = prefactor * (elem1 - elem2) / r**3
 
-        # print()
+        b = prefactor * (elem1 - elem2) / r**3
+        # logger.error(f'{b}')
         # B = cls.MU_0/(4*np.pi*(r+cls.c)**3)*cls.m
         # B = (1e-7)*cls.m/(x+cls.c)**3
-        return b*1e4
+        return b[0] * 1e4 * b.units * unit.ampere * unit.m / unit.henry
         # return 1e3*(cls.MU_0/4*np.pi)*cls.m / (x+cls.c)**3
 
 

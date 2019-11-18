@@ -1,5 +1,6 @@
-import numpy as np
+import logging
 import matplotlib.pyplot as plt
+import numpy as np
 from numpy import gradient
 
 from elements.coils import RealCoil
@@ -9,17 +10,29 @@ from elements.spin_flipper import SpinFlipper
 
 from experiments.mieze.parameters import I_sf1, I_hsf1, lambda_n, I_real_coil, endpoint, HSF1, absolute_x_position, step
 
+from utils.physics_constants import unit
+
+
+# Create a custom logger
+logger = logging.getLogger(__name__)
+
 
 def extra_coil_check(B_extra, B_polariser):
-    if B_extra[0] > B_polariser[0]:
-        raise RuntimeError("Field of the extra coils too strong. Try resetting the extra coils.")
+    if B_extra.units != B_polariser.units:
+        raise RuntimeError(f'B field units do not match:\n extra: {B_extra[0].units}\n'
+                           f'polariser: {B_polariser.units}')
+
+    if B_extra > B_polariser:
+        pass
+        # raise RuntimeError("Field of the extra coils too strong. Try resetting the extra coils.")
 
 
 def main():
     # Define Polariser
     polariser = Polariser()
     # Define Real Coil
-    real_coil = RealCoil(coil_mid_pos=0.05, length=0.1, windings=100, current=I_real_coil, r=0.05)
+    real_coil = RealCoil(coil_mid_pos=0.05 * unit.m, length=0.1 * unit.m, windings=100,
+                         current=I_real_coil, r=0.05 * unit.m)
     # Define Spin Flippers and Helmholtzcoils
     spin_flipper = SpinFlipper(current=I_sf1)
 
@@ -33,16 +46,22 @@ def main():
 
     for x in absolute_x_position:
         b_field_polariser = polariser.b_field(x, 0, 0)
-        b_field_realcoil = real_coil.b_field(x, 0, 0)
-
+        b_field_realcoil = real_coil.b_field(x, 0, 0)[1]
         # Check
         extra_coil_check(b_field_realcoil, b_field_polariser)
 
-        Bx = b_field_polariser + spin_flipper.sf('sf1', x)  # G
+        b_field_spin_flipper = spin_flipper.b_field(x, 0, 0)
+        b_field_helmholtz = helmholtz_spin_flipper.b_field(x, 0, 0)[1]
 
-        By = helmholtz_spin_flipper.b_field(x, 0, 0) + b_field_realcoil  # G
+        Bx = b_field_polariser + b_field_spin_flipper  # G
+        By = b_field_helmholtz + b_field_realcoil  # G
+
+        logger.error(f'polariser{b_field_polariser}\nreal coil {b_field_realcoil}'
+                     f'\nspinflipper{b_field_spin_flipper}\nheilholtz {b_field_helmholtz}')
+        logger.error(f'bx{Bx}\nby{By}')
 
         B = np.sqrt(Bx**2+By**2)
+
         theta = np.degrees(np.arctan(By/Bx))
         dtheta_dy = gradient(theta, step)
 
