@@ -9,9 +9,12 @@
 """Physically relevant constants."""
 
 import numpy as np
-import pint
+from pint import UnitRegistry, set_application_registry
 
-unit = pint.UnitRegistry()
+unit = UnitRegistry()
+set_application_registry(unit)
+
+Q_ = unit.Quantity
 
 pi = np.pi
 MU_0 = 4e-7 * np.pi * unit.H / unit.m  # N/A, vacuum permeability

@@ -8,17 +8,22 @@
 
 """Individual magnetic elements (coils) for the setup."""
 
+import logging
 import mpmath
 import numpy as np
 import warnings
+
 from elements.base import BasicElement
 
 from utils.helper_functions import get_phi, adjust_field, sanitize_output
-from utils.physics_constants import MU_0
+from utils.physics_constants import MU_0, unit
 
 # Set the warning filter to errors such that one can catch them as they were errors
 # This is used to handle divisions by numerical 0
 warnings.filterwarnings('error')
+
+# Create a custom logger
+logger = logging.getLogger(__name__)
 
 
 class BaseCoil(BasicElement):
@@ -272,7 +277,7 @@ class RealCoil(BaseCoil):
         """
         x -= self.coil_mid_pos
         if axis_point == 0:
-            return 0
+            return 0 * unit.henry / unit.m
 
         if r:
             # ToDo: is the radius really not playing a role?
@@ -297,7 +302,6 @@ class RealCoil(BaseCoil):
         x -= self.coil_mid_pos
 
         rho = abs(rho)  # symmetric
-
         n = 4.0 * r * rho / (rho + r) ** 2
 
         return self.prefactor * (-self.sum_element_x(n, rho, x, s=-1) + self.sum_element_x(n, rho, x, s=1))
@@ -321,7 +325,9 @@ class RealCoil(BaseCoil):
 
     def b_field(self, x, y, z):
         """Compute the magnetic field given the position in cartesian coordinates."""
-        field = np.array((0., 0., 0.))
+        field = np.array([0. * unit.henry / unit.m,
+                          0. * unit.henry / unit.m,
+                          0. * unit.henry / unit.m])
         r = np.sqrt(y ** 2 + z ** 2)
 
         x_positions = np.arange(-(self.windings_x * self.wire_d / 2 - self.wire_d / 2),
@@ -331,10 +337,13 @@ class RealCoil(BaseCoil):
 
         for x0 in x_positions:
             for R in rs:
-                field_add = np.array((self.b_field_x(x + x0, R, r),
+                field_add = np.array([self.b_field_x(x + x0, R, r),
                                       self.b_field_rho(x + x0, R, y),
-                                      self.b_field_rho(x + x0, R, z)))
-                field = np.add(field, field_add, out=field)
+                                      self.b_field_rho(x + x0, R, z)])
+                # logger.error(f'{field}\n{field_add}')
+                # Casting is needed to avoid the  deprecation warnings, it casts the float result to integer
+                field += field_add
+                # field = np.add(field, field_add, out=field, casting='unsafe')
 
         if self.angle_y != 0:
             field = self._rotate(field, self.angle_y, np.array([0, 1, 0]))

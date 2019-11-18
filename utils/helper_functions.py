@@ -8,8 +8,12 @@
 
 """Helper functions used for various purposes."""
 
+import logging
 import numpy as np
 import csv
+
+# Create a custom logger
+logger = logging.getLogger(__name__)
 
 
 def transform_cartesian_to_cylindrical(x, y, z):
@@ -59,17 +63,18 @@ def save_data_to_file(data, file_name, extension='.csv'):
 
     with open(full_filename, 'w') as file:
 
-        print(f'Writing data to file {full_filename}')
+        logger.info(f'Writing data to file {full_filename}')
 
         csv_writer = csv.writer(file, delimiter=',')
         csv_writer.writerow(["x", "y", "z", "Bx", "By", "Bz"])
 
         for point, field in data.items():
-            row = list(point) + list(field)
+            row = list(point) + list((field[0].magnitude, field[1].magnitude, field[2].magnitude))
             csv_writer.writerow(row)
 
 
 def read_data_from_file(file_name='../data/data.csv'):
+    """Read data from file"""
     x = list()
     y = list()
     z = list()
@@ -108,7 +113,7 @@ def find_list_length_of_different_items(x):
 def sanitize_output(func):
     def wrapper_sanitize_output(*args, **kwargs):
         value = func(*args, **kwargs)
-        if abs(value) > 10e4:
+        if abs(value.magnitude) > 10e4:
             value = 0
         return value
     return wrapper_sanitize_output

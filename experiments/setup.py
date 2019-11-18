@@ -9,6 +9,7 @@
 """General setup allowing placement of different elements."""
 
 import itertools
+import logging
 from multiprocessing import Pool
 import numpy as np
 import matplotlib.pyplot as plt
@@ -17,6 +18,11 @@ from mpl_toolkits.mplot3d import Axes3D  # Needed for 3d plotting
 
 
 from utils.helper_functions import read_data_from_file
+from utils.physics_constants import unit
+
+
+# Create a custom logger
+logger = logging.getLogger(__name__)
 
 
 class Setup:
@@ -71,8 +77,11 @@ class Setup:
 
     def b_field(self, r: '(x, y, z)'):
         """Compute magnetic field."""
-        field = np.array((0., 0., 0.))
+        field = np.array((0. * unit.henry / unit.m,
+                          0. * unit.henry / unit.m,
+                          0. * unit.henry / unit.m))
         for element in self.elements:
+            logger.error(f'{field[0]._REGISTRY}\n{element.b_field(*r)[0]._REGISTRY}')
             np.add(field, element.b_field(*r), out=field)
             # field += element.B_field(*r)
 
@@ -169,15 +178,15 @@ class Setup:
     def calculate_b_field(self):
         """Calculate the magnetic field."""
 
-        # print(self.x_range, self.y_range, self.z_range)
+        # logger.error(f'{self.x_range}, {self.y_range}, {self.z_range}')
         positions = list(itertools.product(self.x_range, self.y_range, self.z_range))
-        # print(len(args), " calculations")
-        print('calculate')
+        logger.error(f'{len(positions)} calculations')
+        logger.info('calculate')
 
         with Pool(4) as p:
             result = p.map(self.b_field, positions)
 
-        print('calculation finished')
+        logger.info('calculation finished')
 
         self.b = dict(zip(positions, result))
         # print(self.b)
