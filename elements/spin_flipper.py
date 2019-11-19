@@ -18,9 +18,10 @@ from utils.physics_constants import MU_0, pi, unit
 
 class SpinFlipper(BasicElement):
 
-    def __init__(self, position=None, *args, **kwargs):
+    def __init__(self, position=SpinFlipper_position1, *args, **kwargs):
         super(SpinFlipper, self).__init__()
 
+        self.position = position
         self.windings = kwargs.get('windings', 100)
         self.length = kwargs.get('length', 13e-2 * unit.m)  # [m], winding length of the coil
         self.thickness = kwargs.get('thickness', 1e-2 * unit.m)  # [m], thickness of the coil
@@ -30,11 +31,15 @@ class SpinFlipper(BasicElement):
         x0 = self.length / 2.0
         n = self.windings / self.length
 
-        b_eff = n * MU_0 * current / pi * arctan(x0 / position) * unit.m / unit.radian
+        if position == 0:
+            angle = pi / 2
+        else:
+            angle = arctan(x0 / position)
+
+        b_eff = n * MU_0 * current / pi * angle * unit.m / unit.radian
         return b_eff
     
     def b_field(self, x, y, z):
-        zero = SpinFlipper_position1
         # if sf_name == 'sf1':
         #     zero = SpinFlipper_position1
         # elif sf_name == 'sf2':
@@ -42,7 +47,7 @@ class SpinFlipper(BasicElement):
         # else:
         #     raise RuntimeError('Wrong name for sf given.')
 
-        y = x - zero
+        y = x - self.position
 
         b1 = self._sf_th(self.current, y + self.thickness / 2.0)
         b2 = -self._sf_th(self.current, y - self.thickness / 2.0)

@@ -11,7 +11,7 @@ I_real_coil = 10 * unit.A
 
 startpoint = 0.001 * unit.m
 endpoint = 0.10 * unit.m  # Positions.get_position_coilA()
-absolute_x_position = np.linspace(startpoint.magnitude, endpoint.magnitude, num=1000)
+absolute_x_position = np.linspace(startpoint.magnitude, endpoint.magnitude, num=100)
 step = (absolute_x_position[1] - absolute_x_position[0]) * unit.m
 
 polarizer_position = 0 * unit.m

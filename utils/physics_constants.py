@@ -13,8 +13,7 @@ from pint import UnitRegistry, set_application_registry
 
 unit = UnitRegistry()
 set_application_registry(unit)
-
-Q_ = unit.Quantity
+unit.setup_matplotlib(True)
 
 pi = np.pi
 MU_0 = 4e-7 * np.pi * unit.H / unit.m  # N/A, vacuum permeability

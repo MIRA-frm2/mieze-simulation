@@ -341,7 +341,7 @@ class RealCoil(BaseCoil):
                 field_add = np.array([self.b_field_x(x + x0, R, r),
                                       self.b_field_rho(x + x0, R, y),
                                       self.b_field_rho(x + x0, R, z)])
-                logger.error(f'{field}\n{field_add}')
+                # logger.error(f'{field}\n{field_add}')
                 field += field_add
                 # field = np.add(field, field_add, out=field, casting='unsafe')
 
