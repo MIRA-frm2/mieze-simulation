@@ -21,7 +21,13 @@ from experiments.mieze.parameters import absolute_x_position, HSF1, step, lambda
 class Plotter:
 
     def __init__(self):
-        self.x_range, self.y_range, self.z_range, self.bx, self.by, self.bz = read_data_from_file()
+        self.x_range, self.y_range, self.z_range, self.bx, self.bz, self.by = read_data_from_file()
+
+        self.preadjust_values()
+
+    def preadjust_values(self):
+        self.bx = 1e-1 * np.asarray(np.abs(self.bx))
+        self.by = np.abs(self.by)
 
     def plot_field_1d_scalar(self, component=None):
 
@@ -187,7 +193,7 @@ class Plotter:
 
         fig1, ax = plt.subplots()
 
-        dtheta_dy = np.gradient(theta_values, step)
+        dtheta_dy = np.abs(np.gradient(theta_values, step))
         b_values = np.sqrt(np.power(np.asarray(self.bx), 2) + np.power(np.asarray(self.by), 2))
 
         # ax.set_yscale('log')

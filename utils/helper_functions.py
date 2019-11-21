@@ -51,7 +51,7 @@ def adjust_field(vector):
 
     Parameters
     ----------
-    vector: np.arry
+    vector: np.array
 
     """
     return np.array([vector[2], vector[1], vector[0]])

@@ -14,7 +14,6 @@ from multiprocessing import Pool
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
-from mpl_toolkits.mplot3d import Axes3D  # Needed for 3d plotting
 
 
 from utils.helper_functions import read_data_from_file
@@ -55,13 +54,12 @@ class Setup:
     def create_setup(self, current):
         raise NotImplementedError
 
-    def create_element(self, element_class, coil_mid_pos=0, length=0.1, windings=1000, current=10,  r=0.05,
+    def create_element(self, element_class, position=None, length=0.1, windings=1000, current=10,  r=0.05,
                        wire_d=0.006, angle_y=0, angle_z=0):
         """Create the physical geometry of the coils."""
         self.elements.append(
-            element_class(
-                coil_mid_pos=coil_mid_pos, length=length, windings=windings, current=current,
-                r=r, wire_d=wire_d, angle_y=angle_y, angle_z=angle_z))
+            element_class(position,  angle_y=angle_y, angle_z=angle_z, current=current, length=length, r=r,
+                          windings=windings, wire_d=wire_d))
         self.setup_changed = True
 
     def b_x(self, x, rho=0):
@@ -83,14 +81,13 @@ class Setup:
         """Compute magnetic field."""
         self.computation_number += 1
 
-        logger.error(f'{self.computation_number}: Computing magnetic field for point {r}')
         field = np.array((0., 0., 0.))
 
         for element in self.elements:
             np.add(field, element.b_field(*r), out=field)
-            # field += element.B_field(*r)
 
-        # logger.error(f'The total computed magnetic field at point {r} is: {field}')
+        logger.error(f'{self.computation_number}: Computed total magnetic field for point {r} is {field}')
+
         return field
 
     def change_current(self, current):

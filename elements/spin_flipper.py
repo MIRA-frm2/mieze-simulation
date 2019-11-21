@@ -18,14 +18,13 @@ from utils.physics_constants import MU_0, pi
 
 class SpinFlipper(BasicElement):
 
-    def __init__(self, position=SpinFlipper_position1, *args, **kwargs):
-        super(SpinFlipper, self).__init__()
+    def __init__(self, position=(SpinFlipper_position1, 0, 0), *args, **kwargs):
+        super(SpinFlipper, self).__init__(position)
 
-        self.position = position
         self.windings = kwargs.get('windings', 100)
-        self.length = kwargs.get('length', 13e-2 )  # [m], winding length of the coil
-        self.thickness = kwargs.get('thickness', 1e-2 )  # [m], thickness of the coil
-        self.current = kwargs.get('current', 1.0 )  # [A], coil currents
+        self.length = kwargs.get('length', 13e-2)  # [m], winding length of the coil
+        self.thickness = kwargs.get('thickness', 1e-2)  # [m], thickness of the coil
+        self.current = kwargs.get('current', 1.0)  # [A], coil currents
 
     def _sf_th(self, current, position):
         x0 = self.length / 2.0
@@ -47,7 +46,7 @@ class SpinFlipper(BasicElement):
         # else:
         #     raise RuntimeError('Wrong name for sf given.')
 
-        y = x - self.position
+        y = x - self.position_x
 
         b1 = self._sf_th(self.current, y + self.thickness / 2.0)
         b2 = -self._sf_th(self.current, y - self.thickness / 2.0)

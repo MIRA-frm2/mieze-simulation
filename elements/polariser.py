@@ -15,7 +15,7 @@ import numpy as np
 from elements.base import BasicElement
 from experiments.mieze.parameters import polarizer_position
 
-from utils.physics_constants import MU_0, unit
+from utils.physics_constants import MU_0
 from utils.helper_functions import get_vector_norm
 
 
@@ -25,9 +25,9 @@ logger = logging.getLogger(__name__)
 
 class Polariser(BasicElement):
 
-    def __init__(self, position=polarizer_position, *args, **kwargs):
+    def __init__(self, position=(polarizer_position, 0, 0), *args, **kwargs):
 
-        super(Polariser, self).__init__()
+        super(Polariser, self).__init__(position)
 
         self.position = position
 
@@ -36,8 +36,7 @@ class Polariser(BasicElement):
         self.m = kwargs.get('m', np.array((0, 90, 0)))
 
     def b_field(self, x, y, z):
-        x -= self.position
-        x /= unit.m
+        x -= self.position_x
         r_vec = np.array((x + self.c, y, z))
         r = get_vector_norm(r_vec)
 
@@ -49,7 +48,7 @@ class Polariser(BasicElement):
         # logger.error(f'{b}')
         # B = cls.MU_0/(4*np.pi*(r+cls.c)**3)*cls.m
         # B = (1e-7)*cls.m/(x+cls.c)**3
-        return b[0] * 1e4 * b.units * unit.ampere * unit.m / unit.henry
+        return b[0] * 1e4 * b
         # return 1e3*(cls.MU_0/4*np.pi)*cls.m / (x+cls.c)**3
 
 

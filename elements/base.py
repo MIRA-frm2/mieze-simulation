@@ -13,8 +13,8 @@ from abc import abstractmethod
 
 class BasicElement(object):
 
-    def __init__(self):
-        self.position = None
+    def __init__(self, position):
+        self.position_x, self.position_y, self.position_z = position
 
     @abstractmethod
     def b_field(self, x, y, z):

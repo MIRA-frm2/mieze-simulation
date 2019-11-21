@@ -16,24 +16,22 @@ from elements.coils import RealCoil
 
 class HelmholtzSpinFlipper(BasicElement):
 
-    def __init__(self, position=HelmholtzSpinFlipper_position_HSF1, **kwargs):
+    def __init__(self, position=(HelmholtzSpinFlipper_position_HSF1, 0, 0), **kwargs):
         """Inherit init from base class and define additional parameters."""
-        super(HelmholtzSpinFlipper, self).__init__()
-
-        mid_pos = position
+        super(HelmholtzSpinFlipper, self).__init__(position)
 
         length = kwargs.get('length',  0.01)  # length of each coil
-        coil_distance = kwargs.get('coil_distance',  0.045 )
+        coil_distance = kwargs.get('coil_distance',  0.045)
         windings = kwargs.get('windings', 33)
-        radius = kwargs.get('radius', 0.055 )  # Positions.R_HSF # Radius of each coil
-        current = kwargs.get('current', 1.6 )
+        radius = kwargs.get('radius', 0.055)  # Positions.R_HSF # Radius of each coil
+        current = kwargs.get('current', 1.6)
 
-        pos1 = mid_pos - coil_distance / 2.0
-        pos2 = mid_pos + coil_distance / 2.0
+        pos1 = (self.position_x - coil_distance / 2.0, 0, 0)
+        pos2 = (self.position_x + coil_distance / 2.0, 0, 0)
 
-        self.coil1 = RealCoil(coil_mid_pos=pos1, length=length, windings=windings, r=radius, current=current)
+        self.coil1 = RealCoil(pos1, current=current, length=length, windings=windings, r=radius)
 
-        self.coil2 = RealCoil(coil_mid_pos=pos2, length=length, windings=windings, r=radius, current=current)
+        self.coil2 = RealCoil(pos2, current=current, length=length, windings=windings, r=radius)
 
     def b_field(self, x, y, z):
         """Compute the magnetic field given the position."""
