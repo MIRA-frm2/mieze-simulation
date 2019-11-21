@@ -10,10 +10,13 @@
 
 from experiments.setup import Setup
 from experiments.mieze.parameters import (DISTANCE_2ND_COIL, DISTANCE_3RD_COIL, DISTANCE_4TH_COIL,
+                                          I_real_coil, I_hsf1, I_sf1,
                                           L_IN, L_OUT, N_IN, N_OUT, R_IN, R_OUT,
                                           SQUARE_COIL_POSITION_1ST, SQUARE_COIL_POSITION_2ND)
 
-from elements.coils import SquareCoil
+from elements.coils import SquareCoil, RealCoil
+from elements.spin_flipper import SpinFlipper
+from elements.helmholtz_spin_flipper import HelmholtzSpinFlipper
 
 
 class Mieze(Setup):
@@ -48,11 +51,16 @@ class Mieze(Setup):
         current1 = current
         current2 = current * self.detector_distance / (self.detector_distance - self.coil_distance)
 
+        self.create_element(element_class=RealCoil, coil_mid_pos=0.05, length=0.1, windings=100,
+                            current=I_real_coil, r=0.05)
+        self.create_element(element_class=SpinFlipper, current=I_sf1)
+        self.create_element(element_class=HelmholtzSpinFlipper, current=I_hsf1)
+
         # self.create_element(element_class=SquareCoil, coil_mid_pos=SQUARE_COIL_POSITION_1ST)
         #
         # self._create_coil_set(current=current1)
         # self._create_coil_set(current=current2, first_coil_pos=self.coil_distance)
 
-        self.create_element(element_class=SquareCoil, coil_mid_pos=SQUARE_COIL_POSITION_2ND)
+        # self.create_element(element_class=SquareCoil, coil_mid_pos=SQUARE_COIL_POSITION_2ND)
 
         self.set_plot_ticks()

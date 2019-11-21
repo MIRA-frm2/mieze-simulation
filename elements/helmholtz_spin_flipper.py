@@ -8,7 +8,7 @@
 
 """An implementation of the Helmholtz Spin Flipper."""
 
-from experiments.mieze.parameters import HelmholtzSpinFlipper_position_HSF1, unit
+from experiments.mieze.parameters import HelmholtzSpinFlipper_position_HSF1
 
 from elements.base import BasicElement
 from elements.coils import RealCoil
@@ -22,11 +22,11 @@ class HelmholtzSpinFlipper(BasicElement):
 
         mid_pos = position
 
-        length = kwargs.get('length',  0.01 * unit.m)  # length of each coil
-        coil_distance = kwargs.get('coil_distance',  0.045 * unit.m)
+        length = kwargs.get('length',  0.01)  # length of each coil
+        coil_distance = kwargs.get('coil_distance',  0.045 )
         windings = kwargs.get('windings', 33)
-        radius = kwargs.get('radius', 0.055 * unit.m)  # Positions.R_HSF # Radius of each coil
-        current = kwargs.get('current', 1.6 * unit.m)
+        radius = kwargs.get('radius', 0.055 )  # Positions.R_HSF # Radius of each coil
+        current = kwargs.get('current', 1.6 )
 
         pos1 = mid_pos - coil_distance / 2.0
         pos2 = mid_pos + coil_distance / 2.0

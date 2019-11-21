@@ -9,12 +9,7 @@
 """Physically relevant constants."""
 
 import numpy as np
-from pint import UnitRegistry, set_application_registry
-
-unit = UnitRegistry()
-set_application_registry(unit)
-unit.setup_matplotlib(True)
 
 pi = np.pi
-MU_0 = 4e-7 * np.pi * unit.H / unit.m  # N/A, vacuum permeability
+MU_0 = 4e-7 * np.pi  # N/A, vacuum permeability
 earth_field = np.array((0, 210, -436)) * 1e-3

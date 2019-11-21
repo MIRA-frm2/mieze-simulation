@@ -16,7 +16,7 @@ import warnings
 from elements.base import BasicElement
 
 from utils.helper_functions import get_phi, adjust_field, sanitize_output
-from utils.physics_constants import MU_0, unit
+from utils.physics_constants import MU_0
 
 # Set the warning filter to errors such that one can catch them as they were errors
 # This is used to handle divisions by numerical 0
@@ -64,7 +64,7 @@ class BaseCoil(BasicElement):
     @staticmethod
     def _k(m):
         """Compute the elliptical function of first kind."""
-        return float(mpmath.ellipk(m.magnitude))
+        return float(mpmath.ellipk(m))
 
     @staticmethod
     def _e(m):
@@ -74,7 +74,7 @@ class BaseCoil(BasicElement):
     @staticmethod
     def _p(n, m):
         """Compute the elliptical function third kind"""
-        return float(mpmath.ellippi(n.magnitude, np.pi / 2, m.magnitude))
+        return float(mpmath.ellippi(n, np.pi / 2, m))
 
     @staticmethod
     def _rotate(vector, phi, axis):
@@ -243,8 +243,8 @@ class Coil(BaseCoil):
 class RealCoil(BaseCoil):
     """Class that implements a coil with more realistic experimental parameters."""
 
-    def __init__(self, coil_mid_pos=0 * unit.m, length=0.1 * unit.m, windings=100, current=10 * unit.ampere,
-                 r=0.05 * unit.m, wire_d=0.006 * unit.m, angle_y=0, angle_z=0):
+    def __init__(self, coil_mid_pos=0 , length=0.1 , windings=100, current=10 ,
+                 r=0.05 , wire_d=0.006 , angle_y=0, angle_z=0):
         """Simulate physical geometry of the coil."""
 
         super(RealCoil, self).__init__()
@@ -277,7 +277,7 @@ class RealCoil(BaseCoil):
         """
         x -= self.coil_mid_pos
         if axis_point == 0:
-            return 0 * unit.ampere *  unit.henry / unit.m
+            return 0
 
         if r:
             # ToDo: is the radius really not playing a role?
@@ -322,13 +322,13 @@ class RealCoil(BaseCoil):
         """
         return self.zeta(x, s) / self.beta(rho, x, s) \
             * ((rho - self.r) / (rho + self.r) * self._p(n, self.m(rho, x, s)) - self._k(self.m(rho, x, s)))\
-               * unit.m
+               
 
     def b_field(self, x, y, z):
         """Compute the magnetic field given the position in cartesian coordinates."""
-        field = np.array([0. * unit.ampere * unit.henry / unit.m,
-                          0. * unit.ampere * unit.henry / unit.m,
-                          0. * unit.ampere * unit.henry / unit.m])
+        field = np.array([0.,
+                          0.,
+                          0.])
         r = np.sqrt(y ** 2 + z ** 2)
 
         x_positions = np.arange(-(self.windings_x * self.wire_d / 2 - self.wire_d / 2),
@@ -368,7 +368,7 @@ class SquareCoil(BaseCoil):
 
         self.coil_mid_pos = coil_mid_pos
 
-        self.current = current * unit.ampere
+        self.current = current 
         self.length = length
 
         self.width = r * 2

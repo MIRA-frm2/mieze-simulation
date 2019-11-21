@@ -18,7 +18,6 @@ from mpl_toolkits.mplot3d import Axes3D  # Needed for 3d plotting
 
 
 from utils.helper_functions import read_data_from_file
-from utils.physics_constants import unit
 
 
 # Create a custom logger
@@ -51,13 +50,18 @@ class Setup:
         self.x_ticks = None
         self.x_ticks_labels = None
 
+        self.computation_number = 0
+
     def create_setup(self, current):
         raise NotImplementedError
 
     def create_element(self, element_class, coil_mid_pos=0, length=0.1, windings=1000, current=10,  r=0.05,
                        wire_d=0.006, angle_y=0, angle_z=0):
         """Create the physical geometry of the coils."""
-        self.elements.append(element_class(coil_mid_pos, length, windings, current,  r, wire_d, angle_y, angle_z))
+        self.elements.append(
+            element_class(
+                coil_mid_pos=coil_mid_pos, length=length, windings=windings, current=current,
+                r=r, wire_d=wire_d, angle_y=angle_y, angle_z=angle_z))
         self.setup_changed = True
 
     def b_x(self, x, rho=0):
@@ -77,15 +81,16 @@ class Setup:
 
     def b_field(self, r: '(x, y, z)'):
         """Compute magnetic field."""
-        field = np.array((0. * unit.henry / unit.m,
-                          0. * unit.henry / unit.m,
-                          0. * unit.henry / unit.m))
+        self.computation_number += 1
+
+        logger.error(f'{self.computation_number}: Computing magnetic field for point {r}')
+        field = np.array((0., 0., 0.))
+
         for element in self.elements:
-            logger.error(f'{field[0]._REGISTRY}\n{element.b_field(*r)[0]._REGISTRY}')
             np.add(field, element.b_field(*r), out=field)
             # field += element.B_field(*r)
 
-        # print(f'The total computed magnetic field at point {r} is: {field}')
+        # logger.error(f'The total computed magnetic field at point {r} is: {field}')
         return field
 
     def change_current(self, current):

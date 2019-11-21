@@ -11,10 +11,11 @@
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 from mpl_toolkits.mplot3d import Axes3D  # Needed for 3d plotting
+
 import numpy as np
-from scipy.interpolate import griddata
 
 from utils.helper_functions import read_data_from_file, find_list_length_of_different_items
+from experiments.mieze.parameters import absolute_x_position, HSF1, step, lambda_n
 
 
 class Plotter:
@@ -137,11 +138,78 @@ class Plotter:
 
         plt.show()
 
+    def extra_coil_check(self, b_extra, b_polariser):
+        if b_extra.units != b_polariser.units:
+            raise RuntimeError(f'B field units do not match:\n extra: {b_extra.units}\n'
+                               f'polariser: {b_polariser.units}')
+
+        if b_extra > b_polariser:
+            pass
+            # raise RuntimeError("Field of the extra coils too strong. Try resetting the extra coils.")
+
+    def plot_adiabatic_check(self):
+        index_first_hsf = np.argmin(abs(absolute_x_position-HSF1))
+
+        fig1, ax1 = plt.subplots()
+
+        color = 'tab:red'
+        ax1.set_xlabel('Neutron Trajectory (m)')
+        ax1.set_ylabel('Magnetic field (G)', color=color)
+
+        # logger.error(f'{absolute_x_position}\n]{Bx_values}\n{By_values}')
+
+        ax1.plot(absolute_x_position, self.bx)
+        ax1.plot(absolute_x_position, self.by)
+
+        ax1.legend((r'$B_x$', r'$B_y$'), loc=9)
+        ax1.tick_params(axis='y', labelcolor=color)
+
+        ax2 = ax1.twinx()  # instantiate a second axes that shares the same x-axis
+
+        color = 'tab:green'
+        x_pos = absolute_x_position[index_first_hsf]
+        # noinspection PyTypeChecker
+        theta_values = np.degrees(np.arctan(np.divide(np.asarray(self.by), np.asarray(self.bx))))
+        y_pos = theta_values[index_first_hsf]
+
+
+        # we already handled the x-label with ax1
+        ax2.set_ylabel(r'$\theta$ (degree)', color=color)
+        ax2.plot(absolute_x_position, theta_values, color=color)
+        ax2.tick_params(axis='y', labelcolor=color)
+        ax2.plot(x_pos, y_pos, color='black', marker='o')
+        ax2.text(x_pos, y_pos*0.9, '{:.1f}°'.format(y_pos))
+
+        # fig1.tight_layout()  # otherwise the right y-label is slightly clipped
+        plt.show()
+        # plt.savefig('By_Bx.pdf')
+        # plt.close()
+
+        fig1, ax = plt.subplots()
+
+        dtheta_dy = np.gradient(theta_values, step)
+        b_values = np.sqrt(np.power(np.asarray(self.bx), 2) + np.power(np.asarray(self.by), 2))
+
+        # ax.set_yscale('log')
+        ax.plot(absolute_x_position, np.asarray(dtheta_dy) * 1e-2)  # y from m to cm
+        ax.plot(absolute_x_position, 2.65*lambda_n * np.asarray(b_values) * 1e-1)  # B from Gauss to mT,
+        ax.legend((r'$\frac{d\theta}{dy}$', r'$2.65\lambda B$'))
+
+        ax.set_xlabel('Neutron Trajectory (m)')
+        ax.set_ylabel("(degrees/cm)")
+        ax.grid()
+        # fig1.tight_layout()
+        plt.show()
+        # plt.savefig('Adiabatic_Check.pdf')
+        # plt.close()
+
 
 if __name__ == "__main__":
     plotter = Plotter()
 
     # plotter.plot_field_1d_scalar()
     # plotter.plot_field_2d_clr_map(plane='yz')
-    plotter.plot_field_2d_vec_map(plane='xy')
+    # plotter.plot_field_2d_vec_map(plane='xy')
     # plotter.plot_field_3d()
+
+    plotter.plot_adiabatic_check()

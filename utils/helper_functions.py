@@ -69,7 +69,7 @@ def save_data_to_file(data, file_name, extension='.csv'):
         csv_writer.writerow(["x", "y", "z", "Bx", "By", "Bz"])
 
         for point, field in data.items():
-            row = list(point) + list((field[0].magnitude, field[1].magnitude, field[2].magnitude))
+            row = list(point) + list((field[0], field[1], field[2]))
             csv_writer.writerow(row)
 
 
@@ -113,7 +113,7 @@ def find_list_length_of_different_items(x):
 def sanitize_output(func):
     def wrapper_sanitize_output(*args, **kwargs):
         value = func(*args, **kwargs)
-        if abs(value.magnitude) > 10e4:
+        if abs(value) > 10e4:
             value = 0
         return value
     return wrapper_sanitize_output
