@@ -16,7 +16,7 @@ import warnings
 from elements.base import BasicElement
 
 from utils.helper_functions import get_phi, adjust_field, sanitize_output
-from utils.physics_constants import MU_0
+from utils.physics_constants import MU_0, pi
 
 # Set the warning filter to errors such that one can catch them as they were errors
 # This is used to handle divisions by numerical 0
@@ -127,27 +127,30 @@ class BaseCoil(BasicElement):
 class Coil(BaseCoil):
     """Class that implements an ideal circular coil."""
 
-    def __init__(self, position, length=0.1, windings=100, current=10, r=0.05, wire_d=0.006, angle_y=0,
-                 angle_z=0):
+    def __init__(self, position, length, windings, current, r, wire_d, angle_y=0, angle_z=0):
         """Simulate physical geometry of the coil."""
 
         super(Coil, self).__init__(position)
 
         self.length = length
-        self.n = windings
+        self.windings = windings
 
         inverse_r_sum = 0
-        num_layers = windings * wire_d / length
+        num_layers = windings * wire_d / length if wire_d else 1
         r_large = r + wire_d * num_layers
 
-        for r_i in np.arange(r + wire_d / 2, r_large, wire_d):
-            inverse_r_sum += 1 / r_i
+        if wire_d:
+            for r_i in np.arange(r + wire_d / 2, r_large, wire_d):
+                inverse_r_sum += 1 / r_i
+        else:
+            inverse_r_sum = 1/r_large
+
         self.r = 1 / (inverse_r_sum / num_layers)
         self.current = current
         self.angle_y = angle_y
         self.angle_z = angle_z
 
-        self.prefactor *= 1e-1 / (2 * np.pi) * self.n * self.current / self.length
+        self.prefactor *= self.windings * self.current / (2 * pi * self.length)
 
     @sanitize_output
     def b_field_rho(self, x, rho):
@@ -185,7 +188,6 @@ class Coil(BaseCoil):
     @sanitize_output
     def b_field_x(self, x, rho=0):
         """Compute the magnetic field in x direction.
-
 
         # N = turns of winding, I = current (A), R = radius (m), l = length (m)
 
@@ -257,7 +259,7 @@ class RealCoil(BaseCoil):
         self.angle_y = angle_y
         self.angle_z = angle_z
 
-        self.prefactor *= 1e-1 / (2 * np.pi) * self.n * self.current / self.length
+        self.prefactor *= 1 / (2 * np.pi) * self.n * self.current / self.length
 
     def b_field_rho(self, x, r, axis_point):
         """Compute the magnetic field in rho (radial) direction.
@@ -357,8 +359,7 @@ class SquareCoil(BaseCoil):
     The coordinates from the reference paper are changed from (x, y, z) to (z, y, x), hence the change in the formulae.
     """
 
-    def __init__(self, position, length=0.1, windings=100, current=10, r=0.05, wire_d=0.006,
-                 angle_y=0, angle_z=0):
+    def __init__(self, position, length, windings, current, r, wire_d, angle_y=None, angle_z=None):
         """Simulate physical geometry of the coil."""
 
         super(SquareCoil, self).__init__(position)
@@ -375,7 +376,7 @@ class SquareCoil(BaseCoil):
         self.angle_y = angle_y
         self.angle_z = angle_z
 
-        self.prefactor *= 1e-1 / (4 * np.pi) * self.n * self.current / self.length
+        self.prefactor *= 1 / (4 * np.pi) * self.n * self.current / self.length
 
     def check_physical_coil_overlap(self):
         """Deal with division by 0.
@@ -418,7 +419,8 @@ class SquareCoil(BaseCoil):
 
         field = adjust_field(field)
 
-        return self._reverse_coordinates(*self.sanitize_output(field))
+        # return self._reverse_coordinates(*self.sanitize_output(field))
+        return self.sanitize_output(field)
 
     @staticmethod
     def sanitize_output(field):
