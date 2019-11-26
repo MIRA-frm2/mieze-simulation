@@ -15,13 +15,13 @@ from mpl_toolkits.mplot3d import Axes3D  # Needed for 3d plotting
 import numpy as np
 
 from utils.helper_functions import read_data_from_file, find_list_length_of_different_items
-from experiments.mieze.parameters import absolute_x_position, HSF1, step, lambda_n
+from experiments.mieze.parameters import absolute_x_position, HelmholtzSpinFlipper_position_HSF1, step, lambda_n
 
 
 class Plotter:
 
     def __init__(self):
-        self.x_range, self.y_range, self.z_range, self.bx, self.bz, self.by = read_data_from_file()
+        self.x_range, self.y_range, self.z_range, self.bx, self.by, self.bz = read_data_from_file()
 
         self.preadjust_values()
 
@@ -33,9 +33,12 @@ class Plotter:
 
         fig = plt.figure()
         # ax = fig.add_axes([0.1, 0.1, 0.8, 0.8])  # main axes
-
-        plt.plot(self.x_range, self.bx)
-
+        if component == 'x':
+            plt.plot(self.x_range, self.bx)
+        elif component == 'y':
+            plt.plot(self.x_range, self.by)
+        elif component == 'z':
+            plt.plot(self.x_range, self.bz)
         # if self.x_ticks and self.x_ticks_labels:
         #     ax.set_xticks(self.x_ticks)
         #     ax.set_xticklabels(self.x_ticks_labels)
@@ -50,8 +53,8 @@ class Plotter:
             x = self.x_range
             y = self.y_range
 
-            fx = self.bx
-            fy = self.by
+            f = self.bz
+            # fy = self.by
         elif plane == 'yz':
             x = self.y_range
             y = self.z_range
@@ -154,7 +157,7 @@ class Plotter:
             # raise RuntimeError("Field of the extra coils too strong. Try resetting the extra coils.")
 
     def plot_adiabatic_check(self):
-        index_first_hsf = np.argmin(abs(absolute_x_position-HSF1))
+        index_first_hsf = np.argmin(abs(np.asarray(self.x_range)-HelmholtzSpinFlipper_position_HSF1))
 
         fig1, ax1 = plt.subplots()
 
@@ -164,24 +167,24 @@ class Plotter:
 
         # logger.error(f'{absolute_x_position}\n]{Bx_values}\n{By_values}')
 
-        ax1.plot(absolute_x_position, self.bx)
-        ax1.plot(absolute_x_position, self.by)
+        ax1.plot(self.x_range, self.bx)
+        ax1.plot(self.x_range, self.bz)
 
-        ax1.legend((r'$B_x$', r'$B_y$'), loc=9)
+        ax1.legend((r'$B_x$', r'$B_z$'), loc=9)
         ax1.tick_params(axis='y', labelcolor=color)
 
         ax2 = ax1.twinx()  # instantiate a second axes that shares the same x-axis
 
         color = 'tab:green'
-        x_pos = absolute_x_position[index_first_hsf]
+        x_pos = self.x_range[index_first_hsf]
         # noinspection PyTypeChecker
-        theta_values = np.degrees(np.arctan(np.divide(np.asarray(self.by), np.asarray(self.bx))))
+        theta_values = np.degrees(np.arctan(np.divide(np.asarray(self.bz), np.asarray(self.bx))))
         y_pos = theta_values[index_first_hsf]
 
 
         # we already handled the x-label with ax1
         ax2.set_ylabel(r'$\theta$ (degree)', color=color)
-        ax2.plot(absolute_x_position, theta_values, color=color)
+        ax2.plot(self.x_range, theta_values, color=color)
         ax2.tick_params(axis='y', labelcolor=color)
         ax2.plot(x_pos, y_pos, color='black', marker='o')
         ax2.text(x_pos, y_pos*0.9, '{:.1f}°'.format(y_pos))
@@ -194,11 +197,11 @@ class Plotter:
         fig1, ax = plt.subplots()
 
         dtheta_dy = np.abs(np.gradient(theta_values, step))
-        b_values = np.sqrt(np.power(np.asarray(self.bx), 2) + np.power(np.asarray(self.by), 2))
+        b_values = np.sqrt(np.power(np.asarray(self.bx), 2) + np.power(np.asarray(self.bz), 2))
 
         # ax.set_yscale('log')
-        ax.plot(absolute_x_position, np.asarray(dtheta_dy) * 1e-2)  # y from m to cm
-        ax.plot(absolute_x_position, 2.65*lambda_n * np.asarray(b_values) * 1e-1)  # B from Gauss to mT,
+        ax.plot(self.x_range, np.asarray(dtheta_dy) * 1e-2)  # y from m to cm
+        ax.plot(self.x_range, 2.65*lambda_n * np.asarray(b_values) * 1e-1)  # B from Gauss to mT,
         ax.legend((r'$\frac{d\theta}{dy}$', r'$2.65\lambda B$'))
 
         ax.set_xlabel('Neutron Trajectory (m)')
@@ -213,9 +216,10 @@ class Plotter:
 if __name__ == "__main__":
     plotter = Plotter()
 
-    # plotter.plot_field_1d_scalar()
+    plotter.plot_field_1d_scalar(component='z')
+
     # plotter.plot_field_2d_clr_map(plane='yz')
     # plotter.plot_field_2d_vec_map(plane='xy')
     # plotter.plot_field_3d()
 
-    plotter.plot_adiabatic_check()
+    # plotter.plot_adiabatic_check()

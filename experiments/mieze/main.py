@@ -9,13 +9,13 @@
 """An implementation of the MIEZE setup."""
 
 from experiments.setup import Setup
-from experiments.mieze.parameters import (DISTANCE_2ND_COIL, DISTANCE_3RD_COIL, DISTANCE_4TH_COIL,
-                                          I_real_coil, I_hsf1, I_sf1,
-                                          L_IN, L_OUT, N_IN, N_OUT, R_IN, R_OUT,
-                                          SpinFlipper_position1, HelmholtzSpinFlipper_position_HSF1,
-                                          SQUARE_COIL_POSITION_1ST, SQUARE_COIL_POSITION_2ND)
+from experiments.mieze.parameters import (
+    DISTANCE_2ND_COIL, DISTANCE_3RD_COIL, DISTANCE_4TH_COIL, I_real_coil, I_hsf1, I_sf1, L_IN, L_OUT, N_IN, N_OUT, R_IN,
+    R_OUT, SpinFlipper_position1, HelmholtzSpinFlipper_position_HSF1, SQUARE_COIL_POSITION_1ST,
+    SQUARE_COIL_POSITION_2ND, RECTANGULAR_COIL_LENGTH, RECTANGULAR_COIL_HEIGHT, RECTANGULAR_COIL_WIDTH, WIRE_D,
+    WINDINGS)
 
-from elements.coils import SquareCoil, RealCoil
+from elements.coils import RectangularCoil, RealCoil
 from elements.spin_flipper import SpinFlipper
 from elements.helmholtz_spin_flipper import HelmholtzSpinFlipper
 
@@ -52,10 +52,13 @@ class Mieze(Setup):
         current1 = current
         current2 = current * self.detector_distance / (self.detector_distance - self.coil_distance)
 
-        self.create_element(element_class=RealCoil, position=(0.05, 0, 0), length=0.1, windings=100,
-                            current=I_real_coil, r=0.05)
-        self.create_element(element_class=SquareCoil, position=(SpinFlipper_position1, 0, 0), current=I_sf1)
-        self.create_element(element_class=HelmholtzSpinFlipper, position=(HelmholtzSpinFlipper_position_HSF1, 0, 0), current=I_hsf1)
+        # self.create_element(element_class=RealCoil, position=(0.05, 0, 0), length=0.1, windings=100,
+        #                     current=I_real_coil, r=0.05)
+        self.create_element(element_class=RectangularCoil, position=(SpinFlipper_position1, 0, 0), current=I_sf1,
+                            length=RECTANGULAR_COIL_LENGTH, height=RECTANGULAR_COIL_HEIGHT,
+                            width=RECTANGULAR_COIL_WIDTH, wire_d=WIRE_D, windings=WINDINGS)
+
+        # self.create_element(element_class=HelmholtzSpinFlipper, position=(HelmholtzSpinFlipper_position_HSF1, 0, 0), current=I_hsf1)
 
         # self.create_element(element_class=SquareCoil, coil_mid_pos=SQUARE_COIL_POSITION_1ST)
         #

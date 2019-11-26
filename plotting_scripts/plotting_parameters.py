@@ -1,4 +1,4 @@
-from elements.coils import Coil, RealCoil, SquareCoil
+from elements.coils import Coil, RealCoil, RectangularCoil
 
 plot_parameters = {
     'coil_simple_1d_x': {
@@ -49,14 +49,14 @@ plot_parameters = {
         'coil_args': None,
     },
     'coil_square_1d_x': {
-        'element': SquareCoil,
+        'element': RectangularCoil,
         'plot_dimension': '1d',
         'plot_args': {'type': 'scalar', 'component': 'x'},
         'grid_size': {'x_start': -0.2, 'x_end': 0.2, 'y_start': -0.0, 'y_end': 0.0, 'z_start': -0.0, 'z_end': 0.0},
         'coil_args': None,
     },
     'coil_square_2d_yz': {
-        'element': SquareCoil,
+        'element': RectangularCoil,
         'plot_dimension': '2d',
         'plot_args': {'type': 'scalar', 'component': 'x'},
         'grid_size': {'x_start': -0.0, 'x_end': 0.0, 'y_start': -0.2, 'y_end': 0.2, 'z_start': -0.2, 'z_end': 0.2,
@@ -64,7 +64,7 @@ plot_parameters = {
         'coil_args': None,
     },
     'coil_square_2d_xy': {
-        'element': SquareCoil,
+        'element': RectangularCoil,
         'plot_dimension': '2d',
         'plot_args': {'type': 'scalar', 'component': 'x'},
         'grid_size': {'x_start': -0.2, 'x_end': 0.2, 'y_start': -0.2, 'y_end': 0.2, 'z_start': -0.0, 'z_end': 0.0,
@@ -72,7 +72,7 @@ plot_parameters = {
         'coil_args': None,
     },
     'coil_square_3d': {
-        'element': SquareCoil,
+        'element': RectangularCoil,
         'plot_dimension': '3d',
         'plot_args': {'type': 'scalar', 'component': 'x'},
         'grid_size': {'x_start': -0.2, 'x_end': 0.2, 'y_start': -0.0, 'y_end': 0.0, 'z_start': -0.2, 'z_end': 0.2,
@@ -80,7 +80,7 @@ plot_parameters = {
         'coil_args': None,
     },
     'coil_square_3d_beamline': {
-        'element': SquareCoil,
+        'element': RectangularCoil,
         'plot_dimension': '3d',
         'plot_args': {'type': 'scalar', 'component': 'x'},
         'grid_size': {'x_start': -0.0, 'x_end': 0.0, 'y_start': -0.0, 'y_end': 0.0, 'z_start': -0.2, 'z_end': 0.2,

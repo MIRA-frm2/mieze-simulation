@@ -54,12 +54,10 @@ class Setup:
     def create_setup(self, current):
         raise NotImplementedError
 
-    def create_element(self, element_class, position=None, length=0.1, windings=1000, current=10,  r=0.05,
-                       wire_d=0.006, angle_y=0, angle_z=0):
+    def create_element(self, element_class, position=None, **kwargs):
         """Create the physical geometry of the coils."""
         self.elements.append(
-            element_class(position,  angle_y=angle_y, angle_z=angle_z, current=current, length=length, r=r,
-                          windings=windings, wire_d=wire_d))
+            element_class(position,  **kwargs))
         self.setup_changed = True
 
     def b_x(self, x, rho=0):

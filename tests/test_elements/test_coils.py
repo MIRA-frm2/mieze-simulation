@@ -11,15 +11,15 @@
 from numpy import sqrt, pi
 from unittest import TestCase
 
-from elements.coils import Coil, RealCoil, SquareCoil
+from elements.coils import Coil, RealCoil, RectangularCoil
 
 from utils.physics_constants import MU_0
 
 
-class TestSquareCoil(TestCase):
+class TestRectangularCoil(TestCase):
 
     def setUp(self) -> None:
-        self.square_coil = SquareCoil(position=(0, 0, 0), length=1, windings=1, wire_d=1, current=1, r=1)
+        self.coil = RectangularCoil(position=(0, 0, 0), length=1, windings=1, wire_d=1, current=1, width=1, height=1)
 
     def test_square_coil_center_value(self):
         """Test for a reference value in the center of a square coil."""
@@ -32,11 +32,10 @@ class TestSquareCoil(TestCase):
 
         numerical_error_acceptance = 1e-4
 
-        self.square_coil.current = current
-        self.square_coil.r = side_length/2
+        self.coil.current = current
 
         # Evaluate
-        test_value = self.square_coil.b_field(0, 0, 0)
+        test_value = self.coil.b_field(0, 0, 0)
 
         # print(test_value, reference_value)
 

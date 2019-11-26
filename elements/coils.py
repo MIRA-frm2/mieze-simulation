@@ -353,22 +353,19 @@ class RealCoil(BaseCoil):
         return field
 
 
-class SquareCoil(BaseCoil):
-    """Class that implements a square coil.
+class RectangularCoil(BaseCoil):
+    """Class that implements a rectangular coil."""
 
-    The coordinates from the reference paper are changed from (x, y, z) to (z, y, x), hence the change in the formulae.
-    """
-
-    def __init__(self, position, length, windings, current, r, wire_d, angle_y=None, angle_z=None):
+    def __init__(self, position, length, windings, current, width, height, wire_d, angle_y=None, angle_z=None):
         """Simulate physical geometry of the coil."""
 
-        super(SquareCoil, self).__init__(position)
+        super(RectangularCoil, self).__init__(position)
 
         self.current = current 
         self.length = length
 
-        self.width = r
-        self.height = r
+        self.width = width
+        self.height = height
 
         self.n = windings
         self.wire_d = wire_d
@@ -407,6 +404,7 @@ class SquareCoil(BaseCoil):
         -------
         magnetic field in cartesian coordinates
         """
+        # self.x, self.y, self.z = x, y, z
         self.x, self.y, self.z = self._reverse_coordinates(x, y, z)
 
         field = self.check_physical_coil_overlap()
@@ -419,9 +417,9 @@ class SquareCoil(BaseCoil):
 
         field = adjust_field(field)
 
-        # return self._reverse_coordinates(*self.sanitize_output(field))
-        return self.sanitize_output(field)
-
+        return self._reverse_coordinates(*self.sanitize_output(field))
+        # return self.sanitize_output(field)
+    #
     @staticmethod
     def sanitize_output(field):
         """Sanitize magnetic field..
