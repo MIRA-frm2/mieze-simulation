@@ -68,8 +68,17 @@ def save_data_to_file(data, file_name, extension='.csv'):
         csv_writer = csv.writer(file, delimiter=',')
         csv_writer.writerow(["x", "y", "z", "Bx", "By", "Bz"])
 
+        # print(data)
         for point, field in data.items():
-            row = list(point) + list((field[0], field[1], field[2]))
+            # logger.debug(type(point))
+            if type(point) != np.float64:
+                point = list(point)
+            else:
+                point = list((point, ))
+
+            # print(point, field)
+
+            row = point + list((field[0], field[1], field[2]))
             csv_writer.writerow(row)
 
 

@@ -26,6 +26,8 @@ DISTANCE_2ND_COIL = 0.073   # [m]
 DISTANCE_3RD_COIL = 0.187   # [m]
 DISTANCE_4TH_COIL = 0.260   # [m]
 
+COIL_SET_CURRENT = 5  # [A]
+
 # Square coil Parameters
 SQUARE_COIL_POSITION_1ST = 0.1   # [A]
 SQUARE_COIL_POSITION_2ND = 1   # [A]
