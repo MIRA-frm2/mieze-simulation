@@ -112,6 +112,10 @@ def read_data_from_file(file_name='../data/data.csv'):
 
 
 def find_list_length_of_different_items(x):
+    """Returns the length if different items from a list.
+
+    The initial list may contain duplicates that would otherwsid
+    """
     xx = list()
     for item in x:
         if item not in xx:

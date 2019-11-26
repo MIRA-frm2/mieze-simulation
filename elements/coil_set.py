@@ -17,12 +17,16 @@ from experiments.mieze.parameters import DISTANCE_2ND_COIL, DISTANCE_3RD_COIL, D
 class CoilSet(BasicElement):
     """Class that implements a coil with more realistic experimental parameters."""
 
-    def __init__(self, position, coil_type=Coil):
+    def __init__(self, position, coil_type=Coil, distance_2nd_coil=None, distance_4th_coil=None):
         super(CoilSet, self).__init__(position)
 
         self.coil_type = coil_type
 
         self.first_coil_pos = self.position_x
+
+        self.distance_2nd_coil = distance_2nd_coil if distance_2nd_coil else DISTANCE_2ND_COIL
+        self.distance_3rd_coil = DISTANCE_3RD_COIL + (self.distance_2nd_coil - DISTANCE_2ND_COIL)
+        self.distance_4th_coil = self.distance_3rd_coil + distance_4th_coil if distance_4th_coil else (DISTANCE_4TH_COIL - DISTANCE_3RD_COIL)
 
         self.elements = list()
 
@@ -33,9 +37,9 @@ class CoilSet(BasicElement):
         self._create_coil_outer_set()
 
     def _create_coil_inner_set(self):
-        coil_inner_1 = self.coil_type(position=(self.first_coil_pos + DISTANCE_2ND_COIL, 0, 0),
+        coil_inner_1 = self.coil_type(position=(self.first_coil_pos + self.distance_2nd_coil, 0, 0),
                                            length=L_IN, windings=N_IN, current=COIL_SET_CURRENT, r=R_IN, wire_d=0)
-        coil_inner_2 = self.coil_type(position=(self.first_coil_pos + DISTANCE_3RD_COIL, 0, 0),
+        coil_inner_2 = self.coil_type(position=(self.first_coil_pos + self.distance_3rd_coil, 0, 0),
                                            length=L_IN, windings=N_IN, current=COIL_SET_CURRENT, r=R_IN, wire_d=0)
 
         self.elements.append(coil_inner_1)
@@ -44,7 +48,7 @@ class CoilSet(BasicElement):
     def _create_coil_outer_set(self):
         coil_outer_1 = self.coil_type(position=(self.first_coil_pos, 0, 0), length=L_OUT,
                                            windings=N_OUT, current=-COIL_SET_CURRENT, r=R_OUT, wire_d=0)
-        coil_outer_2 = self.coil_type(position=(self.first_coil_pos + DISTANCE_4TH_COIL, 0, 0),
+        coil_outer_2 = self.coil_type(position=(self.first_coil_pos + self.distance_4th_coil, 0, 0),
                                            length=L_OUT, windings=N_OUT, current=-COIL_SET_CURRENT, r=R_OUT, wire_d=0)
 
         self.elements.append(coil_outer_1)
