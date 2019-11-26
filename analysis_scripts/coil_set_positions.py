@@ -14,7 +14,7 @@ def minimizer_function(computed_values, expected_values):
     for j in range(len(computed_values)):
         dif = computed_values[j] - expected_values[j]
         fit_value += dif ** 2
-    return fit_value
+    return 1 / fit_value
 
 
 def optimize_coils_positions():
