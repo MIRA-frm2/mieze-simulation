@@ -29,7 +29,7 @@ class Plotter:
         self.bx = 1e-1 * np.asarray(np.abs(self.bx))
         self.by = np.abs(self.by)
 
-    def plot_field_1d_scalar(self, component=None):
+    def plot_field_1d_scalar(self, component=None, **kwargs):
 
         fig = plt.figure()
         # ax = fig.add_axes([0.1, 0.1, 0.8, 0.8])  # main axes
@@ -39,6 +39,14 @@ class Plotter:
             plt.plot(self.x_range, self.by)
         elif component == 'z':
             plt.plot(self.x_range, self.bz)
+
+        if kwargs:
+            xlabel = kwargs.get('xlabel', None)
+            ylabel = kwargs.get('ylabel', None)
+
+            plt.xlabel(xlabel)
+            plt.ylabel(ylabel)
+
         # if self.x_ticks and self.x_ticks_labels:
         #     ax.set_xticks(self.x_ticks)
         #     ax.set_xticklabels(self.x_ticks_labels)

@@ -85,7 +85,7 @@ def optimize_coils_positions():
 
     plotter = Plotter()
 
-    plotter.plot_field_1d_scalar(component='x')
+    plotter.plot_field_1d_scalar(component='x', xlabel='Position [m]', ylabel='Magnetic field [a.u.]')
 
 
 if __name__ == "__main__":
