@@ -133,3 +133,16 @@ def get_vector_norm(vector):
     for item in vector:
         norm += item ** 2
     return np.sqrt(norm)
+
+
+def unit_square(x_min, x_max, grid):
+    """Return an array of a unit square function.
+
+    """
+    x_values = list()
+    for x in grid:
+        if x_min < x < x_max:
+            x_values.append(1)
+        else:
+            x_values.append(0)
+    return np.array(x_values)

@@ -53,11 +53,11 @@ class CoilSet(BasicElement):
     def b_field(self, x, y, z):
         b_field = 0
         for element in self.elements:
-            b_field += element.b_field(x, y, z)
+            b_field += element.b_field(x, y, z)[0]
         return b_field
 
     def compute_b_field(self, x_positions):
-        b_values = dict()
+        b_values = list()
         for x in x_positions:
-            b_values[x, 0, 0] = self.b_field(x, 0, 0)
+            b_values.append(self.b_field(x, 0, 0))
         return b_values
