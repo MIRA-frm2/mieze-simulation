@@ -14,7 +14,12 @@ from abc import abstractmethod
 class BasicElement(object):
 
     def __init__(self, position):
-        self.position_x, self.position_y, self.position_z = position
+        if type(position) == tuple:
+            self.position_x, self.position_y, self.position_z = position
+        else:
+            self.position_x = position
+            self.position_y = 0
+            self.position_y = 0
 
     @abstractmethod
     def b_field(self, x, y, z):

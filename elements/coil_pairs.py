@@ -50,7 +50,7 @@ class CoilSet(BasicElement):
 
 
 def compute_default_b_field():
-    coil_set = CoilSet(position=(0, 0, 0))
+    coil_set = CoilSet(position=0)
 
     b_field_values = coil_set.compute_b_field(absolute_x_position)
     save_data_to_file(b_field_values, file_name='../data/data')
