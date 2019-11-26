@@ -8,8 +8,8 @@ lambda_n = 4.3  # 1/[Angstrom]
 
 I_real_coil = 10  # [A]
 
-startpoint = 0.001  # [A]
-endpoint = 10  # [A]  # Positions.get_position_coilA()
+startpoint = 0.001  # [m]
+endpoint = 10  # [m]  # Positions.get_position_coilA()
 npoints = 100
 absolute_x_position = np.linspace(startpoint, endpoint, num=npoints)
 step = (absolute_x_position[1] - absolute_x_position[0])  # [A]
