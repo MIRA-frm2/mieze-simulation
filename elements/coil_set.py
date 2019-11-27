@@ -58,14 +58,14 @@ class CoilSet(BasicElement):
     def _create_coil_outer_set(self):
         coil_outer_1 = self.coil_type(current=-COIL_SET_CURRENT,
                                       length=LENGTH_COIL_OUTER,
-                                      position=self.first_inner_coil_pos + self.distance_12,
+                                      position=-LENGTH_COIL_OUTER + self.first_inner_coil_pos + self.distance_12,
                                       r_eff=RADIUS_COIL_OUTER_EFFECTIVE,
                                       windings=N_WINDINGS_COIL_OUTER,
                                       wire_d=WIRE_D)
 
         coil_outer_2 = self.coil_type(current=-COIL_SET_CURRENT,
                                       length=LENGTH_COIL_OUTER,
-                                      position=self.first_inner_coil_pos + self.distance_34,
+                                      position=LENGTH_COIL_OUTER+self.first_inner_coil_pos + self.distance_34,
                                       r_eff=RADIUS_COIL_OUTER_EFFECTIVE,
                                       windings=N_WINDINGS_COIL_OUTER,
                                       wire_d=WIRE_D)

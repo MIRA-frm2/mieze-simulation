@@ -18,11 +18,12 @@ def minimizer_function(computed_values, expected_values, use_chisquare=False):
         for j in range(len(computed_values)):
             dif = computed_values[j] - expected_values[j]
             fit_value += dif ** 2
+        fit_value = 1 / fit_value
     return fit_value
 
 
 def optimize_coils_positions():
-    n = 2
+    n = 4
     max_distance = 0.5
 
     fits = [[0 for i in range(n)] for j in range(n)]
