@@ -18,7 +18,7 @@ def minimizer_function(computed_values, expected_values):
 
 
 def optimize_coils_positions():
-    n = 25
+    n = 10
     max_distance = 0.25
 
     fits = [[0 for i in range(n)] for j in range(n)]
@@ -29,7 +29,7 @@ def optimize_coils_positions():
         for j in range(len(l)):
             print(f'compute i= {i} j= {j}')
             # Create CoilSets
-            coil_set = CoilSet(position=0, distance_2nd_coil=l[i], distance_4th_coil=l[j])
+            coil_set = CoilSet(position=0, distance_12=l[i], distance_34=l[j])
 
             # Computational grid space
             startpoint = -0.25  # [m]
