@@ -37,9 +37,7 @@ class BaseCoil(BasicElement):
 
         # Physical parameters
         self.length = None
-        self.n = None
-        self.windings_x = None
-        self.windings_y = None
+        self.windings = None
 
         # For circular coils
         self.r = None
@@ -127,29 +125,59 @@ class BaseCoil(BasicElement):
 class Coil(BaseCoil):
     """Class that implements an ideal circular coil."""
 
-    def __init__(self, position, length, windings, current, r, wire_d, angle_y=0, angle_z=0):
-        """Simulate physical geometry of the coil."""
+    def __init__(self, position, **kwargs):
+        """Simulate physical geometry of a simplified coil."""
 
         super(Coil, self).__init__(position)
 
-        self.length = length
-        self.windings = windings
+        self.length = kwargs.get('length', None)
 
-        inverse_r_sum = 0
-        num_layers = windings * wire_d / length if wire_d else 1
-        r_large = r + wire_d * num_layers
+        # Place the simplified coil at the middle of the real coil
+        if self.length:
+            self.position_x += self.length / 2
 
-        if wire_d:
-            for r_i in np.arange(r + wire_d / 2, r_large, wire_d):
-                inverse_r_sum += 1 / r_i
+        self.windings = kwargs.get('windings', None)
+
+        r_eff = kwargs.get('r_eff', None)
+        r_min = kwargs.get('r_min', None)
+        r_max = kwargs.get('r_max', None)
+
+        self.wire_d = kwargs.get('wire_d', 0)
+
+        if r_eff:
+            self.r = r_eff
+
+        elif r_min and r_max:
+            inverse_r_sum = 0
+            if self.wire_d:
+                radius_values = np.arange(r_min, r_max, self.wire_d)
+                num_layers = len(radius_values)
+                for r_i in radius_values:
+                    inverse_r_sum += 1 / r_i
+
+                self.r = 1 / (inverse_r_sum / num_layers)
+
+        elif r_min:
+            inverse_r_sum = 0
+            num_layers = self.windings * self.wire_d / self.length if self.wire_d else 1
+            r_large = r_min + self.wire_d * num_layers
+
+            if self.wire_d:
+                for r_i in np.arange(r_min + self.wire_d / 2, r_large, self.wire_d):
+                    inverse_r_sum += 1 / r_i
+            else:
+                inverse_r_sum = 1/r_large
+
+            self.r = 1 / (inverse_r_sum / num_layers)
         else:
-            inverse_r_sum = 1/r_large
+            raise Exception('Radius value not set.')
 
-        self.r = 1 / (inverse_r_sum / num_layers)
-        self.current = current
-        self.angle_y = angle_y
-        self.angle_z = angle_z
+        self.current = kwargs.get('current', 0)
 
+        self.angle_y = kwargs.get('angle_y', 0)
+        self.angle_z = kwargs.get('angle_z', 0)
+
+        # print(f'windings:{self.windings}\ncurrent:{self.current}\nlength:{self.length}')
         self.prefactor *= self.windings * self.current / (2 * pi * self.length)
 
     @sanitize_output
@@ -162,17 +190,15 @@ class Coil(BaseCoil):
             Position on the x axis
         rho: float, int
             Position
-
         Returns
         -------
 
         """
-        x -= self.position_x
         if rho == 0:
             return 0
 
+        x -= self.position_x
         rho = abs(rho)
-
         return self.prefactor * (self.sum_element_rho(rho, x, s=1) - self.sum_element_rho(rho, x, s=-1))
 
     def sum_element_rho(self, rho, x, s):
@@ -206,6 +232,7 @@ class Coil(BaseCoil):
 
         rho = abs(rho)  # symmetric
 
+        # print(f'r:{self.r}\nrho:{rho}')
         n = 4.0 * self.r * rho / (rho + self.r) ** 2
 
         return self.prefactor * (-self.sum_element_x(n, rho, x, s=-1) + self.sum_element_x(n, rho, x, s=1))
@@ -225,7 +252,7 @@ class Coil(BaseCoil):
         r = np.sqrt(z ** 2 + y ** 2)
 
         phi = get_phi(y, z)
-
+        # print(f'y:{z}\ny:{y}\nr:{r}')
         field = np.array((self.b_field_x(x, r),
                           self.b_field_rho(x, r) * np.cos(phi),
                           self.b_field_rho(x, r) * np.sin(phi))
@@ -240,28 +267,10 @@ class Coil(BaseCoil):
         return field
 
 
-class RealCoil(BaseCoil):
+class RealCoil(Coil):
     """Class that implements a coil with more realistic experimental parameters."""
 
-    def __init__(self, position, length=0.1, windings=100, current=10,
-                 r=0.05, wire_d=0.006, angle_y=0, angle_z=0):
-        """Simulate physical geometry of the coil."""
-
-        super(RealCoil, self).__init__(position)
-
-        self.length = length
-        self.n = windings
-        self.windings_x = round(length / wire_d)
-        self.windings_y = windings / self.windings_x
-        self.r = r
-        self.current = current
-        self.wire_d = wire_d
-        self.angle_y = angle_y
-        self.angle_z = angle_z
-
-        self.prefactor *= 1 / (2 * np.pi) * self.n * self.current / self.length
-
-    def b_field_rho(self, x, r, axis_point):
+    def b_field_rho(self, x, rho):
         """Compute the magnetic field in rho (radial) direction.
 
 
@@ -269,20 +278,13 @@ class RealCoil(BaseCoil):
         ----------
         x: float
             Value on the x axis, along the coil.
-        r: float
+        rho: float
             Radius value.
-        axis_point: float
-            Value on the y or z axis.
         """
-        x -= self.position_x
-        if axis_point == 0:
+        if rho == 0:
             return 0
 
-        if r:
-            # ToDo: is the radius really not playing a role?
-            pass
-
-        rho = abs(axis_point)
+        x -= self.position_x
 
         return self.prefactor * (self.sum_element_rho(rho, x, s=1) - self.sum_element_rho(rho, x, s=-1))
 
@@ -325,21 +327,21 @@ class RealCoil(BaseCoil):
 
     def b_field(self, x, y, z):
         """Compute the magnetic field given the position in cartesian coordinates."""
-        field = np.array([0.,
-                          0.,
-                          0.])
+        field = np.array([0., 0., 0.])
         r = np.sqrt(y ** 2 + z ** 2)
+        phi = get_phi(y, z)
 
-        x_positions = np.arange(-(self.windings_x * self.wire_d / 2 - self.wire_d / 2),
-                                self.windings_x * self.wire_d / 2, self.wire_d)
+        x_positions = np.arange(-(self.windings * self.wire_d / 2 - self.wire_d / 2),
+                                self.windings * self.wire_d / 2,
+                                self.wire_d)
 
-        rs = np.arange(self.r, self.r + self.wire_d * (self.windings_y - 0.5), self.wire_d)
+        rs = np.arange(self.r, self.r + self.wire_d * (self.windings - 0.5), self.wire_d)
 
         for x0 in x_positions:
             for R in rs:
                 field_add = np.array([self.b_field_x(x + x0, R, r),
-                                      self.b_field_rho(x + x0, R, y),
-                                      self.b_field_rho(x + x0, R, z)])
+                                      self.b_field_rho(x + x0, R) * np.cos(phi),
+                                      self.b_field_rho(x + x0, R) * np.sin(phi)])
                 # logger.error(f'{field}\n{field_add}')
                 field += field_add
                 # field = np.add(field, field_add, out=field, casting='unsafe')

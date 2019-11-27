@@ -15,17 +15,21 @@ absolute_x_position = np.linspace(startpoint, endpoint, num=npoints)
 step = (absolute_x_position[1] - absolute_x_position[0])  # [A]
 
 # MIEZE coil set values
-L_IN = 0.086  # [m]
-L_OUT = 0.05   # [m]
-N_IN = 168   # [m]
-N_OUT = 48   # [m]
-R_IN = 0.177 / 2.   # [m]
-R_OUT = 0.13   # [m]
+LENGTH_COIL_INNER = 0.086  # [m]
+LENGTH_COIL_OUTER = 0.050   # [m]
+N_WINDINGS_COIL_INNER = 168   # [m]
+N_WINDINGS_COIL_OUTER = 48   # [m]
+RADIUS_COIL_INNER_EFFECTIVE = 0.177 / 2.   # [m]
+RADIUS_COIL_OUTER_EFFECTIVE = 0.13   # [m]
 
-DISTANCE_2ND_COIL = 0.073   # [m]
-DISTANCE_3RD_COIL = 0.187   # [m]
-DISTANCE_4TH_COIL = 0.260   # [m]
+RADIUS_COIL_INNER_MIN = 50 * 1e-3  # [m]
+RADIUS_COIL_INNER_MAX = 126 * 1e-3  # [m]
 
+DISTANCE_2ND_COIL = 73 * 1e-3   # [m]
+DISTANCE_3RD_COIL = 187 * 1e-3   # [m]
+DISTANCE_4TH_COIL = 260 * 1e-3   # [m]
+
+WIRE_D = 5 * 1e-3  # [m]
 COIL_SET_CURRENT = 5  # [A]
 
 # Square coil Parameters
@@ -36,7 +40,6 @@ SQUARE_COIL_POSITION_2ND = 1   # [A]
 RECTANGULAR_COIL_LENGTH = 1 * 1e-2  # [m]
 RECTANGULAR_COIL_WIDTH = 10 * 1e-2  # [m]
 RECTANGULAR_COIL_HEIGHT = 13 * 1e-2  # [m]
-WIRE_D = 1 * 1e-2  # [m]
 WINDINGS = 1
 
 # Coil group
