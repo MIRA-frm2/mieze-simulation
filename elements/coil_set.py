@@ -11,7 +11,7 @@
 from elements.base import BasicElement
 from elements.coils import Coil, RealCoil
 
-from experiments.mieze.parameters import DISTANCE_2ND_COIL, DISTANCE_3RD_COIL, DISTANCE_4TH_COIL, RADIUS_COIL_INNER_EFFECTIVE, RADIUS_COIL_OUTER_EFFECTIVE, LENGTH_COIL_INNER, LENGTH_COIL_OUTER, N_WINDINGS_COIL_INNER, N_WINDINGS_COIL_OUTER, COIL_SET_CURRENT, RADIUS_COIL_INNER_MIN, RADIUS_COIL_INNER_MAX, WIRE_D
+from experiments.mieze.parameters import DISTANCE_2ND_COIL, DISTANCE_3RD_COIL, DISTANCE_4TH_COIL, RADIUS_COIL_INNER_EFFECTIVE, RADIUS_COIL_OUTER_EFFECTIVE, LENGTH_COIL_INNER, LENGTH_COIL_OUTER, N_WINDINGS_COIL_INNER, N_WINDINGS_COIL_OUTER, COIL_SET_CURRENT, RADIUS_COIL_INNER_MIN, RADIUS_COIL_INNER_MAX, WIRE_D, DISTANCE_BETWEEN_INNER_COILS
 
 
 class CoilSet(BasicElement):
@@ -24,8 +24,10 @@ class CoilSet(BasicElement):
 
         self.middle = self.position_x
 
-        self.distance_12 = - distance_12
-        self.distance_34 = distance_34
+        min_distance_inner_outer_coils = (LENGTH_COIL_INNER + LENGTH_COIL_OUTER)/2
+        self.distance_12 = min_distance_inner_outer_coils + distance_12
+
+        self.distance_34 = min_distance_inner_outer_coils + distance_34
 
         self.elements = list()
 
@@ -58,17 +60,17 @@ class CoilSet(BasicElement):
 
     def compute_coil_position(self, name):
         if name == 'coil_inner_1':
-            return - self.middle/2
+            return self.middle - DISTANCE_BETWEEN_INNER_COILS / 2 - LENGTH_COIL_INNER
         elif name == 'coil_inner_2':
-            return self.middle / 2
+            return self.middle + DISTANCE_BETWEEN_INNER_COILS / 2
         elif name == 'coil_outer_1':
             try:
-                return -LENGTH_COIL_OUTER + self.coil_inner_1.position_x + self.distance_12
+                return self.coil_inner_1.position_x - self.distance_12
             except AttributeError:
                 return -LENGTH_COIL_OUTER + self.distance_12
         elif name == 'coil_outer_2':
             try:
-                return LENGTH_COIL_OUTER + self.coil_inner_2.position_x + self.distance_34
+                return self.coil_inner_2.position_x + self.distance_34
             except AttributeError:
                 return LENGTH_COIL_OUTER + self.distance_34
 

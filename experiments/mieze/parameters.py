@@ -15,15 +15,19 @@ absolute_x_position = np.linspace(startpoint, endpoint, num=npoints)
 step = (absolute_x_position[1] - absolute_x_position[0])  # [A]
 
 # MIEZE coil set values
-LENGTH_COIL_INNER = 0.086  # [m]
-LENGTH_COIL_OUTER = 0.050   # [m]
-N_WINDINGS_COIL_INNER = 168   # [m]
-N_WINDINGS_COIL_OUTER = 48   # [m]
-RADIUS_COIL_INNER_EFFECTIVE = 0.177 / 2.   # [m]
-RADIUS_COIL_OUTER_EFFECTIVE = 0.13   # [m]
+LENGTH_COIL_INNER = 86 * 1e-3  # [m]
+LENGTH_COIL_OUTER = 50 * 1e-3   # [m]
+
+N_WINDINGS_COIL_INNER = 168   #
+N_WINDINGS_COIL_OUTER = 48   #
+
+RADIUS_COIL_INNER_EFFECTIVE = 177 / 2. * 1e-3   # [m]
+RADIUS_COIL_OUTER_EFFECTIVE = 13 * 1e-3   # [m]
 
 RADIUS_COIL_INNER_MIN = 50 * 1e-3  # [m]
 RADIUS_COIL_INNER_MAX = 126 * 1e-3  # [m]
+
+DISTANCE_BETWEEN_INNER_COILS = 115 * 1e-3 - LENGTH_COIL_INNER  # [m]
 
 DISTANCE_2ND_COIL = 73 * 1e-3   # [m]
 DISTANCE_3RD_COIL = 187 * 1e-3   # [m]

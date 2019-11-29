@@ -6,7 +6,7 @@ from utils.helper_functions import save_data_to_file
 
 def compute_bfield(params):
     setup = Setup(increment=0.01)
-    setup.create_element(element_class=params['element'], position=(-0.1, 0, 0), r_eff=1, current=-1, length=0.2, windings=1)
+    setup.create_element(element_class=params['element'], position=(0, 0, 0), r_eff=1, current=-1, length=0.2, windings=1)
 
     setup.initialize_computational_space(**params['grid_size'])
     setup.calculate_b_field()

@@ -5,7 +5,7 @@ from elements.coil_set import CoilSet
 
 
 def simple_execution():
-    coil_set = CoilSet(name='CoilSet', position=0.1, distance_12=0.5, distance_34=0.5)
+    coil_set = CoilSet(name='CoilSet', position=0, distance_12=0.5, distance_34=0.5)
 
     # Computational grid space
     startpoint = -0.75  # [m]
