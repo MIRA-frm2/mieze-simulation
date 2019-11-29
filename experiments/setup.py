@@ -194,12 +194,14 @@ class Setup:
         # self.setup_changed = False
 
     def get_b_vec(self):
+        """Returns the magnetic field as a vector."""
         bx = [self.b[x, 0, 0][0] for x in self.x_range]
         by = [self.b[x, 0, 0][1] for x in self.x_range]
         bz = [self.b[x, 0, 0][2] for x in self.x_range]
         return bx, by, bz
 
     def _get_plane_position(self, component, plane_position):
+        """Get the plane position from the 3D grid."""
         if component == 'z':
             component = 2
             plane_idx = self._find_nearest(self.z_range, plane_position)
@@ -216,6 +218,20 @@ class Setup:
 
     @staticmethod
     def _find_nearest(array, value):
+        """Find the nearest grid point index from the requested value.
+
+        Parameters
+        ----------
+        array: np.array
+            Array with values.
+        value: float
+            Float to be found close an array element.
+
+        Returns
+        -------
+        idx: int
+            The index of the array element closest to the value.
+        """
         array = np.asarray(array)
         idx = (np.abs(array - value).argmin())
         return idx

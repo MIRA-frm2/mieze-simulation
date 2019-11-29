@@ -12,8 +12,17 @@ from abc import abstractmethod
 
 
 class BasicElement(object):
+    """Class implementing a basic experiment element."""
 
     def __init__(self, position):
+        """Any physical element is supposed to have a position.
+
+        Parameters
+        ----------
+        position: float, tuple
+            If float, then it represents the x position.
+            Otherwise, it is the 3d position as (x, y, z).
+        """
         if type(position) == tuple:
             self.position_x, self.position_y, self.position_z = position
         else:

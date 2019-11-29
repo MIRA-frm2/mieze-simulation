@@ -126,27 +126,48 @@ class Coil(BaseCoil):
     """Class that implements an ideal circular coil."""
 
     def __init__(self, position, **kwargs):
-        """Simulate physical geometry of a simplified coil."""
+        """Simulate physical geometry of a simplified coil.
+
+        Parameters
+        ----------
+        Keyword Arguments:
+            current: float
+                The value of the coil current.
+            length: float
+                Coil length
+            windings: int
+                Number of coil windings.
+            wire_d: float
+                Diameter of the coil wire.
+            r_eff: float
+                The effective coil radius.
+            r_min: float
+                The inner (min) radius value for the coil.
+            r_max: float
+                The outer (max) radius value for the coil.
+        """
 
         super(Coil, self).__init__(position)
 
         self.length = kwargs.get('length', None)
+        self.current = kwargs.get('current', 0)
 
         # Place the simplified coil at the middle of the real coil
         if self.length:
             self.position_x += self.length / 2
 
         self.windings = kwargs.get('windings', None)
+        self.wire_d = kwargs.get('wire_d', 0)
 
+        # Compute the effective radius, from possibly different inputs
         r_eff = kwargs.get('r_eff', None)
         r_min = kwargs.get('r_min', None)
         r_max = kwargs.get('r_max', None)
 
-        self.wire_d = kwargs.get('wire_d', 0)
-
         if r_eff:
             self.r = r_eff
 
+        # Compute the effective radius from the min, max radiuses and the wire diameter.
         elif r_min and r_max:
             inverse_r_sum = 0
             if self.wire_d:
@@ -172,12 +193,9 @@ class Coil(BaseCoil):
         else:
             raise Exception('Radius value not set.')
 
-        self.current = kwargs.get('current', 0)
-
         self.angle_y = kwargs.get('angle_y', 0)
         self.angle_z = kwargs.get('angle_z', 0)
 
-        # print(f'windings:{self.windings}\ncurrent:{self.current}\nlength:{self.length}')
         self.prefactor *= self.windings * self.current / (2 * pi * self.length)
 
     @sanitize_output
@@ -189,10 +207,12 @@ class Coil(BaseCoil):
         x: float, int
             Position on the x axis
         rho: float, int
-            Position
+            Position in the radial direction (assuming symmetry)
+
         Returns
         -------
-
+        out: float
+            Magnetic field value in radial direction.
         """
         if rho == 0:
             return 0
@@ -215,14 +235,12 @@ class Coil(BaseCoil):
     def b_field_x(self, x, rho=0):
         """Compute the magnetic field in x direction.
 
-        # N = turns of winding, I = current (A), R = radius (m), l = length (m)
-
         Parameters
         ----------
         x: int, float
-
-        rho: int, float
             Position along the cylinder.
+        rho: int, float
+            Position in the radial direction.
 
         Returns
         -------

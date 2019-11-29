@@ -35,10 +35,12 @@ class CoilSet(BasicElement):
         self._create_coil_set()
 
     def _create_coil_set(self):
+        """Create the two coil pairs."""
         self._create_coil_inner_set()
         self._create_coil_outer_set()
 
     def _create_coil_inner_set(self):
+        """Create the two inner coil pairs."""
         coil_inner_1 = self.coil_type(current=COIL_SET_CURRENT,
                                       length=LENGTH_COIL_INNER,
                                       position=self.first_inner_coil_pos,
@@ -56,6 +58,7 @@ class CoilSet(BasicElement):
         self.elements.append(coil_inner_2)
 
     def _create_coil_outer_set(self):
+        """Create the two outer coil pairs."""
         coil_outer_1 = self.coil_type(current=-COIL_SET_CURRENT,
                                       length=LENGTH_COIL_OUTER,
                                       position=-LENGTH_COIL_OUTER + self.first_inner_coil_pos + self.distance_12,
@@ -74,12 +77,25 @@ class CoilSet(BasicElement):
         self.elements.append(coil_outer_2)
 
     def b_field(self, x, y, z):
+        """Compute the magnetic field for one specific position.
+
+        Parameters
+        ----------
+        x
+        y
+        z
+
+        Returns
+        -------
+
+        """
         b_field = 0
         for element in self.elements:
             b_field += element.b_field(x, y, z)[0]
         return b_field
 
     def compute_b_field(self, x_positions):
+        """Compute the magnetic field for the array of positions."""
         b_values = list()
         for x in x_positions:
             b_values.append(self.b_field(x, 0, 0))

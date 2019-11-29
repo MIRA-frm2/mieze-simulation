@@ -1,3 +1,13 @@
+# -*- coding: utf-8 -*-
+#
+# This file is part of MIEZE simulation.
+# Copyright (C) 2019 TUM FRM2 E21 Research Group.
+#
+# This is free software; you can redistribute it and/or modify it
+# under the terms of the MIT License; see LICENSE file for more details.
+
+"""Investigation script to find the ideal position for the two Coil Set Pairs."""
+
 import numpy as np
 from scipy.stats import chisquare
 
@@ -10,6 +20,23 @@ from utils.helper_functions import save_data_to_file, unit_square
 
 
 def minimizer_function(computed_values, expected_values, use_chisquare=False):
+    """Evaluate the similarity of the computed and expected arrays.
+
+    Parameters
+    ----------
+    computed_values: np.array
+        The array of computed values.
+    expected_values: np.array
+        The array of ideal/expeted values, used as reference.
+    use_chisquare: bool
+        Flag indicating whether to use the chisquare test.
+        In order to use chisquare, one needs arrays with at least a value of 5 in each array element.
+
+    Returns
+    -------
+    fit_value: float
+        Value indicating the similarity of the computed array to the expected one
+    """
     if use_chisquare:
         fit_value = chisquare(1e4 * np.asarray(computed_values),
                               1e4 * np.asarray(expected_values))
@@ -19,12 +46,19 @@ def minimizer_function(computed_values, expected_values, use_chisquare=False):
             dif = computed_values[j] - expected_values[j]
             fit_value += dif ** 2
         fit_value = 1 / fit_value
+
     return fit_value
 
 
 def optimize_coils_positions():
-    n = 4
-    max_distance = 0.5
+    """Compute the optimization.
+
+    Iterate over several distances for each outer coil.
+    """
+
+    n = 50
+    max_distance = 0.1
+    step = max_distance / n
 
     fits = [[0 for i in range(n)] for j in range(n)]
 
@@ -32,9 +66,10 @@ def optimize_coils_positions():
     best_fit = {'fit_value': 0, 'l12': 0, 'l34': 0}
 
     # Computational grid space
-    startpoint = -0.5  # [m]
-    endpoint = 0.75  # [m]  # Positions.get_position_coilA()
-    npoints = 200
+    startpoint = -0.25  # [m]
+    endpoint = 0.5  # [m]  # Positions.get_position_coilA()
+    npoints = int((endpoint - startpoint) / step)
+    print(npoints)
     x_positions = np.linspace(startpoint, endpoint, num=npoints)
 
     for i in range(len(l)):
@@ -61,16 +96,13 @@ def optimize_coils_positions():
     plt.imshow(fits, aspect='auto', extent=[min(l), max(l), min(l), max(l)], origin='lower')
     plt.colorbar()
 
-    plt.show()
+    # plt.show()
+    plt.savefig('../docs/experiments/MIEZE/coil_set_optimization_fine.png')
+    plt.close()
 
     # Plot values
+    print(best_fit)
     coil_set = CoilSet(position=0, distance_12=best_fit['l12'], distance_34=best_fit['l34'])
-
-    # Computational grid space
-    startpoint = -0.25  # [m]
-    endpoint = 0.5  # [m]  # Positions.get_position_coilA()
-    npoints = 100
-    x_positions = np.linspace(startpoint, endpoint, num=npoints)
 
     # Compute B_field_values
     b_field_values = coil_set.compute_b_field(x_positions)
@@ -83,7 +115,8 @@ def optimize_coils_positions():
 
     plt.plot(x_positions, ideal_b_field)
 
-    plt.show()
+    # plt.show()
+    plt.savefig('../docs/experiments/MIEZE/bfield_coil_set_fine.png')
 
 
 if __name__ == "__main__":
