@@ -29,34 +29,83 @@ logger = logging.getLogger(__name__)
 class BaseCoil(BasicElement):
     """Class that implements basic method and attributes for a coil."""
 
-    def __init__(self, position, name):
+    def __init__(self, position, name, **kwargs):
+        """
 
+        Parameters
+        ----------
+        Keyword Arguments:
+            current: float
+                The value of the coil current.
+            length: float
+                Coil length
+            windings: int
+                Number of coil windings.
+            wire_d: float
+                Diameter of the coil wire.
+            r_eff: float
+                The effective coil radius.
+            r_min: float
+                The inner (min) radius value for the coil.
+            r_max: float
+                The outer (max) radius value for the coil.
+        """
         super(BaseCoil, self).__init__(position, name)
 
         self.prefactor = MU_0
 
-        # Physical parameters
-        self.length = None
-        self.windings = None
+        self.length = kwargs.get('length', None)
+        self.current = kwargs.get('current', 0)
 
-        # For circular coils
-        self.r = None
+        # Place the simplified coil at the middle of the real coil
+        # if self.length:
+        #     self.position_x += self.length / 2
 
-        # For rectangular coils
-        self.width = None
-        self.height = None
+        self.windings = kwargs.get('windings', None)
+        self.wire_d = kwargs.get('wire_d', None)
+        self.wire_spacing = kwargs.get('wire_spacing', None)
+        self.radial_layers = kwargs.get('radial_layers', None)
 
-        self.width = None
-        self.height = None
+        # Compute the effective radius, from possibly different inputs
+        r_eff = kwargs.get('r_eff', None)
+        r_min = kwargs.get('r_min', None)
+        r_max = kwargs.get('r_max', None)
 
-        self.current = None
-        self.wire_d = None
-        self.angle_y = None
-        self.angle_z = None
+        if r_eff:
+            self.r = r_eff
 
-        self.x = None
-        self.y = None
-        self.z = None
+        # # Compute the effective radius from the min, max radiuses and the wire diameter.
+        # elif r_min and r_max:
+        #     inverse_r_sum = 0
+        #     if self.wire_d:
+        #         radius_values = np.arange(r_min, r_max, self.wire_d)
+        #         num_layers = len(radius_values)
+        #         for r_i in radius_values:
+        #             inverse_r_sum += 1 / r_i
+        #
+        #         self.r = 1 / (inverse_r_sum / num_layers)
+
+        elif r_min and r_max:
+            self.compute_effective_radius(r_min, r_max)
+
+        else:
+            raise Exception('Radius value not set.')
+
+        self.angle_y = kwargs.get('angle_y', 0)
+        self.angle_z = kwargs.get('angle_z', 0)
+
+    def compute_effective_radius(self, r_min, r_max):
+        """Compute the effective radius from the other physical parameters."""
+        inverse_r_sum = 0
+
+        num_layers = (r_max - r_min) / (self.wire_d + self.wire_spacing)
+        step = (r_max - r_min) / num_layers
+        # print(f'r_min:{r_min}\nwire_d:{self.wire_d}\nwire_spacing:{self.wire_spacing}')
+        for r_i in np.arange(r_min, r_max, step):
+            inverse_r_sum += 1 / r_i
+
+        self.r = 1 / (inverse_r_sum / num_layers)
+        # print(self.r)
 
     @staticmethod
     def _k(m):
@@ -126,75 +175,9 @@ class Coil(BaseCoil):
     """Class that implements an ideal circular coil."""
 
     def __init__(self, name, position, **kwargs):
-        """Simulate physical geometry of a simplified coil.
+        """Simulate physical geometry of a simplified coil."""
 
-        Parameters
-        ----------
-        Keyword Arguments:
-            current: float
-                The value of the coil current.
-            length: float
-                Coil length
-            windings: int
-                Number of coil windings.
-            wire_d: float
-                Diameter of the coil wire.
-            r_eff: float
-                The effective coil radius.
-            r_min: float
-                The inner (min) radius value for the coil.
-            r_max: float
-                The outer (max) radius value for the coil.
-        """
-
-        super(Coil, self).__init__(position, name)
-
-        self.length = kwargs.get('length', None)
-        self.current = kwargs.get('current', 0)
-
-        # Place the simplified coil at the middle of the real coil
-        # if self.length:
-        #     self.position_x += self.length / 2
-
-        self.windings = kwargs.get('windings', None)
-        self.wire_d = kwargs.get('wire_d', 0)
-
-        # Compute the effective radius, from possibly different inputs
-        r_eff = kwargs.get('r_eff', None)
-        r_min = kwargs.get('r_min', None)
-        r_max = kwargs.get('r_max', None)
-
-        if r_eff:
-            self.r = r_eff
-
-        # Compute the effective radius from the min, max radiuses and the wire diameter.
-        elif r_min and r_max:
-            inverse_r_sum = 0
-            if self.wire_d:
-                radius_values = np.arange(r_min, r_max, self.wire_d)
-                num_layers = len(radius_values)
-                for r_i in radius_values:
-                    inverse_r_sum += 1 / r_i
-
-                self.r = 1 / (inverse_r_sum / num_layers)
-
-        elif r_min:
-            inverse_r_sum = 0
-            num_layers = self.windings * self.wire_d / self.length if self.wire_d else 1
-            r_large = r_min + self.wire_d * num_layers
-
-            if self.wire_d:
-                for r_i in np.arange(r_min + self.wire_d / 2, r_large, self.wire_d):
-                    inverse_r_sum += 1 / r_i
-            else:
-                inverse_r_sum = 1/r_large
-
-            self.r = 1 / (inverse_r_sum / num_layers)
-        else:
-            raise Exception('Radius value not set.')
-
-        self.angle_y = kwargs.get('angle_y', 0)
-        self.angle_z = kwargs.get('angle_z', 0)
+        super(Coil, self).__init__(position, name, **kwargs)
 
         self.prefactor *= self.windings * self.current / (2 * pi * self.length)
 
@@ -376,24 +359,15 @@ class RealCoil(Coil):
 class RectangularCoil(BaseCoil):
     """Class that implements a rectangular coil."""
 
-    def __init__(self, position, length, windings, current, width, height, wire_d, angle_y=None, angle_z=None):
+    def __init__(self, position, name, **kwargs):
         """Simulate physical geometry of the coil."""
 
-        super(RectangularCoil, self).__init__(position)
+        super(RectangularCoil, self).__init__(position, name, **kwargs)
 
-        self.current = current 
-        self.length = length
+        self.width = kwargs.get('width', None)
+        self.height = kwargs.get('height', None)
 
-        self.width = width
-        self.height = height
-
-        self.n = windings
-        self.wire_d = wire_d
-
-        self.angle_y = angle_y
-        self.angle_z = angle_z
-
-        self.prefactor *= 1 / (4 * np.pi) * self.n * self.current / self.length
+        self.prefactor *= 1 / (4 * np.pi) * self.windings * self.current / self.length
 
     def check_physical_coil_overlap(self):
         """Deal with division by 0.

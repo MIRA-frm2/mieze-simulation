@@ -15,17 +15,25 @@ absolute_x_position = np.linspace(startpoint, endpoint, num=npoints)
 step = (absolute_x_position[1] - absolute_x_position[0])  # [A]
 
 # MIEZE coil set values
+
+# Inner coils
 LENGTH_COIL_INNER = 86 * 1e-3  # [m]
-LENGTH_COIL_OUTER = 50 * 1e-3   # [m]
-
-N_WINDINGS_COIL_INNER = 168   #
-N_WINDINGS_COIL_OUTER = 48   #
-
 RADIUS_COIL_INNER_EFFECTIVE = 177 / 2. * 1e-3   # [m]
-RADIUS_COIL_OUTER_EFFECTIVE = 13 * 1e-3   # [m]
+N_WINDINGS_COIL_INNER = 168   #
 
 RADIUS_COIL_INNER_MIN = 50 * 1e-3  # [m]
-RADIUS_COIL_INNER_MAX = 126 * 1e-3  # [m]
+RADIUS_COIL_INNER_MAX = 252.30 / 2 * 1e-3  # [m]
+
+RADIAL_LAYERS = 13
+
+# Outer Coils
+LENGTH_COIL_OUTER = 50 * 1e-3   # [m]
+RADIUS_COIL_OUTER_EFFECTIVE = 130 * 1e-3   # [m]
+N_WINDINGS_COIL_OUTER = 48   #
+
+RADIUS_COIL_OUTER_MIN = 220 / 2 * 1e-3  # [m]
+RADIUS_COIL_OUTER_MAX = 301.80 / 2 * 1e-3  # [m]
+
 
 DISTANCE_BETWEEN_INNER_COILS = 115 * 1e-3 - LENGTH_COIL_INNER  # [m]
 
@@ -34,6 +42,7 @@ DISTANCE_3RD_COIL = 187 * 1e-3   # [m]
 DISTANCE_4TH_COIL = 260 * 1e-3   # [m]
 
 WIRE_D = 5 * 1e-3  # [m]
+WIRE_SPACING = 1 * 1e-3  # [m]
 COIL_SET_CURRENT = 5  # [A]
 
 # Square coil Parameters

@@ -14,10 +14,10 @@ import numpy as np
 from scipy.stats import chisquare
 
 from elements.coil_set import CoilSet
-from experiments.mieze.parameters import DISTANCE_2ND_COIL, DISTANCE_3RD_COIL, LENGTH_COIL_INNER, DISTANCE_BETWEEN_INNER_COILS
+from experiments.mieze.parameters import LENGTH_COIL_INNER, DISTANCE_BETWEEN_INNER_COILS
 
 
-from utils.helper_functions import save_data_to_file, unit_square
+from utils.helper_functions import unit_square
 
 
 def minimizer_function(computed_values, expected_values, use_chisquare=False):
@@ -51,27 +51,33 @@ def minimizer_function(computed_values, expected_values, use_chisquare=False):
     return fit_value
 
 
+def get_ideal_field(b_max, middle_position, x_positions):
+    """Returns the ideal magnetic field."""
+    return b_max * unit_square(middle_position - DISTANCE_BETWEEN_INNER_COILS / 2 - LENGTH_COIL_INNER - LENGTH_COIL_INNER * 0.25,
+                               middle_position + DISTANCE_BETWEEN_INNER_COILS / 2 + LENGTH_COIL_INNER * 0.25,
+                               x_positions)
+
+
 def define_iteration_values(n=1):
+    """Define the iteration values"""
     if n == 1:
-        l = (0.0,)
+        lspace = (0.0,)
     else:
         max_distance = 0.1
-        step = max_distance / n
+        lspace = np.linspace(0, max_distance, n)
 
-        l = np.linspace(0, max_distance, n)
-        # l = np.linspace(0, 1, 1)
-
-    return l
+    return lspace
 
 
 def define_computational_grid():
-    # Computational grid space
+    """Define the computational grid space."""
     startpoint = -0.25  # [m]
     endpoint = 0.25  # [m]  # Positions.get_position_coilA()
     return np.linspace(startpoint, endpoint, num=200)
 
 
-def plot_l1l2_cmap(fits, l):
+def plot_l1l2_cmap(fits, l, plot_name=None):
+    """Plot the 2d color map."""
     if len(l) > 1:
         plt.imshow(fits, aspect='auto', extent=[min(l), max(l), min(l), max(l)], origin='lower')
         plt.colorbar()
@@ -79,14 +85,19 @@ def plot_l1l2_cmap(fits, l):
         plt.ylabel('L2 (Second Outer Coil Distance) [m]')
 
         # plt.show()
-        plt.savefig('../docs/experiments/MIEZE/coil_set_optimization_fine.png')
+        plt.savefig(f'../docs/experiments/MIEZE/coil_set_optimization{plot_name}.png')
         plt.close()
 
 
-def plot_ideal_position(middle_position, best_fit, x_positions):
+def plot_ideal_position(middle_position, best_fit, x_positions, plot_name=None):
+    """Plot the magnetic field for the ideal position."""
+
     # Plot values
     print(best_fit)
-    coil_set = CoilSet(name='CoilSet', position=middle_position, distance_12=best_fit['l12'], distance_34=best_fit['l34'])
+    coil_set = CoilSet(name='CoilSet',
+                       position=middle_position,
+                       distance_12=best_fit['l12'],
+                       distance_34=best_fit['l34'])
 
     # Compute B_field_values
     with Pool(4) as p:
@@ -124,13 +135,7 @@ def plot_ideal_position(middle_position, best_fit, x_positions):
     ax.set_ylabel('Magnetic field (G)')
 
     # plt.show()
-    plt.savefig('../docs/experiments/MIEZE/bfield_coil_set_fine.png')
-
-
-def get_ideal_field(b_max, middle_position, x_positions):
-    return b_max * unit_square(middle_position - DISTANCE_BETWEEN_INNER_COILS / 2 - LENGTH_COIL_INNER - LENGTH_COIL_INNER * 0.5,
-                               middle_position + DISTANCE_BETWEEN_INNER_COILS / 2 + LENGTH_COIL_INNER * 0.5,
-                               x_positions)
+    plt.savefig(f'../docs/experiments/MIEZE/bfield_coil_set{plot_name}.png')
 
 
 def optimize_coils_positions():
@@ -138,7 +143,7 @@ def optimize_coils_positions():
 
     Iterate over several distances for each outer coil.
     """
-    n = 10
+    n = 25
     l = define_iteration_values(n)
     fits = [[0 for i in range(n)] for j in range(n)]
 
@@ -168,8 +173,8 @@ def optimize_coils_positions():
             if fit_value > best_fit['fit_value']:
                 best_fit = {'fit_value': fit_value, 'l12': l[i], 'l34': l[j]}
 
-    plot_l1l2_cmap(fits, l)
-    plot_ideal_position(middle_position, best_fit, x_positions)
+    plot_l1l2_cmap(fits, l, plot_name='')
+    plot_ideal_position(middle_position, best_fit, x_positions, plot_name='')
 
 
 if __name__ == "__main__":
