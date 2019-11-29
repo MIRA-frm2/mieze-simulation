@@ -5,11 +5,11 @@ from elements.coil_set import CoilSet
 
 
 def simple_execution():
-    coil_set = CoilSet(position=0, distance_12=0, distance_34=0)
+    coil_set = CoilSet(name='CoilSet', position=0.1, distance_12=0.5, distance_34=0.5)
 
     # Computational grid space
-    startpoint = -0.25  # [m]
-    endpoint = 0.5  # [m]  # Positions.get_position_coilA()
+    startpoint = -0.75  # [m]
+    endpoint = 0.75  # [m]  # Positions.get_position_coilA()
     npoints = 100
     x_positions = np.linspace(startpoint, endpoint, num=npoints)
 
@@ -17,7 +17,6 @@ def simple_execution():
     b_field_values = coil_set.compute_b_field(x_positions)
 
     plt.plot(x_positions, b_field_values)
-
     plt.show()
 
 

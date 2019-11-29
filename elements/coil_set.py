@@ -17,18 +17,15 @@ from experiments.mieze.parameters import DISTANCE_2ND_COIL, DISTANCE_3RD_COIL, D
 class CoilSet(BasicElement):
     """Class that implements a coil with more realistic experimental parameters."""
 
-    def __init__(self, position, coil_type=Coil, distance_12=None, distance_34=None):
-        super(CoilSet, self).__init__(position)
+    def __init__(self, name, position, coil_type=Coil, distance_12=None, distance_34=None):
+        super(CoilSet, self).__init__(position, name)
 
         self.coil_type = coil_type
 
-        self.first_inner_coil_pos = self.position_x
+        self.middle = self.position_x
 
-        self.distance_12 = - distance_12 if distance_12 else (- DISTANCE_2ND_COIL)
-        self.distance_23 = DISTANCE_3RD_COIL - DISTANCE_2ND_COIL
-
-        self.distance_34 = distance_34 if distance_34 else (DISTANCE_4TH_COIL - DISTANCE_3RD_COIL)
-        self.distance_34 += self.distance_23
+        self.distance_12 = - distance_12
+        self.distance_34 = distance_34
 
         self.elements = list()
 
@@ -41,34 +38,55 @@ class CoilSet(BasicElement):
 
     def _create_coil_inner_set(self):
         """Create the two inner coil pairs."""
-        coil_inner_1 = self.coil_type(current=COIL_SET_CURRENT,
-                                      length=LENGTH_COIL_INNER,
-                                      position=self.first_inner_coil_pos,
-                                      r_min=RADIUS_COIL_INNER_MIN, r_max=RADIUS_COIL_INNER_MAX,
-                                      windings=N_WINDINGS_COIL_INNER,
-                                      wire_d=WIRE_D)
-        coil_inner_2 = self.coil_type(current=COIL_SET_CURRENT,
-                                      length=LENGTH_COIL_INNER,
-                                      position=self.first_inner_coil_pos + (DISTANCE_3RD_COIL-DISTANCE_2ND_COIL),
-                                      r_min=RADIUS_COIL_INNER_MIN, r_max=RADIUS_COIL_INNER_MAX,
-                                      windings=N_WINDINGS_COIL_INNER,
-                                      wire_d=WIRE_D)
+        self.coil_inner_1 = self.coil_type(current=COIL_SET_CURRENT,
+                                           length=LENGTH_COIL_INNER,
+                                           name='I1',
+                                           position=self.compute_coil_position('coil_inner_1'),
+                                           r_min=RADIUS_COIL_INNER_MIN, r_max=RADIUS_COIL_INNER_MAX,
+                                           windings=N_WINDINGS_COIL_INNER,
+                                           wire_d=WIRE_D)
+        self.coil_inner_2 = self.coil_type(current=COIL_SET_CURRENT,
+                                           length=LENGTH_COIL_INNER,
+                                           name='I2',
+                                           position=self.compute_coil_position('coil_inner_2'),
+                                           r_min=RADIUS_COIL_INNER_MIN, r_max=RADIUS_COIL_INNER_MAX,
+                                           windings=N_WINDINGS_COIL_INNER,
+                                           wire_d=WIRE_D)
 
-        self.elements.append(coil_inner_1)
-        self.elements.append(coil_inner_2)
+        self.elements.append(self.coil_inner_1)
+        self.elements.append(self.coil_inner_2)
+
+    def compute_coil_position(self, name):
+        if name == 'coil_inner_1':
+            return - self.middle/2
+        elif name == 'coil_inner_2':
+            return self.middle / 2
+        elif name == 'coil_outer_1':
+            try:
+                return -LENGTH_COIL_OUTER + self.coil_inner_1.position_x + self.distance_12
+            except AttributeError:
+                return -LENGTH_COIL_OUTER + self.distance_12
+        elif name == 'coil_outer_2':
+            try:
+                return LENGTH_COIL_OUTER + self.coil_inner_2.position_x + self.distance_34
+            except AttributeError:
+                return LENGTH_COIL_OUTER + self.distance_34
 
     def _create_coil_outer_set(self):
         """Create the two outer coil pairs."""
+
         coil_outer_1 = self.coil_type(current=-COIL_SET_CURRENT,
                                       length=LENGTH_COIL_OUTER,
-                                      position=-LENGTH_COIL_OUTER + self.first_inner_coil_pos + self.distance_12,
+                                      name='O1',
+                                      position=self.compute_coil_position('coil_outer_1'),
                                       r_eff=RADIUS_COIL_OUTER_EFFECTIVE,
                                       windings=N_WINDINGS_COIL_OUTER,
                                       wire_d=WIRE_D)
 
         coil_outer_2 = self.coil_type(current=-COIL_SET_CURRENT,
                                       length=LENGTH_COIL_OUTER,
-                                      position=LENGTH_COIL_OUTER+self.first_inner_coil_pos + self.distance_34,
+                                      name='O2',
+                                      position=self.compute_coil_position('coil_outer_2'),
                                       r_eff=RADIUS_COIL_OUTER_EFFECTIVE,
                                       windings=N_WINDINGS_COIL_OUTER,
                                       wire_d=WIRE_D)
@@ -76,7 +94,7 @@ class CoilSet(BasicElement):
         self.elements.append(coil_outer_1)
         self.elements.append(coil_outer_2)
 
-    def b_field(self, x, y, z):
+    def b_field(self, x, y=0, z=0):
         """Compute the magnetic field for one specific position.
 
         Parameters

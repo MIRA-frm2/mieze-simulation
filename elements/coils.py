@@ -29,9 +29,9 @@ logger = logging.getLogger(__name__)
 class BaseCoil(BasicElement):
     """Class that implements basic method and attributes for a coil."""
 
-    def __init__(self, position):
+    def __init__(self, position, name):
 
-        super(BaseCoil, self).__init__(position)
+        super(BaseCoil, self).__init__(position, name)
 
         self.prefactor = MU_0
 
@@ -125,7 +125,7 @@ class BaseCoil(BasicElement):
 class Coil(BaseCoil):
     """Class that implements an ideal circular coil."""
 
-    def __init__(self, position, **kwargs):
+    def __init__(self, name, position, **kwargs):
         """Simulate physical geometry of a simplified coil.
 
         Parameters
@@ -147,14 +147,14 @@ class Coil(BaseCoil):
                 The outer (max) radius value for the coil.
         """
 
-        super(Coil, self).__init__(position)
+        super(Coil, self).__init__(position, name)
 
         self.length = kwargs.get('length', None)
         self.current = kwargs.get('current', 0)
 
         # Place the simplified coil at the middle of the real coil
-        if self.length:
-            self.position_x += self.length / 2
+        # if self.length:
+        #     self.position_x += self.length / 2
 
         self.windings = kwargs.get('windings', None)
         self.wire_d = kwargs.get('wire_d', 0)

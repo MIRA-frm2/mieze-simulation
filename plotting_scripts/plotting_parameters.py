@@ -5,7 +5,7 @@ plot_parameters = {
         'element': Coil,
         'plot_dimension': '1d',
         'plot_args': {'type': 'scalar', 'component': 'x'},
-        'grid_size': {'x_start': -0.2, 'x_end': 0.2, 'y_start': -0.0, 'y_end': 0.0, 'z_start': -0.0, 'z_end': 0.0},
+        'grid_size': {'x_start': -0.5, 'x_end': 0.5, 'y_start': -0.0, 'y_end': 0.0, 'z_start': -0.0, 'z_end': 0.0},
         'coil_args': None,
     },
     'coil_simple_2d_xy': {

@@ -23,7 +23,7 @@ class Plotter:
     def __init__(self):
         self.x_range, self.y_range, self.z_range, self.bx, self.by, self.bz = read_data_from_file()
 
-        self.preadjust_values()
+        # self.preadjust_values()
 
     def preadjust_values(self):
         self.bx = 1e-1 * np.asarray(np.abs(self.bx))
