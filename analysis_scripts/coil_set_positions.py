@@ -14,6 +14,7 @@ import numpy as np
 from scipy.stats import chisquare
 
 from elements.coil_set import CoilSet
+from elements.coils import Coil, RealCoil
 from experiments.mieze.parameters import LENGTH_COIL_INNER, DISTANCE_BETWEEN_INNER_COILS
 
 
@@ -63,7 +64,7 @@ def define_iteration_values(n=1):
     if n == 1:
         lspace = (0.0,)
     else:
-        max_distance = 0.1
+        max_distance = 0.01
         lspace = np.linspace(0, max_distance, n)
 
     return lspace
@@ -73,7 +74,7 @@ def define_computational_grid():
     """Define the computational grid space."""
     startpoint = -0.25  # [m]
     endpoint = 0.25  # [m]  # Positions.get_position_coilA()
-    return np.linspace(startpoint, endpoint, num=200)
+    return np.linspace(startpoint, endpoint, num=400)
 
 
 def plot_l1l2_cmap(fits, l, plot_name=None):
@@ -143,7 +144,7 @@ def optimize_coils_positions():
 
     Iterate over several distances for each outer coil.
     """
-    n = 25
+    n = 1
     l = define_iteration_values(n)
     fits = [[0 for i in range(n)] for j in range(n)]
 
@@ -157,7 +158,10 @@ def optimize_coils_positions():
         for j in range(len(l)):
             print(f'compute i= {i} j= {j}')
             # Create CoilSets
-            coil_set = CoilSet(distance_12=l[i], distance_34=l[j], name='CoilSet', position=middle_position)
+            coil_set = CoilSet(coil_type=RealCoil,
+                               distance_12=l[i], distance_34=l[j],
+                               name='CoilSet',
+                               position=middle_position)
 
             # Compute B_field_values
             with Pool(4) as p:
@@ -172,9 +176,9 @@ def optimize_coils_positions():
 
             if fit_value > best_fit['fit_value']:
                 best_fit = {'fit_value': fit_value, 'l12': l[i], 'l34': l[j]}
-
-    plot_l1l2_cmap(fits, l, plot_name='')
-    plot_ideal_position(middle_position, best_fit, x_positions, plot_name='')
+    plot_name = '_small'
+    plot_l1l2_cmap(fits, l, plot_name=plot_name)
+    plot_ideal_position(middle_position, best_fit, x_positions, plot_name=plot_name)
 
 
 if __name__ == "__main__":

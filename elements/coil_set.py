@@ -9,15 +9,17 @@
 """The two pairs of coils."""
 
 from elements.base import BasicElement
-from elements.coils import Coil, RealCoil
 
-from experiments.mieze.parameters import LENGTH_COIL_INNER, LENGTH_COIL_OUTER, N_WINDINGS_COIL_INNER, N_WINDINGS_COIL_OUTER, COIL_SET_CURRENT, RADIUS_COIL_INNER_MIN, RADIUS_COIL_INNER_MAX, WIRE_D, DISTANCE_BETWEEN_INNER_COILS, RADIAL_LAYERS, WIRE_SPACING, RADIUS_COIL_OUTER_MIN, RADIUS_COIL_OUTER_MAX
+from experiments.mieze.parameters import (
+    COIL_SET_CURRENT, DISTANCE_BETWEEN_INNER_COILS, LENGTH_COIL_INNER, LENGTH_COIL_OUTER, N_WINDINGS_COIL_INNER,
+    N_WINDINGS_COIL_OUTER, RADIAL_LAYERS, RADIUS_COIL_INNER_MAX, RADIUS_COIL_INNER_MIN, RADIUS_COIL_OUTER_MAX,
+    RADIUS_COIL_OUTER_MIN, WIRE_D, WIRE_SPACING)
 
 
 class CoilSet(BasicElement):
     """Class that implements a coil with more realistic experimental parameters."""
 
-    def __init__(self, name, position, coil_type=Coil, distance_12=None, distance_34=None):
+    def __init__(self, name, position, coil_type=None, distance_12=None, distance_34=None):
         super(CoilSet, self).__init__(position, name)
 
         self.coil_type = coil_type
