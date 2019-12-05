@@ -11,6 +11,7 @@
 import logging
 import numpy as np
 import csv
+import pickle
 
 # Create a custom logger
 logger = logging.getLogger(__name__)
@@ -55,6 +56,18 @@ def adjust_field(vector):
 
     """
     return np.array([vector[2], vector[1], vector[0]])
+
+
+def save_obj(obj, name):
+    """Save object (magnetic field) as pickled object."""
+    with open(f'{name}.pkl', 'wb') as f:
+        pickle.dump(obj, f, pickle.HIGHEST_PROTOCOL)
+
+
+def load_obj(name):
+    """Load object (magnetic field) as pickled object."""
+    with open(f'{name}.pkl', 'rb') as f:
+        return pickle.load(f)
 
 
 def save_data_to_file(data, file_name, extension='.csv'):

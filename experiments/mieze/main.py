@@ -54,9 +54,14 @@ class Mieze(Setup):
 
         # self.create_element(element_class=RealCoil, position=(0.05, 0, 0), length=0.1, windings=100,
         #                     current=I_real_coil, r=0.05)
-        self.create_element(element_class=RectangularCoil, position=(SpinFlipper_position1, 0, 0), current=I_sf1,
-                            length=RECTANGULAR_COIL_LENGTH, height=RECTANGULAR_COIL_HEIGHT,
-                            width=RECTANGULAR_COIL_WIDTH, wire_d=WIRE_D, windings=WINDINGS)
+        self.create_element(current=I_sf1,
+                            element_class=RectangularCoil,
+                            height=RECTANGULAR_COIL_HEIGHT,
+                            length=RECTANGULAR_COIL_LENGTH,
+                            position=(SpinFlipper_position1, 0, 0),
+                            width=RECTANGULAR_COIL_WIDTH,
+                            windings=WINDINGS,
+                            wire_d=WIRE_D)
 
         # self.create_element(element_class=HelmholtzSpinFlipper, position=(HelmholtzSpinFlipper_position_HSF1, 0, 0), current=I_hsf1)
 

@@ -13,7 +13,7 @@ import numpy as np
 # from scipy.optimize import curve_fit2
 
 from elements.base import BasicElement
-from experiments.mieze.parameters import polarizer_position
+from experiments.mieze.parameters import POLARISATOR
 
 from utils.physics_constants import MU_0
 from utils.helper_functions import get_vector_norm
@@ -25,9 +25,9 @@ logger = logging.getLogger(__name__)
 
 class Polariser(BasicElement):
 
-    def __init__(self, position=(polarizer_position, 0, 0), *args, **kwargs):
+    def __init__(self, position=(POLARISATOR, 0, 0), *args, **kwargs):
 
-        super(Polariser, self).__init__(position)
+        super(Polariser, self).__init__(position, name='polariser')
 
         self.position = position
 

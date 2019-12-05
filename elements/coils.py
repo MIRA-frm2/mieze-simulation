@@ -74,7 +74,6 @@ class BaseCoil(BasicElement):
 
         if r_eff:
             self.r = r_eff
-
         # # Compute the effective radius from the min, max radiuses and the wire diameter.
         # elif r_min and r_max:
         #     inverse_r_sum = 0
@@ -90,7 +89,11 @@ class BaseCoil(BasicElement):
             self.compute_effective_radius(r_min, r_max)
 
         else:
-            raise Exception('Radius value not set.')
+            self.width = kwargs.get('width', None)
+            self.height = kwargs.get('height', None)
+
+            if not self.width or not self.height:
+                raise Exception('Radius value not set.')
 
         self.angle_y = kwargs.get('angle_y', 0)
         self.angle_z = kwargs.get('angle_z', 0)
@@ -368,9 +371,6 @@ class RectangularCoil(BaseCoil):
         """Simulate physical geometry of the coil."""
 
         super(RectangularCoil, self).__init__(position, name, **kwargs)
-
-        self.width = kwargs.get('width', None)
-        self.height = kwargs.get('height', None)
 
         self.prefactor *= 1 / (4 * np.pi) * self.windings * self.current / self.length
 

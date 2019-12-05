@@ -9,9 +9,11 @@ lambda_n = 4.3  # 1/[Angstrom]
 I_real_coil = 10  # [A]
 
 startpoint = 0.001  # [m]
-endpoint = 10  # [m]  # Positions.get_position_coilA()
+beamend = 10  # [m]  # Positions.get_position_coilA()
+
+
 npoints = 100
-absolute_x_position = np.linspace(startpoint, endpoint, num=npoints)
+absolute_x_position = np.linspace(startpoint, beamend, num=npoints)
 step = (absolute_x_position[1] - absolute_x_position[0])  # [A]
 
 # MIEZE coil set values
@@ -70,3 +72,11 @@ COIL_A = HelmholtzSpinFlipper_position_HSF1 + R_HSF / 2.0
 COIL_B = COIL_A + L1
 HelmholtzSpinFlipper_position_HSF2 = COIL_B + R_HSF / 2.0
 SpinFlipper_position2 = HelmholtzSpinFlipper_position_HSF2
+
+
+# Beam properties
+beamsize=0.02
+number_of_neutrons=1000
+velocity=3956 / 4.5
+incrementsize=0.001
+totalflightlength=3

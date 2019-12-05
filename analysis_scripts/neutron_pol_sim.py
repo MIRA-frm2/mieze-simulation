@@ -10,41 +10,36 @@
 
 # import numpy as np
 
-from elements.polariser import Polariser
-from elements.helmholtz_spin_flipper import HelmholtzSpinFlipper
-from particles.neutron import Neutrons
-# from extra_helmholtz import Extra_Helmholtz
-# from single_coil import Single_Coil
-# from long_coil import Long_Coil
-# from elements.coils import RealCoil
+from particles.beam import NeutronBeam
 
-from experiments.mieze.parameters import I_hsf1, step, endpoint  # , I_real_coil
+from experiments.mieze.parameters import I_hsf1, step, beamend, beamsize, velocity
 
 from utils.physics_constants import earth_field
 
 
-def b_function(vec):
-    x = vec[0]
-    y = vec[1]
-    z = vec[2]
-
-    flipper = HelmholtzSpinFlipper()
-    flipper.create_element(position=0.1, current=I_hsf1)
-
-    return flipper.hsf(x, y, z) + Polariser.B_field(x, y, z) + earth_field
-
+# def b_function(vec):
+#     x = vec[0]
+#     y = vec[1]
+#     z = vec[2]
+#
+#     flipper = HelmholtzSpinFlipper()
+#     flipper.create_element(position=0.1, current=I_hsf1)
+#
+#     return flipper.hsf(x, y, z) + Polariser.B_field(x, y, z) + earth_field
+#
 
 def main():
+    simulation = NeutronBeam(beamsize=beamsize,
+                             incrementsize=step,
+                             number_of_neutrons=10000,
+                             velocity=velocity,
+                             totalflightlength=beamend)
 
-    # Bx = lambda x,y,z: RealCoil.Bx(x, coil_mid_pos=0.05, rho=np.sqrt(z**2+y**2), l=0.1, N=100, I=I_real_coil, R=0.05) + RealCoil.Bx(x, coil_mid_pos=0.05, rho=np.sqrt(z**2+y**2), l=0.1, N=100, I=I_real_coil, R=0.05)
-    # By = lambda x,y,z: RealCoil.pol(x) + RealCoil.Brho(x, coil_mid_pos=0.05, rho=y, l=0.1, N=100, I=I_real_coil, R=0.05)
-    # Bz = lambda x,y,z: RealCoil.Brho(x, coil_mid_pos=0.05, rho=z, l=0.1, N=100, I=I_real_coil, R=0.05)
-
-    simulation = Neutrons(10000, incrementsize=step, totalflightlength=endpoint)
-    # simulation.reset_pol()
+    simulation.create_neutrons()
+    simulation.reset_pol()
 
     print(simulation.get_pol())
-    simulation.create_B_map(b_function, (0.001, 0.001))
+    # simulation.create_b_map(b_function, (0.001, 0.001))
     simulation.simulate_neutrons()
     print(simulation.get_pol())
 

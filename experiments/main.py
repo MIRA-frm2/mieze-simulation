@@ -11,22 +11,27 @@
 from experiments.mieze.main import Mieze
 from elements.coils import Coil
 
-from experiments.mieze.parameters import L1, L2, startpoint, endpoint, step
+from experiments.mieze.parameters import L1, L2, startpoint, beamend, step
 
-from utils.helper_functions import save_data_to_file
+from utils.helper_functions import save_data_to_file, save_obj
 
 
 def main():
-    experiment = Mieze(coil_type=Coil, coil_distance=L1, detector_distance=L2-L1,
-                       increment=step,  sample_distance=1.5)
+    experiment = Mieze(coil_type=Coil,
+                       coil_distance=L1,
+                       detector_distance=L2-L1,
+                       increment=step,
+                       sample_distance=1.5)
+
     experiment.create_setup(current=5)
 
-    grid_size = {'x_start': startpoint, 'x_end': endpoint, 'y_start': -0.0, 'y_end': 0.0, 'z_start': -0.0, 'z_end': 0.0}
+    grid_size = {'x_start': startpoint, 'x_end': beamend, 'y_start': -0.2, 'y_end': 0.2, 'z_start': -0.2, 'z_end': 0.2}
     experiment.initialize_computational_space(**grid_size)
 
     experiment.calculate_b_field()
 
     save_data_to_file(experiment.b, file_name='../data/data')
+    save_obj(experiment.b, name='../data/data')
 
 
 if __name__ == "__main__":
