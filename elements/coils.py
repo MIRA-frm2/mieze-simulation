@@ -52,6 +52,7 @@ class BaseCoil(BasicElement):
         """
         super(BaseCoil, self).__init__(position, name)
 
+        self.iteration = 0
         self.prefactor = MU_0
 
         self.length = kwargs.get('length', None)
@@ -328,6 +329,8 @@ class RealCoil(Coil):
 
     def b_field(self, x, y, z):
         """Compute the magnetic field given the position in cartesian coordinates."""
+        self.iteration += 1
+
         field = np.array([0., 0., 0.])
         r = np.sqrt(y ** 2 + z ** 2)
         phi = get_phi(y, z)
@@ -340,6 +343,8 @@ class RealCoil(Coil):
 
         for x0 in x_positions:
             for R in rs:
+                print(f'iteration:{self.iteration} with x:{x0} and r:{R}')
+                # logger.error(f'{field}\n{field_add}')
                 field_add = np.array([self.b_field_x(x + x0, R, r),
                                       self.b_field_rho(x + x0, R) * np.cos(phi),
                                       self.b_field_rho(x + x0, R) * np.sin(phi)])

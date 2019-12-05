@@ -14,62 +14,76 @@ import numpy as np
 
 from experiments.mieze.parameters import HelmholtzSpinFlipper_position_HSF1, lambda_n, step
 
+from utils.helper_functions import read_data_from_file
 
-def plot_adiabatic_check(self):
-    index_first_hsf = np.argmin(abs(np.asarray(self.x_range) - HelmholtzSpinFlipper_position_HSF1))
 
-    fig1, ax1 = plt.subplots()
+class Plotter:
 
-    color = 'tab:red'
-    ax1.set_xlabel('Neutron Trajectory (m)')
-    ax1.set_ylabel('Magnetic field (G)', color=color)
+    def __init__(self):
+        self.x_range, self.y_range, self.z_range, self.bx, self.by, self.bz = read_data_from_file()
 
-    # logger.error(f'{absolute_x_position}\n]{Bx_values}\n{By_values}')
+        # self.preadjust_values()
 
-    ax1.plot(self.x_range, self.bx)
-    ax1.plot(self.x_range, self.bz)
+    def preadjust_values(self):
+        self.bx = 1e-1 * np.asarray(np.abs(self.bx))
+        self.by = np.abs(self.by)
 
-    ax1.legend((r'$B_x$', r'$B_z$'), loc=9)
-    ax1.tick_params(axis='y', labelcolor=color)
+    def plot_adiabatic_check(self):
+        index_first_hsf = np.argmin(abs(np.asarray(self.x_range) - HelmholtzSpinFlipper_position_HSF1))
 
-    ax2 = ax1.twinx()  # instantiate a second axes that shares the same x-axis
+        fig1, ax1 = plt.subplots()
 
-    color = 'tab:green'
-    x_pos = self.x_range[index_first_hsf]
-    # noinspection PyTypeChecker
-    theta_values = np.degrees(np.arctan(np.divide(np.asarray(self.bz), np.asarray(self.bx))))
-    y_pos = theta_values[index_first_hsf]
+        color = 'tab:red'
+        ax1.set_xlabel('Neutron Trajectory (m)')
+        ax1.set_ylabel('Magnetic field (G)', color=color)
 
-    # we already handled the x-label with ax1
-    ax2.set_ylabel(r'$\theta$ (degree)', color=color)
-    ax2.plot(self.x_range, theta_values, color=color)
-    ax2.tick_params(axis='y', labelcolor=color)
-    ax2.plot(x_pos, y_pos, color='black', marker='o')
-    ax2.text(x_pos, y_pos * 0.9, '{:.1f}°'.format(y_pos))
+        # logger.error(f'{absolute_x_position}\n]{Bx_values}\n{By_values}')
 
-    # fig1.tight_layout()  # otherwise the right y-label is slightly clipped
-    plt.show()
-    # plt.savefig('By_Bx.pdf')
-    # plt.close()
+        ax1.plot(self.x_range, self.bx)
+        ax1.plot(self.x_range, self.bz)
 
-    fig1, ax = plt.subplots()
+        ax1.legend((r'$B_x$', r'$B_z$'), loc=9)
+        ax1.tick_params(axis='y', labelcolor=color)
 
-    dtheta_dy = np.abs(np.gradient(theta_values, step))
-    b_values = np.sqrt(np.power(np.asarray(self.bx), 2) + np.power(np.asarray(self.bz), 2))
+        ax2 = ax1.twinx()  # instantiate a second axes that shares the same x-axis
 
-    # ax.set_yscale('log')
-    ax.plot(self.x_range, np.asarray(dtheta_dy) * 1e-2)  # y from m to cm
-    ax.plot(self.x_range, 2.65 * lambda_n * np.asarray(b_values) * 1e-1)  # B from Gauss to mT,
-    ax.legend((r'$\frac{d\theta}{dy}$', r'$2.65\lambda B$'))
+        color = 'tab:green'
+        x_pos = self.x_range[index_first_hsf]
+        # noinspection PyTypeChecker
+        theta_values = np.degrees(np.arctan(np.divide(np.asarray(self.bz), np.asarray(self.bx))))
+        y_pos = theta_values[index_first_hsf]
 
-    ax.set_xlabel('Neutron Trajectory (m)')
-    ax.set_ylabel("(degrees/cm)")
-    ax.grid()
-    # fig1.tight_layout()
-    plt.show()
-    # plt.savefig('Adiabatic_Check.pdf')
-    # plt.close()
+        # we already handled the x-label with ax1
+        ax2.set_ylabel(r'$\theta$ (degree)', color=color)
+        ax2.plot(self.x_range, theta_values, color=color)
+        ax2.tick_params(axis='y', labelcolor=color)
+        ax2.plot(x_pos, y_pos, color='black', marker='o')
+        ax2.text(x_pos, y_pos * 0.9, '{:.1f}°'.format(y_pos))
+
+        # fig1.tight_layout()  # otherwise the right y-label is slightly clipped
+        plt.show()
+        # plt.savefig('By_Bx.pdf')
+        # plt.close()
+
+        fig1, ax = plt.subplots()
+
+        dtheta_dy = np.abs(np.gradient(theta_values, step))
+        b_values = np.sqrt(np.power(np.asarray(self.bx), 2) + np.power(np.asarray(self.bz), 2))
+
+        # ax.set_yscale('log')
+        ax.plot(self.x_range, np.asarray(dtheta_dy) * 1e-2)  # y from m to cm
+        ax.plot(self.x_range, 2.65 * lambda_n * np.asarray(b_values) * 1e-1)  # B from Gauss to mT,
+        ax.legend((r'$\frac{d\theta}{dy}$', r'$2.65\lambda B$'))
+
+        ax.set_xlabel('Neutron Trajectory (m)')
+        ax.set_ylabel("(degrees/cm)")
+        ax.grid()
+        # fig1.tight_layout()
+        plt.show()
+        # plt.savefig('Adiabatic_Check.pdf')
+        # plt.close()
 
 
 if __name__ == "__main__":
-    plot_adiabatic_check()
+    plot = Plotter()
+    plot.plot_adiabatic_check()

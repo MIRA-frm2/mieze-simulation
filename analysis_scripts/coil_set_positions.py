@@ -44,18 +44,19 @@ def minimizer_function(computed_values, expected_values, use_chisquare=False):
                               1e4 * np.asarray(expected_values))
     else:
         fit_value = 0
-        for j in range(len(computed_values)):
+        n = len(computed_values)
+        for j in range(n):
             dif = computed_values[j] - expected_values[j]
             fit_value += dif ** 2
-        fit_value = 1 / fit_value
+        fit_value = 1 / (fit_value * n)
 
     return fit_value
 
 
 def get_ideal_field(b_max, middle_position, x_positions):
     """Returns the ideal magnetic field."""
-    return b_max * unit_square(middle_position - DISTANCE_BETWEEN_INNER_COILS / 2 - LENGTH_COIL_INNER - LENGTH_COIL_INNER * 0.25,
-                               middle_position + DISTANCE_BETWEEN_INNER_COILS / 2 + LENGTH_COIL_INNER * 0.25,
+    return 0.99 * b_max * unit_square(middle_position - DISTANCE_BETWEEN_INNER_COILS / 2 - LENGTH_COIL_INNER - LENGTH_COIL_INNER * 0.5,
+                               middle_position + DISTANCE_BETWEEN_INNER_COILS / 2 + LENGTH_COIL_INNER * 0.5,
                                x_positions)
 
 
@@ -72,9 +73,9 @@ def define_iteration_values(n=1):
 
 def define_computational_grid():
     """Define the computational grid space."""
-    startpoint = -0.25  # [m]
-    endpoint = 0.25  # [m]  # Positions.get_position_coilA()
-    return np.linspace(startpoint, endpoint, num=400)
+    startpoint = -0.35  # [m]
+    endpoint = 0.35  # [m]  # Positions.get_position_coilA()
+    return np.linspace(startpoint, endpoint, num=700)
 
 
 def plot_l1l2_cmap(fits, l, plot_name=None):
@@ -90,12 +91,13 @@ def plot_l1l2_cmap(fits, l, plot_name=None):
         plt.close()
 
 
-def plot_ideal_position(middle_position, best_fit, x_positions, plot_name=None):
+def plot_ideal_position(middle_position, best_fit, x_positions, coil_type=None, plot_name=None):
     """Plot the magnetic field for the ideal position."""
 
     # Plot values
     print(best_fit)
-    coil_set = CoilSet(name='CoilSet',
+    coil_set = CoilSet(coil_type=coil_type,
+                       name='CoilSet',
                        position=middle_position,
                        distance_12=best_fit['l12'],
                        distance_34=best_fit['l34'])
@@ -139,12 +141,12 @@ def plot_ideal_position(middle_position, best_fit, x_positions, plot_name=None):
     plt.savefig(f'../docs/experiments/MIEZE/bfield_coil_set{plot_name}.png')
 
 
-def optimize_coils_positions():
+def optimize_coils_positions(coil_type=None):
     """Compute the optimization.
 
     Iterate over several distances for each outer coil.
     """
-    n = 1
+    n = 100
     l = define_iteration_values(n)
     fits = [[0 for i in range(n)] for j in range(n)]
 
@@ -158,7 +160,7 @@ def optimize_coils_positions():
         for j in range(len(l)):
             print(f'compute i= {i} j= {j}')
             # Create CoilSets
-            coil_set = CoilSet(coil_type=RealCoil,
+            coil_set = CoilSet(coil_type=coil_type,
                                distance_12=l[i], distance_34=l[j],
                                name='CoilSet',
                                position=middle_position)
@@ -178,8 +180,8 @@ def optimize_coils_positions():
                 best_fit = {'fit_value': fit_value, 'l12': l[i], 'l34': l[j]}
     plot_name = '_small'
     plot_l1l2_cmap(fits, l, plot_name=plot_name)
-    plot_ideal_position(middle_position, best_fit, x_positions, plot_name=plot_name)
+    plot_ideal_position(middle_position, best_fit, x_positions, coil_type=coil_type, plot_name=plot_name)
 
 
 if __name__ == "__main__":
-    optimize_coils_positions()
+    optimize_coils_positions(coil_type=Coil)
