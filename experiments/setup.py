@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
 
 class Setup:
     """Class that simulates a physical setup."""
-    def __init__(self, increment):
+    def __init__(self):
         self.elements = []
         self.b = None
         self.b_cartesian = None
@@ -44,7 +44,6 @@ class Setup:
         self.rho = None
 
         self.current = None
-        self.increment = increment
 
         self.x_ticks = None
         self.x_ticks_labels = None
@@ -100,80 +99,17 @@ class Setup:
         """Initialize the 3d discretized computational space."""
         x_start = kwargs.pop('x_start', 0)
         x_end = kwargs.pop('x_end', 1)
+        x_step = kwargs.pop('x_step', 0.1)
 
         y_start = kwargs.pop('y_start', 0)
         y_end = kwargs.pop('y_end', 1)
-
         z_start = kwargs.pop('z_start', 0)
         z_end = kwargs.pop('z_end', 1)
+        yz_step = kwargs.pop('yz_step', 0.1)
 
-        rho = kwargs.pop('rho', 0)
-
-        self.x_range = np.arange(x_start,
-                                 x_end + self.increment,
-                                 self.increment)
-
-        # if not rho:
-        #     # Create just a line centered at (y,z)=(0,0).
-        #     self.y_range = np.arange(1)
-        #     self.z_range = np.arange(1)
-        # else:
-        self.y_range = np.arange(y_start,
-                                 y_end + self.increment,
-                                 self.increment)
-        self.z_range = np.arange(z_start,
-                                 z_end + self.increment,
-                                 self.increment)
-
-        # elif coordinate_system == 'cartesian':
-        #     square_element = self._get_square_element()
-        #
-        #     plane = kwargs.pop('plane', True)
-        #     # coil_distance = kwargs.pop('coil_distance', square_element.width/10)
-        #
-        #     if self.b is None or self.setup_changed:
-        #         if plane == 'yz':
-        #             self.x_range = np.arange(1)
-        #         else:
-        #             self.x_range = np.arange(zoom_factor * start,
-        #                                      zoom_factor * end + self.increment,
-        #                                      self.increment)
-        #
-        #         if plane == 'xz':
-        #             self.y_range = np.arange(1)
-        #         else:
-        #             self.y_range = np.arange(- zoom_factor * square_element.width - self.increment/2,
-        #                                      zoom_factor * square_element.width + self.increment/2,
-        #                                      self.increment)
-        #
-        #         if plane == 'xy':
-        #             self.z_range = np.arange(1)
-        #         else:
-        #             self.z_range = np.arange(- zoom_factor * square_element.height - self.increment/2,
-        #                                      zoom_factor * square_element.height + self.increment/2,
-        #                                      self.increment)
-        #
-        # # elif coordinate_system == 'cylindrical':
-        # rho = kwargs.pop('rho', 0)
-        # plane = kwargs.pop('plane', True)
-        #
-        # resolution_factor = 1.125
-        # compute_range = resolution_factor * rho
-        #
-        # if plane == 'yz':
-        #     self.x_range = np.arange(1)
-        # else:
-        #     self.x_range = np.arange(start, end - start, self.increment)
-        #
-        # if plane == 'xz':
-        #     self.y_range = np.arange(1)
-        # else:
-        #     self.y_range = np.arange(- compute_range, compute_range, self.increment)
-        #
-        # if plane == 'xy':
-        #     self.z_range = np.arange(1)
-        # else:
-        #     self.z_range = np.arange(- compute_range, compute_range, self.increment)
+        self.x_range = np.arange(x_start, x_end + x_step, x_step)
+        self.y_range = np.arange(y_start, y_end + yz_step, yz_step)
+        self.z_range = np.arange(z_start, z_end + yz_step, yz_step)
 
     def calculate_b_field(self):
         """Calculate the magnetic field."""

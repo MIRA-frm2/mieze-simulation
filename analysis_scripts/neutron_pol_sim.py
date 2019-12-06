@@ -12,7 +12,7 @@
 
 from particles.beam import NeutronBeam
 
-from experiments.mieze.parameters import I_hsf1, step, beamend, beamsize, velocity
+from experiments.mieze.parameters import I_hsf1, step_x, startpoint, beamend, beamsize, step_x, velocity
 
 from utils.physics_constants import earth_field
 
@@ -30,18 +30,27 @@ from utils.physics_constants import earth_field
 
 def main():
     simulation = NeutronBeam(beamsize=beamsize,
-                             incrementsize=step,
-                             number_of_neutrons=10000,
+                             incrementsize=step_x,
+                             number_of_neutrons=1,
                              velocity=velocity,
                              totalflightlength=beamend)
+
+    grid_size = {'x_start': startpoint, 'x_end': beamend, 'x_step': step_x,
+                 'y_start': -1.0, 'y_end': 1.0, 'z_start': -1.0, 'z_end': 1.0,
+                 'yz_step':  (1.0 - -1.0) / 20}
+
+    simulation.initialize_computational_space(**grid_size)
 
     simulation.create_neutrons()
     simulation.reset_pol()
 
     print(simulation.get_pol())
+    print(simulation.get_neutron_position())
+
     # simulation.create_b_map(b_function, (0.001, 0.001))
-    simulation.simulate_neutrons()
+    simulation.simulate_neutron_trajectory()
     print(simulation.get_pol())
+    print(simulation.get_neutron_position())
 
     # 
     # B_polariser = polariser.pol(absolute_y_position)

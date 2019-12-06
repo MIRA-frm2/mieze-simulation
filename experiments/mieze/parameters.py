@@ -14,7 +14,7 @@ beamend = 10  # [m]  # Positions.get_position_coilA()
 
 npoints = 100
 absolute_x_position = np.linspace(startpoint, beamend, num=npoints)
-step = (absolute_x_position[1] - absolute_x_position[0])
+step_x = (absolute_x_position[1] - absolute_x_position[0])
 
 # MIEZE coil set values
 
@@ -86,4 +86,3 @@ beamsize = 0.02
 number_of_neutrons = 1000
 velocity = 3956 / 4.5
 incrementsize = 0.001
-totalflightlength = 3

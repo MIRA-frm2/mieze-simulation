@@ -26,13 +26,10 @@ class Neutron:
     """Implements neutrons and its properties."""
 
     def __init__(self, speed, polarisation, position):
-        self.velocity = speed
+        self.speed = speed
         self.polarisation = polarisation
         self.position = position
 
-    def _time_in_field(self, velocity):
-        return self.incrementsize/velocity
-    
     @staticmethod
     def _omega(b):
         gamma = 1.83247172e4

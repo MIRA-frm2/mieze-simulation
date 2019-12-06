@@ -11,7 +11,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-from experiments.mieze.parameters import HelmholtzSpinFlipper_position_HSF1, lambda_n, step
+from experiments.mieze.parameters import HelmholtzSpinFlipper_position_HSF1, lambda_n, step_x
 
 from utils.helper_functions import read_data_from_file
 from utils.physics_constants import factor_T_to_G
@@ -77,7 +77,7 @@ class Plotter:
 
         fig1, ax = plt.subplots()
 
-        dtheta_dy = np.abs(np.gradient(theta_values, step))
+        dtheta_dy = np.abs(np.gradient(theta_values, step_x))
         b_values = np.sqrt(np.power(np.asarray(self.bx), 2) + np.power(np.asarray(self.by), 2))
 
         ax.set_yscale('log')

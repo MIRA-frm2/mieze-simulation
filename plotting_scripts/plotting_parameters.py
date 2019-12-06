@@ -2,7 +2,7 @@ from elements.coils import Coil, RealCoil, RectangularCoil
 from elements.helmholtz_spin_flipper import HelmholtzSpinFlipper
 from elements.polariser import Polariser
 
-from experiments.mieze.parameters import R_HSF, I_hsf1, HelmholtzSpinFlipper_position_HSF1
+from experiments.mieze.parameters import R_HSF, I_hsf1, HelmholtzSpinFlipper_position_HSF1, startpoint, beamend, step_x
 
 plot_parameters = {
     'coil_simple_1d_x': {
@@ -112,4 +112,19 @@ plot_parameters = {
         'plot_dimension': '1d',
         'plot_args': {'type': 'scalar', 'component': 'x'},
     },
+    'neutron_beam': {
+        'coil_args': None,
+        'element_kwargs': {'coil_type': Coil,
+                           'current': I_hsf1,
+                           'element_class': HelmholtzSpinFlipper,
+                           'position': (HelmholtzSpinFlipper_position_HSF1, 0, 0),
+                           'radius': R_HSF
+                           },
+        'grid_size': {'x_start': startpoint, 'x_end': beamend, 'x_step': step_x,
+                      'y_start': -1.0, 'y_end': 1.0,
+                      'z_start': -1.0, 'z_end': 1.0,
+                      'yz_step': (1.0 - -1.0) / 20},
+        'plot_dimension': '1d',
+        'plot_args': {'type': 'scalar', 'component': 'x'},
+    }
 }

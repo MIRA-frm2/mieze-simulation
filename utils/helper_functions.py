@@ -156,3 +156,34 @@ def unit_square(x_min, x_max, grid):
         else:
             x_values.append(0)
     return np.array(x_values)
+
+
+def _find_nearest(array, value, index=True):
+    """Find the nearest grid point index from the requested value.
+
+    Parameters
+    ----------
+    array: np.array
+        Array with values.
+    value: float
+        Float to be found close an array element.
+    index: bool, optional
+        Flag indicating whether to retrieve value as the index, or the value of the array at that index.
+
+    Returns
+    -------
+    idx: int
+        The index of the array element closest to the value.
+
+    >>> _find_nearest([3, 2, 1], 1.1)
+    2
+    >>> _find_nearest([3, 2, 1], 1.1, index=False)
+    1
+
+    """
+    array = np.asarray(array)
+    idx = (np.abs(array - value).argmin())
+    if index:
+        return idx
+    else:
+        return array[idx]

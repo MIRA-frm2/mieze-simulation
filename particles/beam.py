@@ -17,7 +17,7 @@ import random
 
 from particles.neutron import Neutron
 
-from utils.helper_functions import save_obj, load_obj
+from utils.helper_functions import save_obj, load_obj, _find_nearest
 
 cwd = os.getcwd()
 
@@ -33,7 +33,25 @@ class NeutronBeam:
         self.totalflightlength = totalflightlength
         self.beamsize = beamsize
 
+    def initialize_computational_space(self, **kwargs):
+        """Initialize the 3d discretized computational space."""
+        x_start = kwargs.pop('x_start', 0)
+        x_end = kwargs.pop('x_end', 1)
+        x_step = kwargs.pop('x_step', 0.1)
+
+        y_start = kwargs.pop('y_start', 0)
+        y_end = kwargs.pop('y_end', 1)
+        z_start = kwargs.pop('z_start', 0)
+        z_end = kwargs.pop('z_end', 1)
+        yz_step = kwargs.pop('yz_step', 0.1)
+
+        self.x_range = np.arange(x_start, x_end + x_step, x_step)
+        self.y_range = np.arange(y_start, y_end + yz_step, yz_step)
+        self.z_range = np.arange(z_start, z_end + yz_step, yz_step)
+
+
     def create_neutrons(self):
+        """Initialize the neutrons."""
         while len(self.neutrons) < self.number_of_neutrons:
             c = 0.31225  # sqrt(1-polarisierung²)
             x = c * r.rand()
@@ -46,7 +64,7 @@ class NeutronBeam:
             pos_z = round(random.gauss(0, self.beamsize / 5), ndigits=-int(np.log10(self.incrementsize)))
             position = (0, pos_y, pos_z)
 
-            neutron = Neutron(position, speed, polarisation)
+            neutron = Neutron(polarisation=polarisation, position=position, speed=speed)
 
             self.neutrons.append(neutron)
 
@@ -77,57 +95,49 @@ class NeutronBeam:
         return np.dot(R, vektor)
 
     def _polarisation_change(self, neutron, b, L):
-        t = self._time_in_field(velocity=neutron['speed'])
+        t = self._time_in_field(velocity=neutron.speed)
         phi = self._precession_angle(t, b)
-        return self._rotate(vektor=neutron['polarisation'], phi=phi, axis=b)
+        return self._rotate(vektor=neutron.polarisation, phi=phi, axis=b)
 
-    def create_b_map(self, b_function, profiledimension):
-        """
+    # def create_b_map(self, b_function, profiledimension):
+    #     """
+    #
+    #     Parameters
+    #     ----------
+    #     b_function
+    #     profiledimension: tuple
+    #
+    #     Returns
+    #     -------
+    #
+    #     """
+    #     if not len(profiledimension) == 2:
+    #         print('error: profile dimension has to be 2D ')
+    #         return -1
+    #
+    #     max_y = profiledimension[0]
+    #     max_z = profiledimension[1]
+    #
+    #     x = np.round(np.arange(0, self.totalflightlength, self.incrementsize),
+    #                  decimals=-int(np.log10(self.incrementsize)))
+    #     y = np.round(np.arange(-max_y, max_y + self.incrementsize, self.incrementsize),
+    #                  decimals=-int(np.log10(self.incrementsize)))
+    #     z = np.round(np.arange(-max_z, max_z + self.incrementsize, self.incrementsize),
+    #                  decimals=-int(np.log10(self.incrementsize)))
+    #
+    #     args = list(itertools.product(x, y, z))
+    #
+    #     with Pool(4) as p:
+    #         result = p.map(b_function, args)
+    #
+    #     bmap = dict(zip(args, result))
+    #
+    #     # self.B_map = bmap
+    #     save_obj(bmap, 'B_map')
 
-        Parameters
-        ----------
-        b_function
-        profiledimension: tuple
-
-        Returns
-        -------
-
-        """
-        if not len(profiledimension) == 2:
-            print('error: profile dimension has to be 2D ')
-            return -1
-
-        max_y = profiledimension[0]
-        max_z = profiledimension[1]
-
-        x = np.round(np.arange(0, self.totalflightlength, self.incrementsize),
-                     decimals=-int(np.log10(self.incrementsize)))
-        y = np.round(np.arange(-max_y, max_y + self.incrementsize, self.incrementsize),
-                     decimals=-int(np.log10(self.incrementsize)))
-        z = np.round(np.arange(-max_z, max_z + self.incrementsize, self.incrementsize),
-                     decimals=-int(np.log10(self.incrementsize)))
-
-        args = list(itertools.product(x, y, z))
-
-        with Pool(4) as p:
-            result = p.map(b_function, args)
-
-        bmap = dict(zip(args, result))
-
-        # self.B_map = bmap
-        save_obj(bmap, 'B_map')
-
-    def simulate_neutrons(self):
+    def simulate_neutron_trajectory(self):
         toberemoved = []
-
         b_map = load_obj('../data/data')
-        # try:
-        #     pass
-        # except FileNotFoundError:
-        #     # Todo: If not magnetic field is found, create one.
-        #     # self.create_b_map(b_function, (0.001, 0.001))
-        #     # b_map = self.load_obj('B_map')
-        #     pass
 
         for neutron in self.neutrons:
             # # ToDo: refactor
@@ -136,10 +146,17 @@ class NeutronBeam:
             #     toberemoved.append(neutron)
             #     continue
 
-            for ii in range(int(self.totalflightlength / self.incrementsize)):
-                i = round(ii * self.incrementsize, ndigits=3)
-                neutron.polarisation = self._polarisation_change(neutron, b_map[
-                    (i, neutron.position[1], neutron.position[2])], self.incrementsize)
+            for j in range(int(self.totalflightlength / self.incrementsize)):
+
+                x_position = round(j * self.incrementsize, ndigits=3)
+
+                neutron.polarisation = self._polarisation_change(
+                    neutron,
+                    b_map[(_find_nearest(self.x_range, x_position, index=False),
+                           _find_nearest(self.y_range, neutron.position[1], index=False),
+                           _find_nearest(self.z_range, neutron.position[2], index=False),
+                           )],
+                    self.incrementsize)
 
         for neutron in toberemoved:
             self.neutrons.remove(neutron)
@@ -158,3 +175,6 @@ class NeutronBeam:
         z = np.sqrt(c ** 2 - x ** 2)
         for neutron in self.neutrons:
             neutron.polarisation = np.array([x, 0.95, z])
+
+    def get_neutron_position(self, index=0):
+        return self.neutrons[index].position
