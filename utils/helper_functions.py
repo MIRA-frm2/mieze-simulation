@@ -145,13 +145,6 @@ def sanitize_output(func):
     return wrapper_sanitize_output
 
 
-def get_vector_norm(vector):
-    norm = 0
-    for item in vector:
-        norm += item ** 2
-    return np.sqrt(norm)
-
-
 def unit_square(x_min, x_max, grid):
     """Return an array of a unit square function.
 

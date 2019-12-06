@@ -48,7 +48,7 @@ class TestRectangularCoil(TestCase):
 class TestSimpleCoil(TestCase):
 
     def setUp(self) -> None:
-        self.coil = Coil(position=(0, 0, 0), length=1, r=1, current=1, windings=1, wire_d=0)
+        self.coil = Coil(name='TestCoil', position=(0, 0, 0), length=1, r_eff=1, current=1, windings=1, wire_d=0)
 
     def test_circular_simple_coil_center_value(self):
         # parameters

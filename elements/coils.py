@@ -16,7 +16,7 @@ import warnings
 from elements.base import BasicElement
 
 from utils.helper_functions import get_phi, adjust_field, sanitize_output
-from utils.physics_constants import MU_0, pi
+from utils.physics_constants import MU_0, pi, factor_T_to_G
 
 # Set the warning filter to errors such that one can catch them as they were errors
 # This is used to handle divisions by numerical 0
@@ -269,7 +269,7 @@ class Coil(BaseCoil):
         if self.angle_z != 0:
             field = self._rotate(field, self.angle_z, np.array([0, 0, 1]))
 
-        return field
+        return factor_T_to_G * field
 
 
 class RealCoil(Coil):
@@ -361,7 +361,7 @@ class RealCoil(Coil):
         if self.angle_z != 0:
             field = self._rotate(field, self.angle_z, np.array([0, 0, 1]))
 
-        return field
+        return factor_T_to_G * field
 
 
 class RectangularCoil(BaseCoil):
@@ -371,6 +371,8 @@ class RectangularCoil(BaseCoil):
         """Simulate physical geometry of the coil."""
 
         super(RectangularCoil, self).__init__(position, name, **kwargs)
+
+        self.x, self.y, self.z = None, None, None
 
         self.prefactor *= 1 / (4 * np.pi) * self.windings * self.current / self.length
 
@@ -416,8 +418,7 @@ class RectangularCoil(BaseCoil):
 
         field = adjust_field(field)
 
-        return self._reverse_coordinates(*self.sanitize_output(field))
-        # return self.sanitize_output(field)
+        return factor_T_to_G * self._reverse_coordinates(*self.sanitize_output(field))
     #
     @staticmethod
     def sanitize_output(field):

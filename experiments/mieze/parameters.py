@@ -8,7 +8,7 @@ lambda_n = 4.3  # 1/[Angstrom]
 
 I_real_coil = 10  # [A]
 
-startpoint = 0.001  # [m]
+startpoint = 0.000  # [m]
 beamend = 10  # [m]  # Positions.get_position_coilA()
 
 
@@ -48,8 +48,8 @@ WIRE_SPACING = 1 * 1e-3  # [m]
 COIL_SET_CURRENT = 5  # [A]
 
 # Square coil Parameters
-SQUARE_COIL_POSITION_1ST = 0.1   # [A]
-SQUARE_COIL_POSITION_2ND = 1   # [A]
+SQUARE_COIL_POSITION_1ST = 0.1   # [m]
+SQUARE_COIL_POSITION_2ND = 1   # [m]
 
 # Rectangular coils
 RECTANGULAR_COIL_LENGTH = 1 * 1e-2  # [m]
@@ -58,15 +58,22 @@ RECTANGULAR_COIL_HEIGHT = 13 * 1e-2  # [m]
 WINDINGS = 1
 
 # Coil group
-R_HSF = 5.38e-2   # [A]  # radius of helmholtz coils at the spin flippers; achieved by fitting real magnetic field
-WIDTH_CBOX = 2 * (50 + 86) * 1e-3   # [A]  # width of one group of coils
-L1 = 0.53   # [A]  # coil group A to B
-L2 = 2.58   # [A]  # coil group B to detector
-Ls = L2 - 0.62   # [A]  # sample to detector
-POLARISER_HSF1 = 10e-2   # [A]  # distance between polariser and first coil of hsf1
+WIDTH_CBOX = 2 * (50 + 86) * 1e-3   # [m]  # width of one group of coils
+L1 = 0.53   # [m]  # coil group A to B
+L2 = 2.58   # [m]  # coil group B to detector
+Ls = L2 - 0.62   # [m]  # sample to detector
 
-POLARISATOR = 0.0   # [A]
-HelmholtzSpinFlipper_position_HSF1 = 2  # POLARISATOR + POLARISER_HSF1 + R_HSF / 2.0
+# Spin flippers
+R_HSF = 53.8 * 1e-3   # [m]  # radius of helmholtz coils at the spin flippers; achieved by fitting real magnetic field
+
+
+# Polariser data
+POLARISATOR = 0.0   # [m]
+POLARISER_HSF1 = 10e-2   # [m]  # distance between polariser and first coil of hsf1
+HelmholtzSpinFlipper_position_HSF1 = POLARISATOR + POLARISER_HSF1 + R_HSF / 2.0
+beamend_adiabatic_check = 0.4
+step_adiabatic_check = (beamend_adiabatic_check - startpoint) / npoints
+
 SpinFlipper_position1 = HelmholtzSpinFlipper_position_HSF1
 COIL_A = HelmholtzSpinFlipper_position_HSF1 + R_HSF / 2.0
 COIL_B = COIL_A + L1

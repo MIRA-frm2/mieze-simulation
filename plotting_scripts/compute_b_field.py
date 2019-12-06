@@ -5,8 +5,9 @@ from utils.helper_functions import save_data_to_file
 
 
 def compute_bfield(params):
-    setup = Setup(increment=0.01)
-    setup.create_element(element_class=params['element'], position=(0, 0, 0), r_eff=1, current=-1, length=0.2, windings=1)
+    setup = Setup(increment=params['increment'])
+
+    setup.create_element(**params['element_kwargs'])
 
     setup.initialize_computational_space(**params['grid_size'])
     setup.calculate_b_field()
@@ -23,7 +24,7 @@ def compute_bfield(params):
 
 
 if __name__ == "__main__":
-    name = 'coil_simple_1d_x'
+    name = 'helmholtz_1d_x'
 
     compute_bfield(params=plot_parameters[name])
 

@@ -11,10 +11,12 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-
+from experiments.mieze.main import Mieze
+from elements.coils import Coil
 from experiments.mieze.parameters import HelmholtzSpinFlipper_position_HSF1, lambda_n, step
+from experiments.mieze.parameters import L1, L2
 
-from utils.helper_functions import read_data_from_file
+from utils.helper_functions import read_data_from_file, save_data_to_file
 
 
 class Plotter:
@@ -22,10 +24,10 @@ class Plotter:
     def __init__(self):
         self.x_range, self.y_range, self.z_range, self.bx, self.by, self.bz = read_data_from_file()
 
-        # self.preadjust_values()
+        self.preadjust_values()
 
     def preadjust_values(self):
-        self.bx = 1e-1 * np.asarray(np.abs(self.bx))
+        self.bx = np.asarray(np.abs(self.bx))
         self.by = np.abs(self.by)
 
     def plot_adiabatic_check(self):
@@ -40,9 +42,9 @@ class Plotter:
         # logger.error(f'{absolute_x_position}\n]{Bx_values}\n{By_values}')
 
         ax1.plot(self.x_range, self.bx)
-        ax1.plot(self.x_range, self.bz)
+        ax1.plot(self.x_range, self.by)
 
-        ax1.legend((r'$B_x$', r'$B_z$'), loc=9)
+        ax1.legend((r'$B_x$', r'$B_y$'), loc=9)
         ax1.tick_params(axis='y', labelcolor=color)
 
         ax2 = ax1.twinx()  # instantiate a second axes that shares the same x-axis
@@ -50,7 +52,7 @@ class Plotter:
         color = 'tab:green'
         x_pos = self.x_range[index_first_hsf]
         # noinspection PyTypeChecker
-        theta_values = np.degrees(np.arctan(np.divide(np.asarray(self.bz), np.asarray(self.bx))))
+        theta_values = np.degrees(np.arctan(np.divide(np.asarray(self.by), np.asarray(self.bx))))
         y_pos = theta_values[index_first_hsf]
 
         # we already handled the x-label with ax1
@@ -68,7 +70,7 @@ class Plotter:
         fig1, ax = plt.subplots()
 
         dtheta_dy = np.abs(np.gradient(theta_values, step))
-        b_values = np.sqrt(np.power(np.asarray(self.bx), 2) + np.power(np.asarray(self.bz), 2))
+        b_values = np.sqrt(np.power(np.asarray(self.bx), 2) + np.power(np.asarray(self.by), 2))
 
         # ax.set_yscale('log')
         ax.plot(self.x_range, np.asarray(dtheta_dy) * 1e-2)  # y from m to cm

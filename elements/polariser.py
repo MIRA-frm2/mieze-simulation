@@ -10,13 +10,11 @@
 
 import logging
 import numpy as np
-# from scipy.optimize import curve_fit2
 
 from elements.base import BasicElement
 from experiments.mieze.parameters import POLARISATOR
 
-from utils.physics_constants import MU_0
-from utils.helper_functions import get_vector_norm
+from utils.physics_constants import MU_0, factor_T_to_G
 
 
 # Create a custom logger
@@ -25,40 +23,55 @@ logger = logging.getLogger(__name__)
 
 class Polariser(BasicElement):
 
-    def __init__(self, position=(POLARISATOR, 0, 0), *args, **kwargs):
+    def __init__(self, position=(POLARISATOR, 0, 0), **kwargs):
 
         super(Polariser, self).__init__(position, name='polariser')
 
         self.position = position
 
         self.c = kwargs.get('c', 0.05)  # shift polarisator position
-        # magnetic dipol moment Polarisator; both obtained by real measurements and data analysis
+        # magnetic dipol moment Polarisator;
+        # both obtained by real measurements and data analysis
+        # Pointing in the z upwards directions # Todo: check z or y
         self.m = kwargs.get('m', np.array((0, 90, 0)))
 
-    def b_field(self, x, y, z):
+    def _rectify_x_position(self, x):
+        """Take into account the position and the shift on the x axis.
+
+        The shift is that the magnetic field is measured/computed starting from the right side of the polarise.r
+        """
         x -= self.position_x
-        r_vec = np.array((x + self.c, y, z))
-        r = get_vector_norm(r_vec)
+        x += self.c
+        return x
 
-        prefactor = (MU_0 / (4 * np.pi * r**2))
-        elem1 = 3 * r_vec * get_vector_norm(self.m * r_vec)
-        elem2 = self.m * r**2
+    def b_field(self, x, y, z):
+        """Compute the magnetic field."""
+        if type(x) not in (int, float, np.float64):
+            b_field = list()
+            for item in x:
+                b_field.append(np.abs(self.b_field(item, 0, 0)[1]))
+            return np.asarray(b_field)
+        else:
+            x = self._rectify_x_position(x)
 
+            r_vec = np.array((x, y, z))
+
+            return self.b_field_theoretical(r_vec)
+
+    def b_field_fitted(self, x_data, power, amplitude):
+        """Compute the magnetic field as a power law, with parameters obtained from measured data."""
+        x = self._rectify_x_position(np.asarray(x_data))
+        return amplitude * np.power(x, -power) * 1e-4
+
+    def b_field_theoretical(self, r_vec):
+        """Compute the magnetic field from the equations of a magnetic dipole."""
+        r = np.linalg.norm(r_vec)
+        r_unit_vec = r_vec / r
+
+        prefactor = MU_0 / (4 * np.pi)
+        elem1 = 3 * r_unit_vec * self.m * r_unit_vec
+        elem2 = self.m
+
+        # Modelled as an ideal dipole magnetic field (note: it is divergent at 0)
         b = prefactor * (elem1 - elem2) / r**3
-        # logger.error(f'{b}')
-        # B = cls.MU_0/(4*np.pi*(r+cls.c)**3)*cls.m
-        # B = (1e-7)*cls.m/(x+cls.c)**3
-        return b[0] * 1e4 * b
-        # return 1e3*(cls.MU_0/4*np.pi)*cls.m / (x+cls.c)**3
-
-
-# =============================================================================
-#         def _mfd(x):
-#             length = [0, 0.025, 0.05, 0.075, 0.10, 0.20, 0.30] #m
-#             B = [52.5, 24, 9, 3.7, 2.1, 0.4, 0.12] #mT
-#             length = np.array(length)
-#             B = 10.0 * np. array(B)
-#             popt, pcov = curve_fit(_polariser_mag, length, B, p0=(-5,1,0.1))
-#             return _polariser_mag(x, *popt)
-# 
-# =============================================================================
+        return b * factor_T_to_G
