@@ -4,7 +4,7 @@ import numpy as np
 # Variables are stored as tuples with numerical value and units
 I_sf1 = 1.6  # [A]
 I_hsf1 = 1.6  # [A]
-lambda_n = 4.3  # 1/[Angstrom]
+lambda_n = 4.3  # [Angstrom]
 
 I_real_coil = 10  # [A]
 
@@ -14,7 +14,7 @@ beamend = 10  # [m]  # Positions.get_position_coilA()
 
 npoints = 100
 absolute_x_position = np.linspace(startpoint, beamend, num=npoints)
-step = (absolute_x_position[1] - absolute_x_position[0])  # [A]
+step = (absolute_x_position[1] - absolute_x_position[0])
 
 # MIEZE coil set values
 
@@ -82,8 +82,8 @@ SpinFlipper_position2 = HelmholtzSpinFlipper_position_HSF2
 
 
 # Beam properties
-beamsize=0.02
-number_of_neutrons=1000
-velocity=3956 / 4.5
-incrementsize=0.001
-totalflightlength=3
+beamsize = 0.02
+number_of_neutrons = 1000
+velocity = 3956 / 4.5
+incrementsize = 0.001
+totalflightlength = 3

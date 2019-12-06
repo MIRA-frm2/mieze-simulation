@@ -11,12 +11,20 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-from experiments.mieze.main import Mieze
-from elements.coils import Coil
 from experiments.mieze.parameters import HelmholtzSpinFlipper_position_HSF1, lambda_n, step
-from experiments.mieze.parameters import L1, L2
 
-from utils.helper_functions import read_data_from_file, save_data_to_file
+from utils.helper_functions import read_data_from_file
+from utils.physics_constants import factor_T_to_G
+
+
+def adjust_angle_gradient_for_adiabatic_condition(dtheta_dy):
+    """Convert from angle/m to angle/cm"""
+    return np.asarray(dtheta_dy) / 1e2
+
+
+def compute_adiabatic_condition(b_values):
+    factor_G_to_mT = 1e3 / factor_T_to_G
+    return 2.65 * lambda_n * np.asarray(b_values) * factor_G_to_mT
 
 
 class Plotter:
@@ -72,9 +80,10 @@ class Plotter:
         dtheta_dy = np.abs(np.gradient(theta_values, step))
         b_values = np.sqrt(np.power(np.asarray(self.bx), 2) + np.power(np.asarray(self.by), 2))
 
-        # ax.set_yscale('log')
-        ax.plot(self.x_range, np.asarray(dtheta_dy) * 1e-2)  # y from m to cm
-        ax.plot(self.x_range, 2.65 * lambda_n * np.asarray(b_values) * 1e-1)  # B from Gauss to mT,
+        ax.set_yscale('log')
+
+        ax.plot(self.x_range, adjust_angle_gradient_for_adiabatic_condition(dtheta_dy))  # y from m to cm
+        ax.plot(self.x_range, compute_adiabatic_condition(b_values))  # B from Gauss to mT,
         ax.legend((r'$\frac{d\theta}{dy}$', r'$2.65\lambda B$'))
 
         ax.set_xlabel('Neutron Trajectory (m)')
