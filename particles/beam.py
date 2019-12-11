@@ -23,10 +23,10 @@ cwd = os.getcwd()
 class NeutronBeam:
     """Implements neutrons and its properties."""
 
-    def __init__(self, beamsize, incrementsize, velocity, totalflightlength):
+    def __init__(self, beamsize, incrementsize, speed, totalflightlength):
         self.neutrons = []
         self.number_of_neutrons = None
-        self.velocity = velocity
+        self.speed = speed
         self.incrementsize = incrementsize
         self.totalflightlength = totalflightlength
         self.beamsize = beamsize
@@ -72,18 +72,26 @@ class NeutronBeam:
             x = c * r.rand()
             z = np.sqrt(c ** 2 - x ** 2)
 
-            speed = random.gauss(self.velocity, 0.02 * self.velocity)
             polarisation = np.array([x, 0.95, z])
 
             if distribution:
                 pos_y = round(random.gauss(0, self.beamsize / 5), ndigits=-int(np.log10(self.incrementsize)))
                 pos_z = round(random.gauss(0, self.beamsize / 5), ndigits=-int(np.log10(self.incrementsize)))
+
+                speed = random.gauss(self.speed, 0.02 * self.speed)
+                neutron_velocity = np.array([speed, 0, 0])
+                # neutron_velocity = np.array([speed, speed * 0.01, speed * 0.01])
+
             else:
                 pos_y = 0
                 pos_z = 0
-            position = (0, pos_y, pos_z)
 
-            neutron = Neutron(polarisation=polarisation, position=position, speed=speed)
+                speed = self.speed
+                neutron_velocity = np.array([speed, 0, 0])
+
+            position = np.asarray([0, pos_y, pos_z])
+
+            neutron = Neutron(polarisation=polarisation, position=position, velocity=neutron_velocity)
 
             self.neutrons.append(neutron)
 
@@ -102,7 +110,7 @@ class NeutronBeam:
         gamma = 1.83247172e4
         return gamma * np.linalg.norm(b) * time
 
-    def _polarisation_change(self, neutron, b):
+    def _polarisation_change(self, neutron, b, time):
         """Change the polarisation for the respective neutron.
 
         Parameters
@@ -116,8 +124,7 @@ class NeutronBeam:
         -------
 
         """
-        t = self._time_in_field(velocity=neutron.speed)
-        phi = self._precession_angle(t, b)
+        phi = self._precession_angle(time, b)
         return rotate(vector=neutron.polarisation, phi=phi, axis=b)
 
     def load_magnetic_field(self):
@@ -130,26 +137,32 @@ class NeutronBeam:
         for j in self.x_range:
             for neutron in self.neutrons:
 
-                self.check_neutron_in_beam(neutron)
+                # self.check_neutron_in_beam(neutron)
 
+                time = self._time_in_field(velocity=neutron.speed)
+                print(j)
                 neutron.set_position_x(j)
+                neutron.compute_position_yz(time)
+                print(neutron.position)
 
                 neutron.polarisation = self._polarisation_change(
                     neutron,
                     self.b_map[(find_nearest(self.x_range, neutron.position[0], index=False),
                                 find_nearest(self.y_range, neutron.position[1], index=False),
                                 find_nearest(self.z_range, neutron.position[2], index=False),
-                                )])
+                                )],
+                    time)
 
-            self.polarisation[self.get_neutron_position()] = self.get_pol()
+            self.polarisation[tuple(self.get_neutron_position())] = self.get_pol()
 
             print(self.get_pol())
             print(self.get_neutron_position())
 
     def check_neutron_in_beam(self, neutron):
         """Check if it is in the calculated beam profile (y,z plane)"""
-        if not (0, neutron.position[1], neutron.position[2]) in self.b_map:
-            self.neutrons.remove(neutron)
+        # if not (neutron.position[0], neutron.position[1], neutron.position[2]) in self.b_map:
+        #     self.neutrons.remove(neutron)
+        pass
 
     def get_pol(self):
         """Get the average polarisation for the beam."""

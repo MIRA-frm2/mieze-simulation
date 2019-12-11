@@ -25,21 +25,22 @@ initial_polarisation = np.array([x, 0.95, z])
 class Neutron:
     """Implements neutrons and its properties."""
 
-    def __init__(self, speed, position, polarisation=initial_polarisation):
+    def __init__(self, velocity, position, polarisation=initial_polarisation):
         """
 
         Parameters
         ----------
-        speed: float
-            The speed of the neutrons.
+        velocity: np.array
+            The velocity vector of the neutron.
         position: np.array
             Array of the initial position of the neutron as (x, y, z).
         polarisation: np.array
             The array of the initial polarisation.
         """
-        self.speed = speed
+        self.velocity = velocity
         self.polarisation = polarisation
-        self.position = position
+
+        self.position = np.asarray(position)
 
     def get_pol(self):
         """Return the polarisation of the neutron."""
@@ -49,10 +50,22 @@ class Neutron:
         """Reset the polarisation to the initial value."""
         self.polarisation = initial_polarisation
 
-    def set_position_x(self, x):
+    def set_position_x(self, x_val):
         """Set the neutron position."""
-        self.position = (x, self.position[1], self.position[2])
+        print(f'Set x position to neutron as : {x_val}')
+        self.position = np.array([x_val, self.position[1], self.position[2]])
+        print(f'Neutron position is: {self.position}')
 
     def get_position_x(self):
         """Return the neutron position."""
         return self.position[0]
+
+    def compute_position_yz(self, time):
+        self.position[1] += time * self.velocity[1]
+        self.position[2] += time * self.velocity[2]
+
+    @property
+    def speed(self):
+        # """Return the speed from the velocity."""
+        # return np.linalg.norm(self.velocity)
+        return self.velocity[0]

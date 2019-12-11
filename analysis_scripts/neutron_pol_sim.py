@@ -13,7 +13,7 @@ from mpl_toolkits.mplot3d import Axes3D  # Needed for 3d plotting
 
 from particles.beam import NeutronBeam
 
-from experiments.mieze.parameters import I_hsf1, step_x, startpoint, beamend, beamsize, step_x, velocity
+from experiments.mieze.parameters import I_hsf1, step_x, startpoint, beamend, beamsize, step_x, speed
 from plotting_scripts.plotter import Plotter
 
 from utils.helper_functions import save_data_to_file, read_data_from_file
@@ -30,6 +30,7 @@ class MyPlotter:
         # 3d figure
         fig = plt.figure()
         ax = fig.gca(projection='3d')
+
         # Plot the magnetic field
         ax.quiver(self.x_range, self.y_range, self.z_range,
                   self.bx, self.by, self.bz,
@@ -38,7 +39,6 @@ class MyPlotter:
                   self.px, self.py, self.pz,
                   color='g', **kwargs)
 
-        # plt.title('Magnetic field of a straight wire')
         plt.xlabel('x')
         plt.ylabel('y')
 
@@ -48,7 +48,7 @@ class MyPlotter:
 def main():
     simulation = NeutronBeam(beamsize=beamsize,
                              incrementsize=step_x,
-                             velocity=velocity,
+                             speed=speed,
                              totalflightlength=beamend)
 
     # Define computational space
@@ -71,7 +71,7 @@ def main():
     save_data_to_file(simulation.polarisation, '../data/data_polarisation')
 
     plotter = MyPlotter(magnetic_field_data='../data/data.csv', polarisation_data='../data/data_polarisation.csv')
-    plotter.plot_field_3d(normalize=True, length=0.05)
+    plotter.plot_field_3d(normalize=True, length=0.025)
 
 
 if __name__ == "__main__":

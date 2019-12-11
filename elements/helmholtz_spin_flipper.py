@@ -17,6 +17,7 @@ from utils.physics_constants import factor_T_to_G
 
 
 class HelmholtzSpinFlipper(BasicElement):
+    adjustment_factor = 1
 
     def __init__(self, position=(HelmholtzSpinFlipper_position_HSF1, 0, 0), **kwargs):
         """Inherit init from base class and define additional parameters."""
@@ -52,4 +53,4 @@ class HelmholtzSpinFlipper(BasicElement):
         """Compute the magnetic field given the position."""
         b1 = self.coil2.b_field(x, y, z)
         b2 = self.coil2.b_field(x, y, z)
-        return b1 + b2
+        return (b1 + b2) * self.adjustment_factor

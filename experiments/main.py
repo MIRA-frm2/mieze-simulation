@@ -24,7 +24,7 @@ def main():
 
     experiment.create_setup(current=5)
 
-    grid_size = {'x_start': startpoint, 'x_end': beamend_adiabatic_check, 'x_step': step_adiabatic_check,
+    grid_size = {'x_start': startpoint, 'x_end': beamend, 'x_step': step_x,
                  'y_start': -0.0, 'y_end': 0.0, 'z_start': -0.0, 'z_end': 0.0, 'yz_step': 0.1}
 
     experiment.initialize_computational_space(**grid_size)

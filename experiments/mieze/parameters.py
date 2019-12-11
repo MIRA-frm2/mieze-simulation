@@ -84,5 +84,5 @@ SpinFlipper_position2 = HelmholtzSpinFlipper_position_HSF2
 # Beam properties
 beamsize = 0.02
 number_of_neutrons = 1000
-velocity = 3956 / 4.5
-incrementsize = 0.001
+speed = 3956 / 4.5
+angular_distribution = 45  # minutes
