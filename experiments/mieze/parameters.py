@@ -69,7 +69,7 @@ R_HSF = 53.8 * 1e-3   # [m]  # radius of helmholtz coils at the spin flippers; a
 
 # Polariser data
 POLARISATOR = 0.0   # [m]
-POLARISER_HSF1 = 10e-2   # [m]  # distance between polariser and first coil of hsf1
+POLARISER_HSF1 = 20e-2   # [m]  # distance between polariser and first coil of hsf1
 HelmholtzSpinFlipper_position_HSF1 = POLARISATOR + POLARISER_HSF1 + R_HSF / 2.0
 beamend_adiabatic_check = 0.4
 step_adiabatic_check = (beamend_adiabatic_check - startpoint) / npoints

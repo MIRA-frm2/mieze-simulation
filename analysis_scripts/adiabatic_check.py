@@ -27,10 +27,10 @@ def compute_adiabatic_condition(b_values):
     return 2.65 * lambda_n * np.asarray(b_values) * factor_G_to_mT
 
 
-class Plotter:
+class MyPlotter:
 
     def __init__(self):
-        self.x_range, self.y_range, self.z_range, self.bx, self.by, self.bz = read_data_from_file()
+        self.x_range, self.y_range, self.z_range, self.bx, self.by, self.bz = read_data_from_file('../data/data.csv')
 
         self.preadjust_values()
 
@@ -96,5 +96,5 @@ class Plotter:
 
 
 if __name__ == "__main__":
-    plot = Plotter()
+    plot = MyPlotter()
     plot.plot_adiabatic_check()

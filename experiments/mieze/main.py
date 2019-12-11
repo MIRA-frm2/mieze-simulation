@@ -25,7 +25,7 @@ from elements.polariser import Polariser
 class Mieze(Setup):
     def __init__(self, coil_type, sample_distance, coil_distance, detector_distance, increment=0.001):
 
-        super(Mieze, self).__init__(increment=increment)
+        super(Mieze, self).__init__()
 
         self.sample_distance = sample_distance
         self.detector_distance = detector_distance
