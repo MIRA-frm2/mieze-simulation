@@ -9,7 +9,7 @@ lambda_n = 4.3  # [Angstrom]
 I_real_coil = 10  # [A]
 
 startpoint = 0.000  # [m]
-beamend = 10  # [m]  # Positions.get_position_coilA()
+beamend = 0.5  # [m]  # Positions.get_position_coilA()
 
 
 npoints = 100

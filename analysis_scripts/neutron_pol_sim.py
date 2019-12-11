@@ -8,15 +8,41 @@
 
 """Main script that computes the flow of the particles through the magnetic field."""
 
-# import numpy as np
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D  # Needed for 3d plotting
 
 from particles.beam import NeutronBeam
 
 from experiments.mieze.parameters import I_hsf1, step_x, startpoint, beamend, beamsize, step_x, velocity
-from plotting_scripts.plot import Plotter
+from plotting_scripts.plotter import Plotter
 
-from utils.helper_functions import save_data_to_file
+from utils.helper_functions import save_data_to_file, read_data_from_file
 from utils.physics_constants import earth_field
+
+
+class MyPlotter:
+
+    def __init__(self, magnetic_field_data='../data/data.csv', polarisation_data='../data/polarisation_data.csv'):
+        self.x_range, self.y_range, self.z_range, self.bx, self.by, self.bz = read_data_from_file(magnetic_field_data)
+        self.x_range, self.y_range, self.z_range, self.px, self.py, self.pz = read_data_from_file(polarisation_data)
+
+    def plot_field_3d(self, **kwargs):
+        # 3d figure
+        fig = plt.figure()
+        ax = fig.gca(projection='3d')
+        # Plot the magnetic field
+        ax.quiver(self.x_range, self.y_range, self.z_range,
+                  self.bx, self.by, self.bz,
+                  color='b', **kwargs)
+        ax.quiver(self.x_range, self.y_range, self.z_range,
+                  self.px, self.py, self.pz,
+                  color='g', **kwargs)
+
+        # plt.title('Magnetic field of a straight wire')
+        plt.xlabel('x')
+        plt.ylabel('y')
+
+        plt.show()
 
 
 # def b_function(vec):
@@ -53,7 +79,7 @@ def main():
 
     save_data_to_file(simulation.polarisation, '../data/data_polarisation')
 
-    plotter = Plotter('../data/data_polarisation.csv')
+    plotter = MyPlotter(magnetic_field_data='../data/data.csv', polarisation_data='../data/data_polarisation.csv')
     plotter.plot_field_3d(normalize=True, length=0.05)
 
 
