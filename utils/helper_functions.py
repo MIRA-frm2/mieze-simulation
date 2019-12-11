@@ -17,23 +17,58 @@ import pickle
 logger = logging.getLogger(__name__)
 
 
-def transform_cartesian_to_cylindrical(x, y, z):
-    """Transform coordinates from cartesian to cylindrical."""
-    x = x
-    rho = np.sqrt(y ** 2 + z ** 2)
-    if z:
-        theta = np.arctan(y / z)
+def adjust_field(vector):
+    """
+
+    Parameters
+    ----------
+    vector: np.array
+
+    """
+    return np.array([vector[2], vector[1], vector[0]])
+
+
+def find_list_length_of_different_items(x):
+    """Returns the length if different items from a list.
+
+    The initial list may contain duplicates that would otherwsid
+    """
+    xx = list()
+    for item in x:
+        if item not in xx:
+            xx.append(item)
+    return len(xx)
+
+
+def find_nearest(array, value, index=True):
+    """Find the nearest grid point index from the requested value.
+
+    Parameters
+    ----------
+    array: np.array
+        Array with values.
+    value: float
+        Float to be found close an array element.
+    index: bool, optional
+        Flag indicating whether to retrieve value as the index, or the value of the array at that index.
+
+    Returns
+    -------
+    idx: int
+        The index of the array element closest to the value.
+
+    >>> find_nearest([3, 2, 1], 1.1)
+    2
+    >>> find_nearest([3, 2, 1], 1.1, index=False)
+    1
+
+    """
+    array = np.asarray(array)
+    idx = (np.abs(array - value).argmin())
+    if index:
+        return idx
     else:
-        theta = 0
-    return x, rho, theta
-
-
-def transform_cylindrical_to_cartesian(x, rho, theta):
-    """Transform coordinates from cylindrical to cartesian."""
-    x = x
-    y = rho * np.cos(theta)
-    z = rho * np.sin(theta)
-    return x, y, z
+        return array[idx]
 
 
 def get_phi(y, z):
@@ -47,52 +82,10 @@ def get_phi(y, z):
             return np.pi * 3 / 2
 
 
-def adjust_field(vector):
-    """
-
-    Parameters
-    ----------
-    vector: np.array
-
-    """
-    return np.array([vector[2], vector[1], vector[0]])
-
-
-def save_obj(obj, name):
-    """Save object (magnetic field) as pickled object."""
-    with open(f'{name}.pkl', 'wb') as f:
-        pickle.dump(obj, f, pickle.HIGHEST_PROTOCOL)
-
-
 def load_obj(name):
     """Load object (magnetic field) as pickled object."""
     with open(f'{name}.pkl', 'rb') as f:
         return pickle.load(f)
-
-
-def save_data_to_file(data, file_name, extension='.csv'):
-    """Save data to file."""
-    full_filename = f'{file_name}{extension}'
-
-    with open(full_filename, 'w') as file:
-
-        logger.info(f'Writing data to file {full_filename}')
-
-        csv_writer = csv.writer(file, delimiter=',')
-        csv_writer.writerow(["x", "y", "z", "Bx", "By", "Bz"])
-
-        # print(data)
-        for point, field in data.items():
-            # logger.debug(type(point))
-            if type(point) != np.float64:
-                point = list(point)
-            else:
-                point = list((point, ))
-
-            # print(point, field)
-
-            row = point + list((field[0], field[1], field[2]))
-            csv_writer.writerow(row)
 
 
 def read_data_from_file(file_name):
@@ -124,18 +117,6 @@ def read_data_from_file(file_name):
     return x, y, z, bx, by, bz
 
 
-def find_list_length_of_different_items(x):
-    """Returns the length if different items from a list.
-
-    The initial list may contain duplicates that would otherwsid
-    """
-    xx = list()
-    for item in x:
-        if item not in xx:
-            xx.append(item)
-    return len(xx)
-
-
 def sanitize_output(func):
     def wrapper_sanitize_output(*args, **kwargs):
         value = func(*args, **kwargs)
@@ -158,32 +139,67 @@ def unit_square(x_min, x_max, grid):
     return np.array(x_values)
 
 
-def _find_nearest(array, value, index=True):
-    """Find the nearest grid point index from the requested value.
+def rotate(vector, phi, axis):
+    """Rotate the vector with an angle phi with respect to the axis."""
+    n = axis / np.linalg.norm(axis)
+    c = np.cos(phi)
+    s = np.sin(phi)
 
-    Parameters
-    ----------
-    array: np.array
-        Array with values.
-    value: float
-        Float to be found close an array element.
-    index: bool, optional
-        Flag indicating whether to retrieve value as the index, or the value of the array at that index.
+    n1 = n[0]
+    n2 = n[1]
+    n3 = n[2]
 
-    Returns
-    -------
-    idx: int
-        The index of the array element closest to the value.
+    r = [[n1 ** 2 * (1 - c) + c, n1 * n2 * (1 - c) - n3 * s, n1 * n3 * (1 - c) + n2 * s],
+         [n2 * n1 * (1 - c) + n3 * s, n2 ** 2 * (1 - c) + c, n2 * n3 * (1 - c) - n1 * s],
+         [n3 * n1 * (1 - c) - n2 * s, n3 * n2 * (1 - c) + n1 * s, n3 ** 2 * (1 - c) + c]]
+    return np.dot(r, vector)
 
-    >>> _find_nearest([3, 2, 1], 1.1)
-    2
-    >>> _find_nearest([3, 2, 1], 1.1, index=False)
-    1
 
-    """
-    array = np.asarray(array)
-    idx = (np.abs(array - value).argmin())
-    if index:
-        return idx
+def save_data_to_file(data, file_name, extension='.csv'):
+    """Save data to file."""
+    full_filename = f'{file_name}{extension}'
+
+    with open(full_filename, 'w') as file:
+
+        logger.info(f'Writing data to file {full_filename}')
+
+        csv_writer = csv.writer(file, delimiter=',')
+        csv_writer.writerow(["x", "y", "z", "Bx", "By", "Bz"])
+
+        # print(data)
+        for point, field in data.items():
+            # logger.debug(type(point))
+            if type(point) != np.float64:
+                point = list(point)
+            else:
+                point = list((point, ))
+
+            # print(point, field)
+
+            row = point + list((field[0], field[1], field[2]))
+            csv_writer.writerow(row)
+
+
+def save_obj(obj, name):
+    """Save object (magnetic field) as pickled object."""
+    with open(f'{name}.pkl', 'wb') as f:
+        pickle.dump(obj, f, pickle.HIGHEST_PROTOCOL)
+
+
+def transform_cartesian_to_cylindrical(x, y, z):
+    """Transform coordinates from cartesian to cylindrical."""
+    x = x
+    rho = np.sqrt(y ** 2 + z ** 2)
+    if z:
+        theta = np.arctan(y / z)
     else:
-        return array[idx]
+        theta = 0
+    return x, rho, theta
+
+
+def transform_cylindrical_to_cartesian(x, rho, theta):
+    """Transform coordinates from cylindrical to cartesian."""
+    x = x
+    y = rho * np.cos(theta)
+    z = rho * np.sin(theta)
+    return x, y, z

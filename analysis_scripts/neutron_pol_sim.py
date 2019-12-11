@@ -45,17 +45,6 @@ class MyPlotter:
         plt.show()
 
 
-# def b_function(vec):
-#     x = vec[0]
-#     y = vec[1]
-#     z = vec[2]
-#
-#     flipper = HelmholtzSpinFlipper()
-#     flipper.create_element(position=0.1, current=I_hsf1)
-#
-#     return flipper.hsf(x, y, z) + Polariser.B_field(x, y, z) + earth_field
-#
-
 def main():
     simulation = NeutronBeam(beamsize=beamsize,
                              incrementsize=step_x,
@@ -68,6 +57,7 @@ def main():
                  'yz_step':  (1.0 - -1.0) / 20}
 
     simulation.initialize_computational_space(**grid_size)
+    simulation.load_magnetic_field()
 
     simulation.create_neutrons()
     simulation.reset_pol()

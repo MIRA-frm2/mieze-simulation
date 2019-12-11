@@ -8,106 +8,51 @@
 
 """Neutron class."""
 
-
-import itertools
-from multiprocessing import Pool
 import numpy as np
 import numpy.random as r
 import os
-import random
 
-
-from utils.helper_functions import save_obj, load_obj
 
 cwd = os.getcwd()
+
+c = 0.31225  # sqrt(1-polarisierung²)
+x = c * r.rand()
+z = np.sqrt(c ** 2 - x ** 2)
+
+initial_polarisation = np.array([x, 0.95, z])
 
 
 class Neutron:
     """Implements neutrons and its properties."""
 
-    def __init__(self, speed, polarisation, position):
+    def __init__(self, speed, position, polarisation=initial_polarisation):
+        """
+
+        Parameters
+        ----------
+        speed: float
+            The speed of the neutrons.
+        position: np.array
+            Array of the initial position of the neutron as (x, y, z).
+        polarisation: np.array
+            The array of the initial polarisation.
+        """
         self.speed = speed
         self.polarisation = polarisation
         self.position = position
 
-    @staticmethod
-    def _omega(b):
-        gamma = 1.83247172e4
-        return b*gamma
-
-    @staticmethod
-    def _precession_angle(time, b):
-        gamma = 1.83247172e4
-        return gamma * np.linalg.norm(b)*time
-
-    @staticmethod
-    def _rotate(vektor, phi, axis):
-        n = axis/np.linalg.norm(axis)
-        c = np.cos(phi)
-        s = np.sin(phi)
-
-        n1 = n[0]
-        n2 = n[1]
-        n3 = n[2]
-
-        R = [[n1**2 * (1-c) + c, n1 * n2 * (1-c) - n3 * s, n1 * n3 * (1-c) + n2 * s],
-             [n2 * n1 * (1-c) + n3 * s, n2**2 * (1-c) + c, n2 * n3 * (1-c) - n1 * s],
-             [n3 * n1 * (1-c) - n2 * s, n3 * n2 * (1-c) + n1 *s, n3**2*(1-c) + c]]
-        return np.dot(R, vektor)
-    
-    # def _polarisation_change(self, neutron, b, L):
-    #     t = self._time_in_field(velocity=neutron['speed'])
-    #     phi = self._precession_angle(t, b)
-    #     return self._rotate(vektor=neutron['polarisation'], phi=phi, axis=b)
-    #
-    # def create_b_map(self, b_function, profiledimension):
-    #     """
-    #
-    #     Parameters
-    #     ----------
-    #     b_function
-    #     profiledimension: tuple
-    #
-    #     Returns
-    #     -------
-    #
-    #     """
-    #     if not len(profiledimension) == 2:
-    #         print('error: profile dimension has to be 2D ')
-    #         return -1
-    #
-    #     max_y = profiledimension[0]
-    #     max_z = profiledimension[1]
-    #
-    #     x = np.round(np.arange(0, self.totalflightlength, self.incrementsize),
-    #                  decimals=-int(np.log10(self.incrementsize)))
-    #     y = np.round(np.arange(-max_y, max_y + self.incrementsize, self.incrementsize),
-    #                  decimals=-int(np.log10(self.incrementsize)))
-    #     z = np.round(np.arange(-max_z, max_z + self.incrementsize, self.incrementsize),
-    #                  decimals=-int(np.log10(self.incrementsize)))
-    #
-    #     args = list(itertools.product(x, y, z))
-    #
-    #     with Pool(4) as p:
-    #         result = p.map(b_function, args)
-    #
-    #     bmap = dict(zip(args, result))
-    #
-    #     # self.B_map = bmap
-    #     save_obj(bmap, 'B_map')
-
     def get_pol(self):
+        """Return the polarisation of the neutron."""
         return self.polarisation
 
     def reset_pol(self):
-        c = 0.31225  # sqrt(1-polarisierung²)
-        x = c*r.rand()
-        z = np.sqrt(c**2-x**2)
-
-        self.polarisation = np.array([x, 0.95, z])
+        """Reset the polarisation to the initial value."""
+        self.polarisation = initial_polarisation
 
     def set_position_x(self, x):
+        """Set the neutron position."""
         self.position = (x, self.position[1], self.position[2])
 
     def get_position_x(self):
+        """Return the neutron position."""
         return self.position[0]
