@@ -48,25 +48,26 @@ class MyPlotter:
 def main():
     simulation = NeutronBeam(beamsize=beamsize,
                              incrementsize=step_x,
-                             number_of_neutrons=1,
                              velocity=velocity,
                              totalflightlength=beamend)
 
+    # Define computational space
     grid_size = {'x_start': startpoint, 'x_end': beamend, 'x_step': step_x,
                  'y_start': 0.0, 'y_end': 0.0, 'z_start': -0.0, 'z_end': 0.0,
                  'yz_step':  (1.0 - -1.0) / 20}
-
     simulation.initialize_computational_space(**grid_size)
+
+    # Load magnetic field values
     simulation.load_magnetic_field()
 
-    simulation.create_neutrons()
+    # Initialize the neutrons and set their polarisation
+    simulation.create_neutrons(number_of_neutrons=1)
     simulation.reset_pol()
 
-    print(simulation.get_pol())
-    print(simulation.get_neutron_position())
-
+    # Simulate the actual beam trajectory and the polarisation thereof
     simulation.compute_beam()
 
+    # Save data to file and plot
     save_data_to_file(simulation.polarisation, '../data/data_polarisation')
 
     plotter = MyPlotter(magnetic_field_data='../data/data.csv', polarisation_data='../data/data_polarisation.csv')

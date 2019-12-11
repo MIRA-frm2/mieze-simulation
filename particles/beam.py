@@ -23,9 +23,9 @@ cwd = os.getcwd()
 class NeutronBeam:
     """Implements neutrons and its properties."""
 
-    def __init__(self, beamsize, number_of_neutrons, incrementsize, velocity, totalflightlength):
+    def __init__(self, beamsize, incrementsize, velocity, totalflightlength):
         self.neutrons = []
-        self.number_of_neutrons = number_of_neutrons
+        self.number_of_neutrons = None
         self.velocity = velocity
         self.incrementsize = incrementsize
         self.totalflightlength = totalflightlength
@@ -55,9 +55,23 @@ class NeutronBeam:
         self.y_range = np.arange(y_start, y_end + yz_step, yz_step)
         self.z_range = np.arange(z_start, z_end + yz_step, yz_step)
 
-    def create_neutrons(self, distribution=False):
-        """Initialize the neutrons."""
-        while len(self.neutrons) < self.number_of_neutrons:
+    def create_neutrons(self, number_of_neutrons, distribution=True):
+        """Initialize the neutrons with a specific distribution.
+
+        Parameters
+        ----------
+        number_of_neutrons: int
+            Number of neutrons to be simulated.
+        distribution: boolean, optional
+            If True, then the neutrons are uniformly distributed.
+            If False, then the neutrons are not spread and all start at 0.
+            Defaults to True.
+
+        Returns
+        -------
+
+        """
+        while len(self.neutrons) < number_of_neutrons:
             c = 0.31225  # sqrt(1-polarisierung²)
             x = c * r.rand()
             z = np.sqrt(c ** 2 - x ** 2)
