@@ -95,7 +95,7 @@ def save_data_to_file(data, file_name, extension='.csv'):
             csv_writer.writerow(row)
 
 
-def read_data_from_file(file_name='../data/data.csv'):
+def read_data_from_file(file_name):
     """Read data from file"""
     x = list()
     y = list()

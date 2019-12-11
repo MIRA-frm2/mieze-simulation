@@ -17,7 +17,7 @@ def compute_bfield(params):
 
 
 if __name__ == "__main__":
-    name = 'neutron_beam'
+    name = 'neutron_beam_axis'
 
     compute_bfield(params=plot_parameters[name])
 

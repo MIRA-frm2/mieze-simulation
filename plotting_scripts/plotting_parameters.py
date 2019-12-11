@@ -112,6 +112,21 @@ plot_parameters = {
         'plot_dimension': '1d',
         'plot_args': {'type': 'scalar', 'component': 'x'},
     },
+    'neutron_beam_axis': {
+        'coil_args': None,
+        'element_kwargs': {'coil_type': Coil,
+                           'current': I_hsf1,
+                           'element_class': HelmholtzSpinFlipper,
+                           'position': (HelmholtzSpinFlipper_position_HSF1, 0, 0),
+                           'radius': R_HSF
+                           },
+        'grid_size': {'x_start': startpoint, 'x_end': beamend, 'x_step': step_x,
+                      'y_start': -0.0, 'y_end': 0.0,
+                      'z_start': -0.0, 'z_end': 0.0,
+                      'yz_step': (1.0 - -1.0) / 20},
+        'plot_dimension': '1d',
+        'plot_args': {'type': 'scalar', 'component': 'x'},
+    },
     'neutron_beam': {
         'coil_args': None,
         'element_kwargs': {'coil_type': Coil,

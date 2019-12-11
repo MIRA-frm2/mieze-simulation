@@ -9,8 +9,8 @@
 """Plotting scripts from data file."""
 
 import matplotlib.pyplot as plt
-# import matplotlib.cm as cm
-# from mpl_toolkits.mplot3d import Axes3D  # Needed for 3d plotting
+import matplotlib.cm as cm
+from mpl_toolkits.mplot3d import Axes3D  # Needed for 3d plotting
 
 import numpy as np
 
@@ -19,9 +19,8 @@ from utils.helper_functions import read_data_from_file, find_list_length_of_diff
 
 class Plotter:
 
-    def __init__(self):
-        self.x_range, self.y_range, self.z_range, self.bx, self.by, self.bz = read_data_from_file()
-
+    def __init__(self, filename='../data/data.csv'):
+        self.x_range, self.y_range, self.z_range, self.bx, self.by, self.bz = read_data_from_file(filename)
         # self.preadjust_values()
 
     def preadjust_values(self):
@@ -140,14 +139,14 @@ class Plotter:
 
         plt.show()
 
-    def plot_field_3d(self):
+    def plot_field_3d(self, **kwargs):
         # 3d figure
         fig = plt.figure()
         ax = fig.gca(projection='3d')
         # Plot the magnetic field
         ax.quiver(self.x_range, self.y_range, self.z_range,
                   self.bx, self.by, self.bz,
-                  color='b')
+                  color='b', **kwargs)
 
         # plt.title('Magnetic field of a straight wire')
         plt.xlabel('x')

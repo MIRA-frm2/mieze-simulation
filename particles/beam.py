@@ -33,6 +33,8 @@ class NeutronBeam:
         self.totalflightlength = totalflightlength
         self.beamsize = beamsize
 
+        self.polarisation = dict()
+
     def initialize_computational_space(self, **kwargs):
         """Initialize the 3d discretized computational space."""
         x_start = kwargs.pop('x_start', 0)
@@ -49,8 +51,7 @@ class NeutronBeam:
         self.y_range = np.arange(y_start, y_end + yz_step, yz_step)
         self.z_range = np.arange(z_start, z_end + yz_step, yz_step)
 
-
-    def create_neutrons(self):
+    def create_neutrons(self, distribution=False):
         """Initialize the neutrons."""
         while len(self.neutrons) < self.number_of_neutrons:
             c = 0.31225  # sqrt(1-polarisierung²)
@@ -60,8 +61,12 @@ class NeutronBeam:
             speed = random.gauss(self.velocity, 0.02 * self.velocity)
             polarisation = np.array([x, 0.95, z])
 
-            pos_y = round(random.gauss(0, self.beamsize / 5), ndigits=-int(np.log10(self.incrementsize)))
-            pos_z = round(random.gauss(0, self.beamsize / 5), ndigits=-int(np.log10(self.incrementsize)))
+            if distribution:
+                pos_y = round(random.gauss(0, self.beamsize / 5), ndigits=-int(np.log10(self.incrementsize)))
+                pos_z = round(random.gauss(0, self.beamsize / 5), ndigits=-int(np.log10(self.incrementsize)))
+            else:
+                pos_y = 0
+                pos_z = 0
             position = (0, pos_y, pos_z)
 
             neutron = Neutron(polarisation=polarisation, position=position, speed=speed)
@@ -135,28 +140,36 @@ class NeutronBeam:
     #     # self.B_map = bmap
     #     save_obj(bmap, 'B_map')
 
-    def simulate_neutron_trajectory(self):
-        toberemoved = []
-        b_map = load_obj('../data/data')
+    def compute_beam(self):
+        self.b_map = load_obj('../data/data')
 
         for neutron in self.neutrons:
-            # # ToDo: refactor
-            # # check if it is in the calculated beamprofile (y,z plane)
-            # if not (0, neutron.position[1], neutron.position[2]) in b_map:
-            #     toberemoved.append(neutron)
-            #     continue
+            self.simulate_neutron_trajectory(neutron)
 
-            for j in range(int(self.totalflightlength / self.incrementsize)):
+    def simulate_neutron_trajectory(self, neutron):
+        toberemoved = []
 
-                x_position = round(j * self.incrementsize, ndigits=3)
+        # # ToDo: refactor
+        # # check if it is in the calculated beamprofile (y,z plane)
+        # if not (0, neutron.position[1], neutron.position[2]) in b_map:
+        #     toberemoved.append(neutron)
+        #     continue
 
-                neutron.polarisation = self._polarisation_change(
-                    neutron,
-                    b_map[(_find_nearest(self.x_range, x_position, index=False),
-                           _find_nearest(self.y_range, neutron.position[1], index=False),
-                           _find_nearest(self.z_range, neutron.position[2], index=False),
-                           )],
-                    self.incrementsize)
+        for j in self.x_range:
+
+            neutron.set_position_x(j)
+
+            neutron.polarisation = self._polarisation_change(
+                neutron,
+                self.b_map[(_find_nearest(self.x_range, neutron.position[0], index=False),
+                            _find_nearest(self.y_range, neutron.position[1], index=False),
+                            _find_nearest(self.z_range, neutron.position[2], index=False),
+                            )],
+                self.incrementsize)
+
+            self.polarisation[self.get_neutron_position()] = self.get_pol()
+            print(self.get_pol())
+            print(self.get_neutron_position())
 
         for neutron in toberemoved:
             self.neutrons.remove(neutron)

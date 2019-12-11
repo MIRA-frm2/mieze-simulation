@@ -13,7 +13,9 @@
 from particles.beam import NeutronBeam
 
 from experiments.mieze.parameters import I_hsf1, step_x, startpoint, beamend, beamsize, step_x, velocity
+from plotting_scripts.plot import Plotter
 
+from utils.helper_functions import save_data_to_file
 from utils.physics_constants import earth_field
 
 
@@ -36,7 +38,7 @@ def main():
                              totalflightlength=beamend)
 
     grid_size = {'x_start': startpoint, 'x_end': beamend, 'x_step': step_x,
-                 'y_start': -1.0, 'y_end': 1.0, 'z_start': -1.0, 'z_end': 1.0,
+                 'y_start': 0.0, 'y_end': 0.0, 'z_start': -0.0, 'z_end': 0.0,
                  'yz_step':  (1.0 - -1.0) / 20}
 
     simulation.initialize_computational_space(**grid_size)
@@ -47,21 +49,12 @@ def main():
     print(simulation.get_pol())
     print(simulation.get_neutron_position())
 
-    # simulation.create_b_map(b_function, (0.001, 0.001))
-    simulation.simulate_neutron_trajectory()
-    print(simulation.get_pol())
-    print(simulation.get_neutron_position())
+    simulation.compute_beam()
 
-    # 
-    # B_polariser = polariser.pol(absolute_y_position)
-    # B_extra = RealCoil.Bz(z=absolute_y_position, coil_mid_pos=0.05, rho=0.01, l=0.1, N=100, I=I_real_coil, R=0.05)
-    # 
-    # Bx = B_polariser + Spin_Flipper.sf('sf1', I_sf1, absolute_y_position) #G
-    # By = Helmholtz_Spin_Flipper.hsf('hsf1', I_hsf1, absolute_y_position) + B_extra #G
-    # Long_Coil.hsf('long', 20.0, 0.05, absolute_y_position)+ Single_Coil.hsf('extra', 10.0, 0.02, absolute_y_position) + Single_Coil.hsf('extra', 10.0, 0.03, absolute_y_position)+ Single_Coil.hsf('extra', 10.0, 0.04, absolute_y_position) ++ Single_Coil.hsf('extra', 10.0, 0.05, absolute_y_position)+ Single_Coil.hsf('extra', 10.0, 0.06, absolute_y_position)
-    # B = np.sqrt(Bx**2+By**2)
-    # theta = np.degrees(np.arctan(By/Bx))
-    # dtheta_dy = gradient(theta, step)
+    save_data_to_file(simulation.polarisation, '../data/data_polarisation')
+
+    plotter = Plotter('../data/data_polarisation.csv')
+    plotter.plot_field_3d(normalize=True, length=0.05)
 
 
 if __name__ == "__main__":
