@@ -61,7 +61,7 @@ def main():
     simulation.load_magnetic_field()
 
     # Initialize the neutrons and set their polarisation
-    simulation.create_neutrons(number_of_neutrons=1)
+    simulation.create_neutrons(number_of_neutrons=1, distribution=False)
     simulation.reset_pol()
 
     # Simulate the actual beam trajectory and the polarisation thereof

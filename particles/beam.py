@@ -66,10 +66,6 @@ class NeutronBeam:
             If True, then the neutrons are uniformly distributed.
             If False, then the neutrons are not spread and all start at 0.
             Defaults to True.
-
-        Returns
-        -------
-
         """
         while len(self.neutrons) < number_of_neutrons:
             c = 0.31225  # sqrt(1-polarisierung²)
