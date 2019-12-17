@@ -196,28 +196,10 @@ class Setup:
             b = self._get_b_field_values()[component]
 
         return self._get_b_field_values_from_plane(b, component, plane_idx)
-    #
-    # def get_b(self, arg):
-    #     x, y, z = arg
-    #     local_b = self.b[(x, y, z)]
-    #     return local_b
-    #
-    # def get_b_abs(self, arg):
-    #     """
-    #
-    #     Parameters
-    #     ----------
-    #     arg: tuple
-    #         x, y, z coordinates
-    #     """
-    #     # b = np.zeros(3)
-    #     # print(self.b)
-    #     local_b = self.b[arg]
-    #     return np.linalg.norm(local_b)
 
     def get_2d_abs_plot_data(self, plane, source='new'):
         if source == 'storage':
-            b, extent = read_data_from_file()
+            b, extent = read_data_from_file('../data/data.csv')
         else:
             b = self.get_magnetic_field_value(plane, plane_position=0)
 
@@ -332,3 +314,9 @@ class Setup:
         plt.ylim(-1, 1)
 
         plt.show()
+
+    # def set_plot_ticks(self, set_ticks=False):
+    #     if set_ticks:
+    #         self.x_ticks = [0, self.coil_distance, SQUARE_COIL_POSITION_1ST, SQUARE_COIL_POSITION_2ND]
+    #         self.x_ticks_labels = ['1st Coil Set', '2nd Coil Set', '1st Square Coil ', '2nd Square Coil']
+    #

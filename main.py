@@ -11,7 +11,7 @@
 from experiments.mieze.main import Mieze
 from elements.coils import Coil
 
-from experiments.mieze.parameters import L1, L2, startpoint, beamend, step_x, beamend_adiabatic_check, step_adiabatic_check
+from experiments.mieze.parameters import L1, L2, startpoint, beamend, step_x
 
 from utils.helper_functions import save_data_to_file, save_obj
 
@@ -31,8 +31,8 @@ def main():
 
     experiment.calculate_b_field()
 
-    save_data_to_file(experiment.b, file_name='../data/data')
-    save_obj(experiment.b, name='../data/data')
+    save_data_to_file(experiment.b, file_name='../data/data_magnetic_field')
+    save_obj(experiment.b, name='../data/data_magnetic_field')
 
 
 if __name__ == "__main__":

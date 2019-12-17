@@ -11,7 +11,7 @@
 from numpy import array
 from unittest import TestCase
 
-from elements.helmholtz_spin_flipper import HelmholtzSpinFlipper
+from elements.helmholtz_pair import HelmholtzPair
 from elements.coils import Coil
 
 from experiments.mieze.parameters import R_HSF, I_hsf1, HelmholtzSpinFlipper_position_HSF1
@@ -20,7 +20,7 @@ from experiments.mieze.parameters import R_HSF, I_hsf1, HelmholtzSpinFlipper_pos
 class Test(TestCase):
 
     def setUp(self):
-        self.helmholtz_spin_flipper = HelmholtzSpinFlipper(
+        self.helmholtz_spin_flipper = HelmholtzPair(
             coil_type=Coil,
             coil_distance=R_HSF,
             current=I_hsf1,

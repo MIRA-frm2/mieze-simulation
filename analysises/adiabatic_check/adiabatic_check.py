@@ -6,7 +6,9 @@
 # This is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
 
-"""Plotting the magnetic field to check whether the adiabatic condition is fulfilled."""
+"""Plotting the magnetic field to check whether the adiabatic condition is fulfilled.
+
+"""
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -23,11 +25,27 @@ def adjust_angle_gradient_for_adiabatic_condition(dtheta_dy):
 
 
 def compute_adiabatic_condition(b_values):
-    factor_G_to_mT = 1e3 / factor_T_to_G
-    return 2.65 * lambda_n * np.asarray(b_values) * factor_G_to_mT
+    """Compute the adiabatic condition value from the magnetic field.
+
+    Note: 1 T = 1000 Gauss, hence 1 mT = 10 G
+
+    Parameters
+    ----------
+    b_values: np.array, float
+        Either the array of magnetic field values, or a single  value,
+
+    Returns
+    -------
+    out: np.array, float
+        The adiabatic transition condition value.
+        Depending on the input, either the array or a single value.
+    """
+    factor_gauss_to_militesla = 1e3 / factor_T_to_G
+    return 2.65 * lambda_n * np.asarray(b_values) * factor_gauss_to_militesla
 
 
 class MyPlotter:
+    """Customized Plotter Class."""
 
     def __init__(self):
         self.x_range, self.y_range, self.z_range, self.bx, self.by, self.bz = read_data_from_file('../data/data.csv')
@@ -39,6 +57,7 @@ class MyPlotter:
         self.by = np.abs(self.by)
 
     def plot_adiabatic_check(self):
+        """Perform the adiabatic checks plots."""
         index_first_hsf = np.argmin(abs(np.asarray(self.x_range) - HelmholtzSpinFlipper_position_HSF1))
 
         fig1, ax1 = plt.subplots()

@@ -11,19 +11,19 @@
 from experiments.mieze.parameters import HelmholtzSpinFlipper_position_HSF1
 
 from elements.base import BasicElement
-from elements.coils import RealCoil
+from elements.coils import Coil
 
 from utils.physics_constants import factor_T_to_G
 
 
-class HelmholtzSpinFlipper(BasicElement):
+class HelmholtzPair(BasicElement):
     adjustment_factor = 1
 
     def __init__(self, position=(HelmholtzSpinFlipper_position_HSF1, 0, 0), **kwargs):
         """Inherit init from base class and define additional parameters."""
-        super(HelmholtzSpinFlipper, self).__init__(position, name='HelmHoltzSpinFlipper1')
+        super(HelmholtzPair, self).__init__(position, name='HelmHoltzSpinFlipper1')
 
-        coil_type = kwargs.get('coil_type', None)
+        coil_type = kwargs.get('coil_type', Coil)
 
         width = kwargs.get('width',  0.01)  # width of each coil
         windings = kwargs.get('windings', 33)

@@ -14,7 +14,7 @@ import numpy as np
 from scipy.stats import chisquare
 
 from elements.coil_set import CoilSet
-from elements.coils import Coil, RealCoil
+from elements.coils import Coil  # , RealCoil
 from experiments.mieze.parameters import LENGTH_COIL_INNER, DISTANCE_BETWEEN_INNER_COILS
 
 
@@ -117,7 +117,7 @@ def plot_ideal_position(middle_position, best_fit, x_positions, coil_type=None, 
     b_max = max(b_field_values)
     ideal_b_field = get_ideal_field(b_max, middle_position, x_positions)
 
-    plt.plot(x_positions, ideal_b_field)
+    # plt.plot(x_positions, ideal_b_field)
 
     locs, labels = plt.xticks()
     mylocs = list()
@@ -138,7 +138,7 @@ def plot_ideal_position(middle_position, best_fit, x_positions, coil_type=None, 
     ax.set_ylabel('Magnetic field (G)')
 
     # plt.show()
-    plt.savefig(f'../docs/experiments/MIEZE/bfield_coil_set{plot_name}.png')
+    plt.savefig(f'./bfield_coil_set{plot_name}.png')
 
 
 def optimize_coils_positions(coil_type=None):
@@ -146,7 +146,7 @@ def optimize_coils_positions(coil_type=None):
 
     Iterate over several distances for each outer coil.
     """
-    n = 100
+    n = 1
     l = define_iteration_values(n)
     fits = [[0 for i in range(n)] for j in range(n)]
 
@@ -178,7 +178,8 @@ def optimize_coils_positions(coil_type=None):
 
             if fit_value > best_fit['fit_value']:
                 best_fit = {'fit_value': fit_value, 'l12': l[i], 'l34': l[j]}
-    plot_name = '_small'
+
+    plot_name = '_test'
     plot_l1l2_cmap(fits, l, plot_name=plot_name)
     plot_ideal_position(middle_position, best_fit, x_positions, coil_type=coil_type, plot_name=plot_name)
 

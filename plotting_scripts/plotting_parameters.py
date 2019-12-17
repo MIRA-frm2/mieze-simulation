@@ -1,5 +1,5 @@
 from elements.coils import Coil, RealCoil, RectangularCoil
-from elements.helmholtz_spin_flipper import HelmholtzSpinFlipper
+from elements.helmholtz_pair import HelmholtzPair
 from elements.polariser import Polariser
 
 from experiments.mieze.parameters import R_HSF, I_hsf1, HelmholtzSpinFlipper_position_HSF1, startpoint, beamend, step_x
@@ -103,7 +103,7 @@ plot_parameters = {
         'coil_args': None,
         'element_kwargs': {'coil_type': Coil,
                            'current': I_hsf1,
-                           'element_class': HelmholtzSpinFlipper,
+                           'element_class': HelmholtzPair,
                            'position': (HelmholtzSpinFlipper_position_HSF1, 0, 0),
                            'radius': R_HSF
                            },
@@ -116,7 +116,7 @@ plot_parameters = {
         'coil_args': None,
         'element_kwargs': {'coil_type': Coil,
                            'current': I_hsf1,
-                           'element_class': HelmholtzSpinFlipper,
+                           'element_class': HelmholtzPair,
                            'position': (HelmholtzSpinFlipper_position_HSF1, 0, 0),
                            'radius': R_HSF
                            },
@@ -131,7 +131,7 @@ plot_parameters = {
         'coil_args': None,
         'element_kwargs': {'coil_type': Coil,
                            'current': I_hsf1,
-                           'element_class': HelmholtzSpinFlipper,
+                           'element_class': HelmholtzPair,
                            'position': (HelmholtzSpinFlipper_position_HSF1, 0, 0),
                            'radius': R_HSF
                            },

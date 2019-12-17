@@ -19,7 +19,7 @@ from utils.physics_constants import MU_0, pi
 class SpinFlipper(BasicElement):
 
     def __init__(self, position=(SpinFlipper_position1, 0, 0), *args, **kwargs):
-        super(SpinFlipper, self).__init__(position)
+        super(SpinFlipper, self).__init__(position, name='SpinFlipper')
 
         self.windings = kwargs.get('windings', 100)
         self.length = kwargs.get('length', 13e-2)  # [m], winding length of the coil
