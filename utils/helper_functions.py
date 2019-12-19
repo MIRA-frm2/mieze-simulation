@@ -131,15 +131,18 @@ def read_data_from_file(file_name):
                 # print(f'Column names are {", ".join(row)}')
                 line_count += 1
             else:
-                x.append(float(row[0]))
-                y.append(float(row[1]))
-                z.append(float(row[2]))
+                try:
+                    x.append(float(row[0]))
+                    y.append(float(row[1]))
+                    z.append(float(row[2]))
 
-                bx.append(float(row[3]))
-                by.append(float(row[4]))
-                bz.append(float(row[5]))
+                    bx.append(float(row[3]))
+                    by.append(float(row[4]))
+                    bz.append(float(row[5]))
+                except IndexError:
+                    bx.append(float(row[1]))
 
-    return x, y, z, bx, by, bz
+        return x, y, z, bx, by, bz
 
 
 def sanitize_output(func):
@@ -194,17 +197,13 @@ def save_data_to_file(data, file_name, extension='.csv'):
         csv_writer = csv.writer(file, delimiter=',')
         csv_writer.writerow(["x", "y", "z", "Bx", "By", "Bz"])
 
-        # print(data)
         for point, field in data.items():
             # logger.debug(type(point))
             if type(point) != np.float64:
                 point = list(point)
+                row = point + list((field[0], field[1], field[2]))
             else:
-                point = list((point, ))
-
-            # print(point, field)
-
-            row = point + list((field[0], field[1], field[2]))
+                row = list([point, field])
             csv_writer.writerow(row)
 
 

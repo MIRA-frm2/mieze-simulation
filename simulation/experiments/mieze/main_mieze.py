@@ -10,12 +10,14 @@
 
 from simulation.experiments.setup import Setup
 from simulation.experiments.mieze.parameters import (
-    I_hsf1, HelmholtzSpinFlipper_position_HSF1, POLARISATOR, R_HSF, L1, L2, default_beam_grid)
+    I_hsf1, HelmholtzSpinFlipper_position_HSF1, POLARISATOR, R_HSF, L1, L2, default_beam_grid, CoilSet_position,
+    distance_between_HSF1_coilset)
 
 from utils.helper_functions import save_data_to_file
 
 
 from simulation.elements.coils import Coil
+from simulation.elements.coil_set import CoilSet
 from simulation.elements.helmholtz_pair import HelmholtzPair
 from simulation.elements.polariser import Polariser
 # from elements.spin_flipper import SpinFlipper
@@ -23,13 +25,15 @@ from simulation.elements.polariser import Polariser
 
 class Mieze(Setup):
     def __init__(self, coil_type, sample_distance, detector_distance,
-                 spin_flipper_distance=HelmholtzSpinFlipper_position_HSF1):
+                 spin_flipper_distance=HelmholtzSpinFlipper_position_HSF1,
+                 coil_set_distance=distance_between_HSF1_coilset):
 
         super(Mieze, self).__init__()
 
         self.sample_distance = sample_distance
         self.detector_distance = detector_distance
         self.spin_flipper_distance = spin_flipper_distance
+        self.coil_set_distance = coil_set_distance
 
         self.coil_type = coil_type
 
@@ -52,14 +56,19 @@ class Mieze(Setup):
         #                     windings=WINDINGS,
         #                     wire_d=WIRE_D)
 
-        # self.create_element(element_class=CoilSet,
-        #                     current=I_sf1,
-        #                     position=SQUARE_COIL_POSITION_1ST)
+        self.create_element(element_class=CoilSet,
+                            current=100,  # [A]
+                            position=CoilSet_position + self.coil_set_distance)
 
 
-def main_mieze(grid_size=default_beam_grid, spin_flipper_distance=HelmholtzSpinFlipper_position_HSF1, filename='data/data_magnetic_field'):
+def main_mieze(grid_size=default_beam_grid,
+               coil_set_distance=distance_between_HSF1_coilset,
+               spin_flipper_distance=HelmholtzSpinFlipper_position_HSF1,
+               filename='data/data_magnetic_field'):
+
     experiment = Mieze(coil_type=Coil,
                        spin_flipper_distance=spin_flipper_distance,
+                       coil_set_distance=coil_set_distance,
                        detector_distance=L2-L1,
                        sample_distance=1.5)
 

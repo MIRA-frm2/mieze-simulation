@@ -18,7 +18,7 @@ The part of the setup that actually does the MIEZE condition is the Set of coils
 from simulation.elements.base import BasicElement
 from simulation.elements.coils import Coil
 
-from simulation.experiments.mieze import (
+from simulation.experiments.mieze.parameters import (
     COIL_SET_CURRENT, DISTANCE_BETWEEN_INNER_COILS, LENGTH_COIL_INNER, LENGTH_COIL_OUTER, N_WINDINGS_COIL_INNER,
     N_WINDINGS_COIL_OUTER, RADIAL_LAYERS, RADIUS_COIL_INNER_MAX, RADIUS_COIL_INNER_MIN, RADIUS_COIL_OUTER_MAX,
     RADIUS_COIL_OUTER_MIN, WIRE_D, WIRE_SPACING)
@@ -57,9 +57,9 @@ class CoilSet(BasicElement):
     def compute_coil_position(self, name):
         """Compute the relative position of each coil."""
         if name == 'coil_inner_1':
-            return self.middle - DISTANCE_BETWEEN_INNER_COILS / 2 - LENGTH_COIL_INNER
+            return self.middle - DISTANCE_BETWEEN_INNER_COILS / 2 - LENGTH_COIL_INNER / 2
         elif name == 'coil_inner_2':
-            return self.middle + DISTANCE_BETWEEN_INNER_COILS / 2
+            return self.middle + DISTANCE_BETWEEN_INNER_COILS / 2 + LENGTH_COIL_INNER / 2
         elif name == 'coil_outer_1':
             try:
                 return self.coil_inner_1.position_x - self.distance_12
@@ -98,8 +98,9 @@ class CoilSet(BasicElement):
 
     def _create_coil_outer_set(self):
         """Create the two outer coil pairs."""
+        outer_current = - self.current
 
-        coil_outer_1 = self.coil_type(current=-self.current,
+        coil_outer_1 = self.coil_type(current=outer_current,
                                       length=LENGTH_COIL_OUTER,
                                       name='O1',
                                       position=self.compute_coil_position('coil_outer_1'),
@@ -109,7 +110,7 @@ class CoilSet(BasicElement):
                                       wire_d=WIRE_D,
                                       wire_spacing=WIRE_SPACING)
 
-        coil_outer_2 = self.coil_type(current=-self.current,
+        coil_outer_2 = self.coil_type(current=outer_current,
                                       length=LENGTH_COIL_OUTER,
                                       name='O2',
                                       position=self.compute_coil_position('coil_outer_2'),

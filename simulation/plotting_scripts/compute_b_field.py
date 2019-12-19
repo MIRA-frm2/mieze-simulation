@@ -1,6 +1,6 @@
 from simulation.plotting_scripts.plotting_parameters import plot_parameters
 
-from simulation.experiments import Setup
+from simulation.experiments.setup import Setup
 from utils.helper_functions import save_data_to_file, save_obj
 
 

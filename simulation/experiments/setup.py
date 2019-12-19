@@ -16,7 +16,7 @@ import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 
 
-from utils.helper_functions import read_data_from_file
+from utils.helper_functions import read_data_from_file, find_nearest
 
 
 # Create a custom logger
@@ -140,37 +140,17 @@ class Setup:
         """Get the plane position from the 3D grid."""
         if component == 'z':
             component = 2
-            plane_idx = self._find_nearest(self.z_range, plane_position)
+            plane_idx = find_nearest(self.z_range, plane_position)
         elif component == 'y':
             component = 1
-            plane_idx = self._find_nearest(self.y_range, plane_position)
+            plane_idx = find_nearest(self.y_range, plane_position)
         elif component == 'x':
             component = 0
-            plane_idx = self._find_nearest(self.x_range, plane_position)
+            plane_idx = find_nearest(self.x_range, plane_position)
         else:
             component = 'abs'
-            plane_idx = self._find_nearest(self.y_range, plane_position)
+            plane_idx = find_nearest(self.y_range, plane_position)
         return component, plane_idx
-
-    @staticmethod
-    def _find_nearest(array, value):
-        """Find the nearest grid point index from the requested value.
-
-        Parameters
-        ----------
-        array: np.array
-            Array with values.
-        value: float
-            Float to be found close an array element.
-
-        Returns
-        -------
-        idx: int
-            The index of the array element closest to the value.
-        """
-        array = np.asarray(array)
-        idx = (np.abs(array - value).argmin())
-        return idx
 
     @staticmethod
     def _get_b_field_values_from_plane(b, component, plane_idx):

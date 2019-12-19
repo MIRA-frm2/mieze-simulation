@@ -19,7 +19,7 @@ from utils.helper_functions import read_data_from_file, find_list_length_of_diff
 
 class Plotter:
 
-    def __init__(self, filename='../data/data.csv'):
+    def __init__(self, filename='../../data/data_magnetic_field.csv'):
         self.x_range, self.y_range, self.z_range, self.bx, self.by, self.bz = read_data_from_file(filename)
         # self.preadjust_values()
 
@@ -168,7 +168,7 @@ class Plotter:
 if __name__ == "__main__":
     plotter = Plotter()
 
-    plotter.plot_field_1d_scalar(component='y')
+    plotter.plot_field_1d_scalar(component='x')
 
     # plotter.plot_field_2d_clr_map(plane='yz')
     # plotter.plot_field_2d_vec_map(plane='xy')

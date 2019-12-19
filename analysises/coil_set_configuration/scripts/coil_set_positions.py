@@ -14,10 +14,10 @@ import numpy as np
 from scipy.stats import chisquare
 
 from simulation.elements.coil_set import CoilSet
-from simulation.experiments.mieze import LENGTH_COIL_INNER, DISTANCE_BETWEEN_INNER_COILS
+from simulation.experiments.mieze.parameters import LENGTH_COIL_INNER, DISTANCE_BETWEEN_INNER_COILS
 
 
-from utils.helper_functions import unit_square
+from utils.helper_functions import unit_square, save_data_to_file
 
 
 def minimizer_function(computed_values, expected_values, use_chisquare=False):
@@ -143,7 +143,8 @@ def plot_ideal_position(middle_position, best_fit, x_positions, coil_type=None, 
     with Pool(4) as p:
         b_field_values = p.map(coil_set.b_field, x_positions)
 
-    print(b_field_values)
+    dictionary = dict(zip(x_positions, b_field_values))
+    save_data_to_file(dictionary, file_name='ideal_position_b_field_values')
 
     fig = plt.figure()
     ax = plt.axes()
