@@ -13,9 +13,8 @@ from multiprocessing import Pool
 import numpy as np
 from scipy.stats import chisquare
 
-from elements.coil_set import CoilSet
-from elements.coils import Coil  # , RealCoil
-from experiments.mieze.parameters import LENGTH_COIL_INNER, DISTANCE_BETWEEN_INNER_COILS
+from simulation.elements.coil_set import CoilSet
+from simulation.experiments.mieze import LENGTH_COIL_INNER, DISTANCE_BETWEEN_INNER_COILS
 
 
 from utils.helper_functions import unit_square
@@ -30,9 +29,10 @@ def minimizer_function(computed_values, expected_values, use_chisquare=False):
         The array of computed values.
     expected_values: np.array
         The array of ideal/expeted values, used as reference.
-    use_chisquare: bool
+    use_chisquare: bool, optional
         Flag indicating whether to use the chisquare test.
         In order to use chisquare, one needs arrays with at least a value of 5 in each array element.
+        Defaults to False.
 
     Returns
     -------
@@ -53,19 +53,56 @@ def minimizer_function(computed_values, expected_values, use_chisquare=False):
     return fit_value
 
 
-def get_ideal_field(b_max, middle_position, x_positions):
-    """Returns the ideal magnetic field."""
-    return 0.99 * b_max * unit_square(middle_position - DISTANCE_BETWEEN_INNER_COILS / 2 - LENGTH_COIL_INNER - LENGTH_COIL_INNER * 0.5,
-                               middle_position + DISTANCE_BETWEEN_INNER_COILS / 2 + LENGTH_COIL_INNER * 0.5,
-                               x_positions)
+def get_ideal_field(b_max, middle_position, x_positions, scale_factor=0.99):
+    """Returns the ideal magnetic field.
+
+    Parameters
+    ----------
+    b_max: float
+        Flat TOP value for the magnetic field.
+        It is usually the maximum of the gaussian peak
+    middle_position: float
+        Position  of the centre of the ideal field.
+        Should be the centre in between the Helmholtz coils.
+    x_positions: np.array
+        Array of positions where the ideal field is supposed to be computed at.
+    scale_factor: float, optional
+        Perhaps the ideal magnetic field is not supposed to be at the maximum of the gaussian peak.
+        This factor allows to implement a scale that reduces it.
+        Should have values cloes to unity.
+        Defaults to 0.99.
+
+    Returns
+    -------
+    out: np.array
+        Array representing the ideal magnetic field value.
+    """
+    return scale_factor * b_max \
+           * unit_square(middle_position - DISTANCE_BETWEEN_INNER_COILS/2 - LENGTH_COIL_INNER - LENGTH_COIL_INNER * 0.5,
+                         middle_position + DISTANCE_BETWEEN_INNER_COILS / 2 + LENGTH_COIL_INNER * 0.5,
+                         x_positions)
 
 
-def define_iteration_values(n=1):
-    """Define the iteration values"""
+def define_iteration_values_for_coil_distances(n=1, max_distance=0.01):
+    """Define the iteration values.
+
+    Parameters
+    ----------
+    n: int, optional
+        Number of iteration steps.
+        Defaults to 1.
+    max_distance: float, optional
+        The maximum distance to be iterated over.
+        Defaults to 0.01.
+
+    Returns
+    -------
+    out: np.array
+        Array consisting of iteration points for the analysis.
+    """
     if n == 1:
         lspace = (0.0,)
     else:
-        max_distance = 0.01
         lspace = np.linspace(0, max_distance, n)
 
     return lspace
@@ -73,9 +110,9 @@ def define_iteration_values(n=1):
 
 def define_computational_grid():
     """Define the computational grid space."""
-    startpoint = -0.35  # [m]
-    endpoint = 0.35  # [m]  # Positions.get_position_coilA()
-    return np.linspace(startpoint, endpoint, num=700)
+    start_point = -0.35  # [m]
+    end_point = 0.35  # [m]  # Positions.get_position_coilA()
+    return np.linspace(start_point, end_point, num=700)
 
 
 def plot_l1l2_cmap(fits, l, plot_name=None):
@@ -141,13 +178,27 @@ def plot_ideal_position(middle_position, best_fit, x_positions, coil_type=None, 
     plt.savefig(f'./bfield_coil_set{plot_name}.png')
 
 
-def optimize_coils_positions(coil_type=None):
+def optimize_coils_positions(coil_type, n, max_distance):
     """Compute the optimization.
 
     Iterate over several distances for each outer coil.
+
+
+    Parameters
+    ----------
+    coil_type: Class instance
+        Coil Class to be used for the analysis.
+    n: int, optional
+        Number of iteration steps.
+    max_distance: float, optional
+        The maximum distance to be iterated over.
+
+    Returns
+    -------
+    out: np.array
+        Array consisting of iteration points for the
     """
-    n = 1
-    l = define_iteration_values(n)
+    l = define_iteration_values_for_coil_distances(n, max_distance)
     fits = [[0 for i in range(n)] for j in range(n)]
 
     best_fit = {'fit_value': 0, 'l12': 0, 'l34': 0}
@@ -182,7 +233,3 @@ def optimize_coils_positions(coil_type=None):
     plot_name = '_test'
     plot_l1l2_cmap(fits, l, plot_name=plot_name)
     plot_ideal_position(middle_position, best_fit, x_positions, coil_type=coil_type, plot_name=plot_name)
-
-
-if __name__ == "__main__":
-    optimize_coils_positions(coil_type=Coil)

@@ -8,10 +8,10 @@
 
 """An implementation of the Spin Flipper."""
 
-from experiments.mieze.parameters import SpinFlipper_position1, SpinFlipper_position2
+from simulation.experiments.mieze import SpinFlipper_position1
 from numpy import arctan
 
-from elements.base import BasicElement
+from simulation.elements.base import BasicElement
 
 from utils.physics_constants import MU_0, pi
 

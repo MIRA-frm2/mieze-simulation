@@ -8,10 +8,9 @@
 
 """Numerical tests for the codebase."""
 
-from numpy import array
 from unittest import TestCase
 
-from elements.spin_flipper import SpinFlipper
+from simulation.elements.spin_flipper import SpinFlipper
 
 
 class Test(TestCase):

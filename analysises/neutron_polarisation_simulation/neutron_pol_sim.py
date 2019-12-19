@@ -9,15 +9,12 @@
 """Main script that computes the flow of the particles through the magnetic field."""
 
 import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D  # Needed for 3d plotting
 
-from particles.beam import NeutronBeam
+from simulation.particles.beam import NeutronBeam
 
-from experiments.mieze.parameters import I_hsf1, step_x, startpoint, beamend, beamsize, step_x, speed
-from plotting_scripts.plotter import Plotter
+from simulation.experiments.mieze import startpoint, beamend, beamsize, step_x, speed
 
 from utils.helper_functions import save_data_to_file, read_data_from_file
-from utils.physics_constants import earth_field
 
 
 class MyPlotter:

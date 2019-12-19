@@ -6,22 +6,15 @@
 # This is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
 
-"""Plotting the magnetic field to check whether the adiabatic condition is fulfilled.
-
-"""
+"""Plotting the magnetic field to check whether the adiabatic condition is fulfilled."""
 
 import matplotlib.pyplot as plt
 import numpy as np
 
-from experiments.mieze.parameters import HelmholtzSpinFlipper_position_HSF1, lambda_n, step_x
+from simulation.experiments.mieze.parameters import HelmholtzSpinFlipper_position_HSF1, lambda_n, step_x
 
-from utils.helper_functions import read_data_from_file, append_column_to_csv
+from utils.helper_functions import append_column_to_csv, convert_between_m_and_cm, read_data_from_file
 from utils.physics_constants import factor_T_to_G
-
-
-def adjust_angle_gradient_for_adiabatic_condition(dtheta_dy):
-    """Convert from angle/m to angle/cm"""
-    return np.asarray(dtheta_dy) / 1e2
 
 
 def compute_adiabatic_condition(b_values):
@@ -45,13 +38,34 @@ def compute_adiabatic_condition(b_values):
 
 
 def get_b_field_magnitude(bx, by):
+    """Compute the magnetic field magnitude from x and y components only.
+
+    Parameters
+    ----------
+    bx: np.array, float
+        Magnetic field on x axis.
+    by: np.array, float
+        Magnetic field on y axis.
+
+    Returns
+    -------
+    out: np.array, float
+        Magnetic field magnitude computed from x and y components only.
+    """
     return np.sqrt(np.power(np.asarray(bx), 2) + np.power(np.asarray(by), 2))
 
 
 class MyPlotter:
     """Customized Plotter Class."""
 
-    def __init__(self, data_file='./data_adiabatic_transition.csv'):
+    def __init__(self, data_file='../../data/data_magnetic_field.csv'):
+        """
+
+        Parameters
+        ----------
+        data_file: string
+            Location of the data file containing the magnteic field values.
+        """
         self.data_file = data_file
         self.x_range, self.y_range, self.z_range, self.bx, self.by, self.bz = read_data_from_file(data_file)
 
@@ -59,18 +73,19 @@ class MyPlotter:
         self.dtheta_dy = None
         self.b_values = None
         self.adiabatic_condition_values = None
+        self.diff_data = None
 
         self.preadjust_values()
 
     def preadjust_values(self):
-        """Adjust values format."""
+        """Adjust values format for plotting/analysis purposes."""
         self.bx = np.asarray(np.abs(self.bx))
         self.by = np.abs(self.by)
 
     def get_adiabatic_values(self, new=True):
         """Compute/Get the adiabatic specific values."""
         if new:
-            self.theta_values = adjust_angle_gradient_for_adiabatic_condition(
+            self.theta_values = convert_between_m_and_cm(
                 np.degrees(np.arctan(np.divide(np.asarray(self.by), np.asarray(self.bx)))))
             self.dtheta_dy = np.abs(np.gradient(self.theta_values, step_x))
 
@@ -121,8 +136,8 @@ class MyPlotter:
 
         ax.set_yscale('log')
 
-        ax.plot(self.x_range, self.dtheta_dy)  # y from m to cm
-        ax.plot(self.x_range, self.b_values)  # B from Gauss to mT,
+        ax.plot(self.x_range, self.dtheta_dy)
+        ax.plot(self.x_range, self.b_values)
         ax.legend((r'$\frac{d\theta}{dy}$', r'$2.65\lambda B$'))
 
         ax.set_xlabel('Neutron Trajectory (m)')
@@ -134,17 +149,13 @@ class MyPlotter:
         # plt.close()
 
     def get_adiabatic_difference_data(self):
+        """Compute the adiabatic transition discriminant as the difference between the two values."""
         self.diff_data = self.adiabatic_condition_values - self.dtheta_dy
 
     def plot_adiabatic_check_difference(self):
+        """Plot the adiabatic transition discriminant."""
         self.get_adiabatic_difference_data()
+
         plt.plot(self.x_range, self.diff_data)
         plt.yscale('log')
         plt.show()
-
-
-if __name__ == "__main__":
-    plot = MyPlotter()
-    plot.get_adiabatic_values(new=True)
-    # plot.plot_adiabatic_check()
-    plot.plot_adiabatic_check_difference()

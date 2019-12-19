@@ -8,14 +8,16 @@
 
 """An implementation of the MIEZE setup."""
 
-from experiments.setup import Setup
-from experiments.mieze.parameters import (
-    I_hsf1, I_sf1, HelmholtzSpinFlipper_position_HSF1, SQUARE_COIL_POSITION_1ST, POLARISATOR, R_HSF)
+from simulation.experiments.setup import Setup
+from simulation.experiments.mieze.parameters import (
+    I_hsf1, HelmholtzSpinFlipper_position_HSF1, POLARISATOR, R_HSF, L1, L2, default_beam_grid)
 
-from elements.coils import Coil
-from elements.coil_set import CoilSet
-from elements.helmholtz_pair import HelmholtzPair
-from elements.polariser import Polariser
+from utils.helper_functions import save_data_to_file
+
+
+from simulation.elements.coils import Coil
+from simulation.elements.helmholtz_pair import HelmholtzPair
+from simulation.elements.polariser import Polariser
 # from elements.spin_flipper import SpinFlipper
 
 
@@ -53,3 +55,18 @@ class Mieze(Setup):
         # self.create_element(element_class=CoilSet,
         #                     current=I_sf1,
         #                     position=SQUARE_COIL_POSITION_1ST)
+
+
+def main_mieze(grid_size=default_beam_grid, spin_flipper_distance=HelmholtzSpinFlipper_position_HSF1, filename='data/data_magnetic_field'):
+    experiment = Mieze(coil_type=Coil,
+                       spin_flipper_distance=spin_flipper_distance,
+                       detector_distance=L2-L1,
+                       sample_distance=1.5)
+
+    experiment.create_setup(current=5)
+
+    experiment.initialize_computational_space(**grid_size)
+
+    experiment.calculate_b_field()
+
+    save_data_to_file(experiment.b, file_name=filename)

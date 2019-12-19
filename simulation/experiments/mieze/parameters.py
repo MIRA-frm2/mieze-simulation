@@ -71,7 +71,7 @@ R_HSF = 53.8 * 1e-3   # [m]  # radius of helmholtz coils at the spin flippers; a
 # Polariser data
 POLARISATOR = 0.0
 # distance between polariser and first coil of hsf1
-POLARISER_HSF1 = 0.2
+POLARISER_HSF1 = 0.125
 HelmholtzSpinFlipper_position_HSF1 = POLARISATOR + POLARISER_HSF1 + R_HSF / 2.0
 beamend_adiabatic_check = 0.4
 step_adiabatic_check = (beamend_adiabatic_check - startpoint) / npoints
@@ -88,3 +88,6 @@ beamsize = 0.02
 number_of_neutrons = 1000
 speed = 3956 / 4.5
 angular_distribution = 45  # minutes
+
+default_beam_grid = {'x_start': startpoint, 'x_end': beamend, 'x_step': step_x,
+                     'y_start': -0.0, 'y_end': 0.0, 'z_start': -0.0, 'z_end': 0.0, 'yz_step': 0.1}

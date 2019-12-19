@@ -8,12 +8,10 @@
 
 """An implementation of the Helmholtz Spin Flipper."""
 
-from experiments.mieze.parameters import HelmholtzSpinFlipper_position_HSF1
+from simulation.experiments.mieze.parameters import HelmholtzSpinFlipper_position_HSF1
 
-from elements.base import BasicElement
-from elements.coils import Coil
-
-from utils.physics_constants import factor_T_to_G
+from simulation.elements.base import BasicElement
+from simulation.elements.coils import Coil
 
 
 class HelmholtzPair(BasicElement):

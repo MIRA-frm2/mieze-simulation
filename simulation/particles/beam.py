@@ -13,7 +13,7 @@ import numpy.random as r
 import os
 import random
 
-from particles.neutron import Neutron
+from simulation.particles.neutron import Neutron
 
 from utils.helper_functions import load_obj, find_nearest, rotate
 

@@ -11,7 +11,7 @@
 from numpy import sqrt, pi
 from unittest import TestCase
 
-from elements.coils import Coil, RealCoil, RectangularCoil
+from simulation.elements.coils import Coil, RealCoil, RectangularCoil
 
 from utils.physics_constants import MU_0
 

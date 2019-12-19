@@ -35,6 +35,24 @@ def append_column_to_csv(filename, column_name, column_data):
     csv_input.to_csv(filename, index=False)
 
 
+def convert_between_m_and_cm(value, backwards=False):
+    """Convert from m to cm, and backwards.
+
+    Parameters
+    ----------
+    value: np.array, float, ndarray
+        Array or value to be converted.
+    backwards: bool
+        Flag indicating whether to convert from m to cm, or from cm to m.
+        If True, converts from m to cm.
+        If False, converts from cm to m.
+    """
+    if backwards:
+        return np.asarray(value) * 1e2
+    else:
+        return np.asarray(value) / 1e2
+
+
 def find_list_length_of_different_items(x):
     """Returns the length if different items from a list.
 

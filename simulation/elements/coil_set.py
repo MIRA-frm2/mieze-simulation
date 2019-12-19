@@ -15,10 +15,10 @@ The part of the setup that actually does the MIEZE condition is the Set of coils
     coils.
 """
 
-from elements.base import BasicElement
-from elements.coils import Coil
+from simulation.elements.base import BasicElement
+from simulation.elements.coils import Coil
 
-from experiments.mieze.parameters import (
+from simulation.experiments.mieze import (
     COIL_SET_CURRENT, DISTANCE_BETWEEN_INNER_COILS, LENGTH_COIL_INNER, LENGTH_COIL_OUTER, N_WINDINGS_COIL_INNER,
     N_WINDINGS_COIL_OUTER, RADIAL_LAYERS, RADIUS_COIL_INNER_MAX, RADIUS_COIL_INNER_MIN, RADIUS_COIL_OUTER_MAX,
     RADIUS_COIL_OUTER_MIN, WIRE_D, WIRE_SPACING)

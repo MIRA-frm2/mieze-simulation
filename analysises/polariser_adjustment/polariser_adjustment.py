@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy.optimize import curve_fit
 
-from elements.polariser import Polariser
+from simulation.elements.polariser import Polariser
 
 # These values represent measured data
 # The 0 actually corresponds to the right side of the polariser

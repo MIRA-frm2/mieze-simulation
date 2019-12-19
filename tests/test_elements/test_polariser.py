@@ -11,7 +11,7 @@
 from numpy import array
 from unittest import TestCase
 
-from elements.polariser import Polariser
+from simulation.elements.polariser import Polariser
 
 
 class Test(TestCase):

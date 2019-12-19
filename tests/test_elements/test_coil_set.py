@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-from elements.coil_set import CoilSet
+from simulation.elements.coil_set import CoilSet
 
 
 def simple_execution():
