@@ -22,7 +22,8 @@ setup_requires = [
 
 install_requires = [
     'matplotlib>=3.1.2',
-    'mpmath>=1.1.0'
+    'mpmath>=1.1.0',
+    'pandas>=0.25.3'
 ]
 
 packages = find_packages()

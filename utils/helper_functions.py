@@ -8,9 +8,10 @@
 
 """Helper functions used for various purposes."""
 
+import csv
 import logging
 import numpy as np
-import csv
+import pandas as pd
 import pickle
 
 # Create a custom logger
@@ -26,6 +27,12 @@ def adjust_field(vector):
 
     """
     return np.array([vector[2], vector[1], vector[0]])
+
+
+def append_column_to_csv(filename, column_name, column_data):
+    csv_input = pd.read_csv(filename)
+    csv_input[column_name] = column_data
+    csv_input.to_csv(filename, index=False)
 
 
 def find_list_length_of_different_items(x):
@@ -103,7 +110,7 @@ def read_data_from_file(file_name):
         line_count = 0
         for row in csv_reader:
             if line_count == 0:
-                print(f'Column names are {", ".join(row)}')
+                # print(f'Column names are {", ".join(row)}')
                 line_count += 1
             else:
                 x.append(float(row[0]))
@@ -157,7 +164,10 @@ def rotate(vector, phi, axis):
 
 def save_data_to_file(data, file_name, extension='.csv'):
     """Save data to file."""
-    full_filename = f'{file_name}{extension}'
+    if extension in file_name:
+        full_filename = file_name
+    else:
+        full_filename = f'{file_name}{extension}'
 
     with open(full_filename, 'w') as file:
 

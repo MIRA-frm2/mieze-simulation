@@ -20,13 +20,14 @@ from elements.polariser import Polariser
 
 
 class Mieze(Setup):
-    def __init__(self, coil_type, sample_distance, coil_distance, detector_distance):
+    def __init__(self, coil_type, sample_distance, detector_distance,
+                 spin_flipper_distance=HelmholtzSpinFlipper_position_HSF1):
 
         super(Mieze, self).__init__()
 
         self.sample_distance = sample_distance
         self.detector_distance = detector_distance
-        self.coil_distance = coil_distance
+        self.spin_flipper_distance = spin_flipper_distance
 
         self.coil_type = coil_type
 
@@ -37,7 +38,7 @@ class Mieze(Setup):
         self.create_element(coil_type=Coil,
                             current=I_hsf1,
                             element_class=HelmholtzPair,
-                            position=(HelmholtzSpinFlipper_position_HSF1, 0, 0),
+                            position=(self.spin_flipper_distance, 0, 0),
                             radius=R_HSF)
 
         # self.create_element(current=I_sf1,
@@ -49,6 +50,6 @@ class Mieze(Setup):
         #                     windings=WINDINGS,
         #                     wire_d=WIRE_D)
 
-        self.create_element(element_class=CoilSet,
-                            current=I_sf1,
-                            position=SQUARE_COIL_POSITION_1ST)
+        # self.create_element(element_class=CoilSet,
+        #                     current=I_sf1,
+        #                     position=SQUARE_COIL_POSITION_1ST)

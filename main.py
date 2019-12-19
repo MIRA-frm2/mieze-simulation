@@ -11,14 +11,14 @@
 from experiments.mieze.main import Mieze
 from elements.coils import Coil
 
-from experiments.mieze.parameters import L1, L2, startpoint, beamend, step_x
+from experiments.mieze.parameters import L1, L2, startpoint, beamend, step_x, HelmholtzSpinFlipper_position_HSF1
 
 from utils.helper_functions import save_data_to_file, save_obj
 
 
-def main():
+def main(spin_flipper_distance, filename='../data/data_magnetic_field'):
     experiment = Mieze(coil_type=Coil,
-                       coil_distance=L1,
+                       spin_flipper_distance=spin_flipper_distance,
                        detector_distance=L2-L1,
                        sample_distance=1.5)
 
@@ -31,9 +31,9 @@ def main():
 
     experiment.calculate_b_field()
 
-    save_data_to_file(experiment.b, file_name='../data/data_magnetic_field')
-    save_obj(experiment.b, name='../data/data_magnetic_field')
+    save_data_to_file(experiment.b, file_name=filename)
+    # save_obj(experiment.b, name=filename)
 
 
 if __name__ == "__main__":
-    main()
+    main(spin_flipper_distance=HelmholtzSpinFlipper_position_HSF1)

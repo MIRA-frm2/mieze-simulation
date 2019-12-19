@@ -1,5 +1,6 @@
 import numpy as np
-
+import json
+import os
 
 # Variables are stored as tuples with numerical value and units
 I_sf1 = 1.6  # [A]
@@ -9,7 +10,7 @@ lambda_n = 4.3  # [Angstrom]
 I_real_coil = 10  # [A]
 
 startpoint = 0.000  # [m]
-beamend = 0.5  # [m]  # Positions.get_position_coilA()
+beamend = 1.0  # [m]  # Positions.get_position_coilA()
 
 
 npoints = 100
@@ -68,8 +69,9 @@ R_HSF = 53.8 * 1e-3   # [m]  # radius of helmholtz coils at the spin flippers; a
 
 
 # Polariser data
-POLARISATOR = 0.0   # [m]
-POLARISER_HSF1 = 20e-2   # [m]  # distance between polariser and first coil of hsf1
+POLARISATOR = 0.0
+# distance between polariser and first coil of hsf1
+POLARISER_HSF1 = 0.2
 HelmholtzSpinFlipper_position_HSF1 = POLARISATOR + POLARISER_HSF1 + R_HSF / 2.0
 beamend_adiabatic_check = 0.4
 step_adiabatic_check = (beamend_adiabatic_check - startpoint) / npoints

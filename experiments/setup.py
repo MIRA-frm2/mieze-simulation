@@ -83,7 +83,7 @@ class Setup:
         for element in self.elements:
             np.add(field, element.b_field(*r), out=field)
 
-        logger.error(f'{self.computation_number}: Computed total magnetic field for point {r} is {field}')
+        # logger.error(f'{self.computation_number}: Computed total magnetic field for point {r} is {field}')
 
         return field
 
