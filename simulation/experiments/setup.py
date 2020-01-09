@@ -51,13 +51,13 @@ class Setup:
 
         self.consider_earth_field = consider_earth_field
 
-    def create_setup(self, current):
+    def create_setup(self, kwargs):
         raise NotImplementedError
 
     def create_element(self, element_class, position, **kwargs):
         """Create the physical geometry of the coils."""
         self.elements.append(
-            element_class(position=position, name='test',  **kwargs))
+            element_class(position=position, **kwargs))
         self.setup_changed = True
 
     def b_x(self, x, rho=0):

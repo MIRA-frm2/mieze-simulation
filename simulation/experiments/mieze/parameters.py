@@ -1,7 +1,6 @@
 import numpy as np
 
 # Variables are stored as tuples with numerical value and units
-I_sf1 = 1.6  # [A]
 I_hsf1 = 1.6  # [A]
 lambda_n = 4.3  # [Angstrom]
 
@@ -58,10 +57,6 @@ SQUARE_COIL_POSITION_1ST = 0.1   # [m]
 SQUARE_COIL_POSITION_2ND = 1   # [m]
 
 # Rectangular coils
-RECTANGULAR_COIL_LENGTH = 1 * 1e-2  # [m]
-RECTANGULAR_COIL_WIDTH = 10 * 1e-2  # [m]
-RECTANGULAR_COIL_HEIGHT = 13 * 1e-2  # [m]
-WINDINGS = 1
 
 # Coil group
 L1 = 0.53   # [m]  # coil group A to B
@@ -91,3 +86,24 @@ beamsize = 0.02
 number_of_neutrons = 1000
 speed = 3956 / 4.5
 angular_distribution = 45  # minutes
+
+
+COIL_SET_PARAMETERS = {
+    "CURRENT": 100,  # [A]
+}
+
+SPIN_FLIPPER_PARAMETERS = {
+    "I_sf1": 1.6,  # [A]
+    "SpinFlipper_position1": SpinFlipper_position1,
+    "RECTANGULAR_COIL_LENGTH": 1 * 1e-2,   # [m]
+    "RECTANGULAR_COIL_WIDTH": 10 * 1e-2,  # [m]
+    "RECTANGULAR_COIL_HEIGHT": 13 * 1e-2,  # [m]
+    "WINDINGS": 1,
+    "WIRE_D":  5 * 1e-3  # [m]
+}
+
+ELEMENTS_POSITIONS = {
+    "coil_set_distance": distance_between_HSF1_coilset,
+    "spin_flipper_distance": HelmholtzSpinFlipper_position_HSF1
+}
+
