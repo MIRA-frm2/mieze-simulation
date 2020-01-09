@@ -16,8 +16,7 @@ import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 
 
-from utils.helper_functions import read_data_from_file, find_nearest
-
+from utils.helper_functions import read_data_from_file, find_nearest, add_earth_magnetic_field
 
 # Create a custom logger
 logger = logging.getLogger(__name__)
@@ -25,7 +24,7 @@ logger = logging.getLogger(__name__)
 
 class Setup:
     """Class that simulates a physical setup."""
-    def __init__(self):
+    def __init__(self, consider_earth_field=False):
         self.elements = []
         self.b = None
         self.b_cartesian = None
@@ -49,6 +48,8 @@ class Setup:
         self.x_ticks_labels = None
 
         self.computation_number = 0
+
+        self.consider_earth_field = consider_earth_field
 
     def create_setup(self, current):
         raise NotImplementedError
@@ -84,6 +85,8 @@ class Setup:
             np.add(field, element.b_field(*r), out=field)
 
         # logger.error(f'{self.computation_number}: Computed total magnetic field for point {r} is {field}')
+
+        field = add_earth_magnetic_field(field, flag=self.consider_earth_field)
 
         return field
 

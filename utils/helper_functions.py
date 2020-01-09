@@ -14,6 +14,9 @@ import numpy as np
 import pandas as pd
 import pickle
 
+
+from utils.physics_constants import earth_field
+
 # Create a custom logger
 logger = logging.getLogger(__name__)
 
@@ -27,6 +30,34 @@ def adjust_field(vector):
 
     """
     return np.array([vector[2], vector[1], vector[0]])
+
+
+def add_earth_magnetic_field(field, flag):
+    """Add the earth magnetic field to the computation.
+
+    Parameters
+    ----------
+    field: np.array, ndarray
+        Magnetic field array.
+    flag: bool
+        Flag indicating whether to consider the earth magnetic field or not.
+        If True, adds the earth magnetic field to the input field.
+        If False, only returns the input field.
+
+    >>> add_earth_magnetic_field(np.array([0, 0, 0]), True)
+    array([ 0.   ,  0.21 , -0.436])
+    >>> add_earth_magnetic_field(np.array([1, 2, 0]), True)
+    array([ 1.   ,  2.21 , -0.436])
+    >>> add_earth_magnetic_field(np.array([0, 0, 0]), False)
+    array([0, 0, 0])
+    >>> add_earth_magnetic_field(np.array([1, 2, 3]), False)
+    array([1, 2, 3])
+
+    """
+    if flag:
+        return field + earth_field
+    else:
+        return field
 
 
 def append_column_to_csv(filename, column_name, column_data):
