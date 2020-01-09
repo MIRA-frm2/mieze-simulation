@@ -48,7 +48,7 @@ class Mieze(Setup):
                             radius=R_HSF)
 
         # self.create_element(current=I_sf1,
-        #                     element_class=RectangularCoil,
+        #                     element_class=SpinFlipper,
         #                     height=RECTANGULAR_COIL_HEIGHT,
         #                     length=RECTANGULAR_COIL_LENGTH,
         #                     position=(SpinFlipper_position1, 0, 0),

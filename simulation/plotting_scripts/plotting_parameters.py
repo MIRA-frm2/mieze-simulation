@@ -2,7 +2,7 @@ from simulation.elements.coils import Coil, RealCoil, RectangularCoil
 from simulation.elements.helmholtz_pair import HelmholtzPair
 from simulation.elements.polariser import Polariser
 
-from simulation.experiments.mieze import R_HSF, I_hsf1, HelmholtzSpinFlipper_position_HSF1, startpoint, beamend, step_x
+from simulation.experiments.mieze.parameters import R_HSF, I_hsf1, HelmholtzSpinFlipper_position_HSF1, startpoint, beamend, step_x
 
 plot_parameters = {
     'coil_simple_1d_x': {

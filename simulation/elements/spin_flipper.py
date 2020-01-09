@@ -8,17 +8,17 @@
 
 """An implementation of the Spin Flipper."""
 
-from simulation.experiments.mieze import SpinFlipper_position1
+from simulation.experiments.mieze.parameters import SpinFlipper_position1
 from numpy import arctan
 
-from simulation.elements.base import BasicElement
+from simulation.elements.coils import RectangularCoil
 
 from utils.physics_constants import MU_0, pi
 
 
-class SpinFlipper(BasicElement):
+class SpinFlipper(RectangularCoil):
 
-    def __init__(self, position=(SpinFlipper_position1, 0, 0), *args, **kwargs):
+    def __init__(self, position=(SpinFlipper_position1, 0, 0), **kwargs):
         super(SpinFlipper, self).__init__(position, name='SpinFlipper')
 
         self.windings = kwargs.get('windings', 100)
@@ -27,6 +27,7 @@ class SpinFlipper(BasicElement):
         self.current = kwargs.get('current', 1.0)  # [A], coil currents
 
     def _sf_th(self, current, position):
+        """Compute spin flipper approximation."""
         x0 = self.length / 2.0
         n = self.windings / self.length
 
@@ -38,14 +39,8 @@ class SpinFlipper(BasicElement):
         b_eff = n * MU_0 * current / pi * angle
         return b_eff
     
-    def b_field(self, x, y, z):
-        # if sf_name == 'sf1':
-        #     zero = SpinFlipper_position1
-        # elif sf_name == 'sf2':
-        #     zero = SpinFlipper_position2
-        # else:
-        #     raise RuntimeError('Wrong name for sf given.')
-
+    def b_field_approx(self, x, y, z):
+        """Compute an approximation of the magnetic field."""
         y = x - self.position_x
 
         b1 = self._sf_th(self.current, y + self.thickness / 2.0)

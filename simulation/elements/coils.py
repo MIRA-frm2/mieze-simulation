@@ -298,7 +298,7 @@ class RealCoil(Coil):
         return self.beta(rho, x, s) \
             / rho * ((2 - self.m(rho, x, s)) * self._k(self.m(rho, x, s)) - 2 * self._e(self.m(rho, x, s)))
 
-    def b_field_x(self, x, r, rho=0):
+    def b_field_beam(self, x, r, rho=0):
         """Compute the magnetic field in the x direction.
 
         # N = turns of winding, I = current (A), R = radius (m), l = length (m)
@@ -348,7 +348,7 @@ class RealCoil(Coil):
             for R in rs:
                 print(f'iteration:{self.iteration} with x:{x0} and r:{R}')
                 # logger.error(f'{field}\n{field_add}')
-                field_add = np.array([self.b_field_x(x + x0, R, r),
+                field_add = np.array([self.b_field_beam(x + x0, R, r),
                                       self.b_field_rho(x + x0, R) * np.cos(phi),
                                       self.b_field_rho(x + x0, R) * np.sin(phi)])
                 # logger.error(f'{field}\n{field_add}')
@@ -419,7 +419,7 @@ class RectangularCoil(BaseCoil):
         field = adjust_field(field)
 
         return factor_T_to_G * self._reverse_coordinates(*self.sanitize_output(field))
-    #
+
     @staticmethod
     def sanitize_output(field):
         """Sanitize magnetic field..
