@@ -61,6 +61,17 @@ def add_earth_magnetic_field(field, flag):
 
 
 def append_column_to_csv(filename, column_name, column_data):
+    """Append the column data with column name to the csv file filename.
+
+    Parameters
+    ----------
+    filename: str
+        Name of the file to append to.
+    column_name: str
+        Column name to append.
+    column_data: str
+        Column data to append.
+    """
     csv_input = pd.read_csv(filename)
     csv_input[column_name] = column_data
     csv_input.to_csv(filename, index=False)
@@ -77,6 +88,12 @@ def convert_between_m_and_cm(value, backwards=False):
         Flag indicating whether to convert from m to cm, or from cm to m.
         If True, converts from m to cm.
         If False, converts from cm to m.
+
+    >>> convert_between_m_and_cm(1, backwards=False)
+    0.01
+    >>> convert_between_m_and_cm(1, backwards=True)
+    100.0
+
     """
     if backwards:
         return np.asarray(value) * 1e2
@@ -85,9 +102,17 @@ def convert_between_m_and_cm(value, backwards=False):
 
 
 def find_list_length_of_different_items(x):
-    """Returns the length if different items from a list.
+    """Returns the length of different items from a list.
 
-    The initial list may contain duplicates that would otherwsid
+    The initial list may contain duplicates that would otherwise be doubly counted for.
+
+    >>> find_list_length_of_different_items([0, 1])
+    2
+    >>> find_list_length_of_different_items([0, 1, 3])
+    3
+    >>> find_list_length_of_different_items([0, 1, 1])
+    2
+
     """
     xx = list()
     for item in x:
@@ -128,7 +153,16 @@ def find_nearest(array, value, index=True):
 
 
 def get_phi(y, z):
-    """Compute the angle from two coordinates."""
+    """Compute the angle from two coordinates.
+
+    >>> get_phi(0, 1)
+    1.5707963267948966
+    >>> get_phi(0, -1)
+    4.71238898038469
+    >>> get_phi(1, 1)
+    0.7853981633974483
+
+    """
     if y:
         return np.arctan(z/y)
     else:
@@ -145,7 +179,13 @@ def load_obj(name):
 
 
 def read_data_from_file(file_name):
-    """Read data from file"""
+    """Read data from file.
+
+    Parameters
+    ----------
+    file_name: str
+        Name of the file to be read from.
+    """
     x = list()
     y = list()
     z = list()
@@ -177,6 +217,7 @@ def read_data_from_file(file_name):
 
 
 def sanitize_output(func):
+    """Define a wrapper to sanitie ouputs from infinty values."""
     def wrapper_sanitize_output(*args, **kwargs):
         value = func(*args, **kwargs)
         if abs(value) > 10e4:
@@ -188,14 +229,31 @@ def sanitize_output(func):
 def unit_square(x_min, x_max, grid):
     """Return an array of a unit square function.
 
+    Parameters
+    ----------
+    x_min: int, float
+        Left edge of the flat top/unit square.
+    x_max: int, float
+        Right edge of the flat top/unit square.
+    grid: np.array
+        Array of x values to be transformed to a unit square.
+
+    Returns
+    -------
+    y_values: np.array
+        Array of 0 or 1 corresponding to a flat top.
+
+    >>> unit_square(0.1, 0.2, np.array([0.0, 0.1, 0.15, 0.2, 0.3]))
+    array([0, 1, 1, 1, 0])
+
     """
-    x_values = list()
+    y_values = list()
     for x in grid:
-        if x_min < x < x_max:
-            x_values.append(1)
+        if x_min <= x <= x_max:
+            y_values.append(1)
         else:
-            x_values.append(0)
-    return np.array(x_values)
+            y_values.append(0)
+    return np.array(y_values)
 
 
 def rotate(vector, phi, axis):
