@@ -35,6 +35,7 @@ class Mieze(Setup):
         self.coil_type = coil_type
 
     def create_setup(self):
+        """Create the elements for the setup."""
 
         self.create_element(element_class=Polariser,
                             position=(POLARISATOR, 0, 0))
@@ -75,3 +76,9 @@ def main_mieze(grid_size=default_beam_grid,
     experiment.calculate_b_field()
 
     save_data_to_file(experiment.b, file_name=filename)
+
+    # experiment.set_plot_ticks(set_ticks=False)
+    #
+    # experiment.plot_field_1d_scalar(component='x')
+    # experiment.plot_field_1d_scalar(component='y')
+    # experiment.plot_field_1d_scalar(component='z')

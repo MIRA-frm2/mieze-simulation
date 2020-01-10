@@ -9,6 +9,7 @@
 """Helper functions used for various purposes."""
 
 import csv
+import json
 import logging
 import numpy as np
 import pandas as pd
@@ -319,3 +320,19 @@ def transform_cylindrical_to_cartesian(x, rho, theta):
     y = rho * np.cos(theta)
     z = rho * np.sin(theta)
     return x, y, z
+
+
+def write_metadata(metadata_filename, metadata):
+    """Write metadata to file.
+
+    Parameters
+    ----------
+    metadata_filename: str
+        Filename for metadata storage.
+    metadata: dict
+        Dictionary containing the metadata to be written.
+    """
+    with open(f'{metadata_filename}', 'wb') as f:
+        description = 'The data.csv file has been generated using the following parameters: \n'
+        f.write(description.encode())
+        f.write(json.dumps(metadata))

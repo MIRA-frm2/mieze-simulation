@@ -25,7 +25,7 @@ class Polariser(BasicElement):
 
     def __init__(self, position=(POLARISATOR, 0, 0), **kwargs):
 
-        super(Polariser, self).__init__(position, name='polariser')
+        super(Polariser, self).__init__(position, name='Polariser')
 
         self.position = position
 

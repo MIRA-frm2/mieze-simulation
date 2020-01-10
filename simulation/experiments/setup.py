@@ -44,21 +44,20 @@ class Setup:
 
         self.current = None
 
-        self.x_ticks = None
-        self.x_ticks_labels = None
+        self.x_ticks = list()
+        self.x_ticks_labels = list()
 
         self.computation_number = 0
 
         self.consider_earth_field = consider_earth_field
 
-    def create_setup(self, kwargs):
+    def create_setup(self):
         raise NotImplementedError
 
     def create_element(self, element_class, position, **kwargs):
         """Create the physical geometry of the coils."""
         self.elements.append(
             element_class(position=position, **kwargs))
-        self.setup_changed = True
 
     def b_x(self, x, rho=0):
         """Compute magnetic field in x direction."""
@@ -228,10 +227,11 @@ class Setup:
 
         ax.plot(plot_x_values, plot_y_values)
 
+        locs, labels = plt.xticks()
         if self.x_ticks and self.x_ticks_labels:
-            ax.set_xticks(self.x_ticks)
-            ax.set_xticklabels(self.x_ticks_labels)
-
+            print(f'{locs}, {labels}, {self.x_ticks}, {self.x_ticks_labels}')
+            plt.xticks([*locs, *self.x_ticks], [*labels, *self.x_ticks_labels])
+            print(f'{plt.xticks()}')
         plt.show()
 
     def plot_field_1d_vec(self, _type='3d'):
@@ -298,8 +298,8 @@ class Setup:
 
         plt.show()
 
-    # def set_plot_ticks(self, set_ticks=False):
-    #     if set_ticks:
-    #         self.x_ticks = [0, self.coil_distance, SQUARE_COIL_POSITION_1ST, SQUARE_COIL_POSITION_2ND]
-    #         self.x_ticks_labels = ['1st Coil Set', '2nd Coil Set', '1st Square Coil ', '2nd Square Coil']
-    #
+    def set_plot_ticks(self, set_ticks=False):
+        if set_ticks:
+            for element in self.elements:
+                self.x_ticks.append(element.position_x)
+                self.x_ticks_labels.append(element.name)

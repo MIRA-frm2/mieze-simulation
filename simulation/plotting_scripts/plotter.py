@@ -169,6 +169,8 @@ if __name__ == "__main__":
     plotter = Plotter()
 
     plotter.plot_field_1d_scalar(component='x')
+    plotter.plot_field_1d_scalar(component='y')
+    plotter.plot_field_1d_scalar(component='z')
 
     # plotter.plot_field_2d_clr_map(plane='yz')
     # plotter.plot_field_2d_vec_map(plane='xy')

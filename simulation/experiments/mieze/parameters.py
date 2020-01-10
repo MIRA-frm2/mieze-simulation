@@ -89,7 +89,7 @@ angular_distribution = 45  # minutes
 
 
 COIL_SET_PARAMETERS = {
-    "CURRENT": 100,  # [A]
+    "CURRENT": 10,  # [A]
 }
 
 SPIN_FLIPPER_PARAMETERS = {
