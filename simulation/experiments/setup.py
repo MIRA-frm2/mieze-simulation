@@ -113,23 +113,22 @@ class Setup:
         self.y_range = np.arange(y_start, y_end + yz_step, yz_step)
         self.z_range = np.arange(z_start, z_end + yz_step, yz_step)
 
-    def calculate_b_field(self):
+    def calculate_b_field(self, point=None):
         """Calculate the magnetic field."""
+        if point:
+            return self.b_field(point)
+        else:
+            # logger.error(f'{self.x_range}, {self.y_range}, {self.z_range}')
+            positions = list(itertools.product(self.x_range, self.y_range, self.z_range))
+            logger.error(f'{len(positions)} calculations')
+            logger.info('calculate')
 
-        # logger.error(f'{self.x_range}, {self.y_range}, {self.z_range}')
-        positions = list(itertools.product(self.x_range, self.y_range, self.z_range))
-        logger.error(f'{len(positions)} calculations')
-        logger.info('calculate')
+            with Pool(4) as p:
+                result = p.map(self.b_field, positions)
 
-        with Pool(4) as p:
-            result = p.map(self.b_field, positions)
+            logger.info('calculation finished')
 
-        logger.info('calculation finished')
-
-        self.b = dict(zip(positions, result))
-        # print(self.b)
-
-        # self.setup_changed = False
+            self.b = dict(zip(positions, result))
 
     def get_b_vec(self):
         """Returns the magnetic field as a vector."""
@@ -232,6 +231,10 @@ class Setup:
             print(f'{locs}, {labels}, {self.x_ticks}, {self.x_ticks_labels}')
             plt.xticks([*locs, *self.x_ticks], [*labels, *self.x_ticks_labels])
             print(f'{plt.xticks()}')
+
+        plt.xlabel('Beam line [m]')
+        plt.ylabel('Magnetic field [G]')
+
         plt.show()
 
     def plot_field_1d_vec(self, _type='3d'):

@@ -235,7 +235,8 @@ class Coil(BaseCoil):
         """
         x -= self.position_x
 
-        rho = abs(rho)  # symmetric
+        # symmetric
+        rho = abs(rho)
 
         # print(f'r:{self.r}\nrho:{rho}')
         n = 4.0 * self.r * rho / (rho + self.r) ** 2
@@ -253,7 +254,7 @@ class Coil(BaseCoil):
             * ((rho - self.r) / (rho + self.r) * self._p(n, self.m(rho, x, s)) - self._k(self.m(rho, x, s)))
 
     def b_field(self, x, y, z):
-        """Compute the magnetic field given the position in cylindrical coordinates."""
+        """Compute the magnetic field given the position in cartesian coordinates."""
         r = np.sqrt(z ** 2 + y ** 2)
 
         phi = get_phi(y, z)
