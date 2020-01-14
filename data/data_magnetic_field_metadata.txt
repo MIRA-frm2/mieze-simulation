@@ -1,0 +1,10 @@
+The data/data_magnetic_field file has been generated using the following parameters: 
+
+Polariser
+{"position": [0.0, 0, 0], "c": 0.05, "m": [0, 90, 0]}
+HelmHoltzSpinFlipper1
+{"position": 0.1519, "coil_type": "Coil"}
+SpinFlipper
+{"position": 0.1519, "coil_type": "RectangularCoil"}
+CoilSet
+{"position": 0.32930000000000004, "coil_type": "Coil"}

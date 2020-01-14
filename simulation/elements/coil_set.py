@@ -49,6 +49,9 @@ class CoilSet(BasicElement):
         # current1 = current
         # current2 = current * self.detector_distance / (self.detector_distance - self.coil_distance)
 
+    def meta_data(self):
+        return {"position": self.position_x, "coil_type": self.coil_type.name}
+
     def _create_coil_set(self):
         """Create the two coil pairs."""
         self._create_coil_inner_set()

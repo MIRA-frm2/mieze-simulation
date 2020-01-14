@@ -297,6 +297,24 @@ def save_data_to_file(data, file_name, extension='.csv'):
             csv_writer.writerow(row)
 
 
+def save_metadata_to_file(filename, metadata):
+    """Write metadata to file.
+
+    Parameters
+    ----------
+    filename: str
+        Filename for data storage.
+    metadata: dict
+        Dictionary containing the metadata to be written.
+    """
+    with open(f'{filename}_metadata.txt', 'w') as f:
+        description = f'The {filename} file has been generated using the following parameters: \n'
+        f.write(description)
+        for key, val in metadata.items():
+            f.write(f'\n{key}\n')
+            f.write(json.dumps(val))
+
+
 def save_obj(obj, name):
     """Save object (magnetic field) as pickled object."""
     with open(f'{name}.pkl', 'wb') as f:
@@ -320,19 +338,3 @@ def transform_cylindrical_to_cartesian(x, rho, theta):
     y = rho * np.cos(theta)
     z = rho * np.sin(theta)
     return x, y, z
-
-
-def write_metadata(metadata_filename, metadata):
-    """Write metadata to file.
-
-    Parameters
-    ----------
-    metadata_filename: str
-        Filename for metadata storage.
-    metadata: dict
-        Dictionary containing the metadata to be written.
-    """
-    with open(f'{metadata_filename}', 'wb') as f:
-        description = 'The data.csv file has been generated using the following parameters: \n'
-        f.write(description.encode())
-        f.write(json.dumps(metadata))

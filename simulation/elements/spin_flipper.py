@@ -23,6 +23,9 @@ class SpinFlipper(RectangularCoil):
 
         self.thickness = kwargs.get('thickness', 1e-2)  # [m], thickness of the coil
 
+    def meta_data(self):
+        return {"position": self.position_x, "coil_type": "RectangularCoil"}
+
     def _sf_th(self, current, position):
         """Compute spin flipper approximation."""
         x0 = self.length / 2.0

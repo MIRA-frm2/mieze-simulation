@@ -16,7 +16,8 @@ import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 
 
-from utils.helper_functions import read_data_from_file, find_nearest, add_earth_magnetic_field
+from utils.helper_functions import read_data_from_file, find_nearest, add_earth_magnetic_field, save_data_to_file, \
+    save_metadata_to_file
 
 # Create a custom logger
 logger = logging.getLogger(__name__)
@@ -51,8 +52,15 @@ class Setup:
 
         self.consider_earth_field = consider_earth_field
 
+        self.meta_data = dict()
+
     def create_setup(self):
         raise NotImplementedError
+
+    def update_metadata(self):
+        for element in self.elements:
+            self.meta_data[element.name] = element.meta_data()
+            # self.meta_data[element.name] = dict(element.__dict__)
 
     def create_element(self, element_class, position, **kwargs):
         """Create the physical geometry of the coils."""
@@ -302,7 +310,20 @@ class Setup:
         plt.show()
 
     def set_plot_ticks(self, set_ticks=False):
+        """Set ticks and labels on the x axis of the plot to distinguish the position of the elements.
+
+        Parameters
+        ----------
+        set_ticks: bool, optional
+            Flag indicating whether to plot the ticks or not.
+            Defaults to False.
+        """
         if set_ticks:
             for element in self.elements:
                 self.x_ticks.append(element.position_x)
                 self.x_ticks_labels.append(element.name)
+
+    def save_data_to_file(self, filename):
+        """Save the computed field data and its metadata to two separate files."""
+        save_data_to_file(self.b, file_name=filename)
+        save_metadata_to_file(metadata=self.meta_data, filename=filename)

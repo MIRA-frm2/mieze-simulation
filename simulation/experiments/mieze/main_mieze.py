@@ -73,20 +73,22 @@ def main_mieze(grid_size=default_beam_grid,
 
     # Create the components of the beamline with their parameters
     experiment.create_setup()
+    experiment.update_metadata()
 
     # Initialize the computational space (grid) and compute the magnetic field for it
-    # experiment.initialize_computational_space(**grid_size)
-    # experiment.calculate_b_field()
+    experiment.initialize_computational_space(**grid_size)
+    experiment.calculate_b_field()
 
     # Compute the magnetic field for one point only
-    output = experiment.calculate_b_field(point=(0, 0, 0))
-    print(output)
+    # output = experiment.calculate_b_field(point=(0, 0, 0))
+    # print(output)
 
     # Save the obtained data to a file
-    # save_data_to_file(experiment.b, file_name=filename)
+    experiment.save_data_to_file(filename=filename)
 
-    # experiment.set_plot_ticks(set_ticks=False)
     # Plot results
+    # experiment.set_plot_ticks(set_ticks=False)
+
     # experiment.plot_field_1d_scalar(component='x')
     # experiment.plot_field_1d_scalar(component='y')
     # experiment.plot_field_1d_scalar(component='z')

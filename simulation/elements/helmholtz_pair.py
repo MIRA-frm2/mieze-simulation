@@ -21,7 +21,7 @@ class HelmholtzPair(BasicElement):
         """Inherit init from base class and define additional parameters."""
         super(HelmholtzPair, self).__init__(position, name='HelmHoltzSpinFlipper1')
 
-        coil_type = kwargs.get('coil_type', Coil)
+        self.coil_type = kwargs.get('coil_type', Coil)
 
         width = kwargs.get('width',  0.01)  # width of each coil
         windings = kwargs.get('windings', 33)
@@ -31,21 +31,14 @@ class HelmholtzPair(BasicElement):
         pos1 = (self.position_x - radius / 2.0, 0, 0)
         pos2 = (self.position_x + radius / 2.0, 0, 0)
 
-        self.coil1 = coil_type(name='HSF1',
-                               position=pos1,
-                               current=current,
-                               length=width,
-                               r_eff=radius,
-                               windings=windings,
-                               wire_d=0)
+        self.coil1 = self.coil_type(name='HSF1', current=current, length=width, position=pos1, r_eff=radius,
+                                    windings=windings, wire_d=0)
 
-        self.coil2 = coil_type(name='HSF2',
-                               position=pos2,
-                               current=current,
-                               length=width,
-                               windings=windings,
-                               r_eff=radius,
-                               wire_d=0)
+        self.coil2 = self.coil_type(name='HSF2', current=current, length=width, windings=windings, position=pos2,
+                                    r_eff=radius, wire_d=0)
+
+    def meta_data(self):
+        return {"position": self.position_x, "coil_type": self.coil_type.name}
 
     def b_field(self, x, y, z):
         """Compute the magnetic field given the position."""

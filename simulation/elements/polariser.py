@@ -33,7 +33,10 @@ class Polariser(BasicElement):
         # magnetic dipol moment Polarisator;
         # both obtained by real measurements and data analysis
         # Pointing in the z upwards directions # Todo: check z or y
-        self.m = kwargs.get('m', np.array((0, 90, 0)))
+        self.m = kwargs.get('m', (0, 90, 0))
+
+    def meta_data(self):
+        return {"position": self.position, "c": self.c, "m": self.m}
 
     def _rectify_x_position(self, x):
         """Take into account the position and the shift on the x axis.
@@ -69,8 +72,8 @@ class Polariser(BasicElement):
         r_unit_vec = r_vec / r
 
         prefactor = MU_0 / (4 * np.pi)
-        elem1 = 3 * r_unit_vec * self.m * r_unit_vec
-        elem2 = self.m
+        elem1 = 3 * r_unit_vec * np.asarray(self.m) * r_unit_vec
+        elem2 = np.asarray(self.m)
 
         # Modelled as an ideal dipole magnetic field (note: it is divergent at 0)
         b = prefactor * (elem1 - elem2) / r**3

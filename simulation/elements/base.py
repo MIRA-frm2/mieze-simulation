@@ -9,6 +9,7 @@
 """Base element class."""
 
 from abc import abstractmethod
+import json
 
 
 class BasicElement(object):

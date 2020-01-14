@@ -8,6 +8,7 @@
 
 """Individual magnetic elements (coils) for the setup."""
 
+import json
 import logging
 import mpmath
 import numpy as np
@@ -98,6 +99,10 @@ class BaseCoil(BasicElement):
         self.angle_y = kwargs.get('angle_y', 0)
         self.angle_z = kwargs.get('angle_z', 0)
 
+    def __repr__(self):
+        return json.dumps(self, default=lambda o: o.__dict__,
+                          sort_keys=True, indent=4)
+
     def compute_effective_radius(self, r_min, r_max):
         """Compute the effective radius from the other physical parameters."""
         inverse_r_sum = 0
@@ -177,6 +182,8 @@ class BaseCoil(BasicElement):
 
 class Coil(BaseCoil):
     """Class that implements an ideal circular coil."""
+
+    name = 'Coil'
 
     def __init__(self, name, position, **kwargs):
         """Simulate physical geometry of a simplified coil."""
