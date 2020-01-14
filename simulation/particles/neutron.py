@@ -41,6 +41,7 @@ class Neutron:
         self.polarisation = polarisation
 
         self.position = np.asarray(position)
+        self.trajectory = list()
 
     def get_pol(self):
         """Return the polarisation of the neutron."""
@@ -61,11 +62,18 @@ class Neutron:
         return self.position[0]
 
     def compute_position_yz(self, time):
+        """Compute the position on the yz axes, based on the time spent in the cell on x axis.
+
+        Parameters
+        ----------
+        time: float
+            Time spent in the cell on x axis.
+        """
         self.position[1] += time * self.velocity[1]
         self.position[2] += time * self.velocity[2]
 
     @property
     def speed(self):
-        # """Return the speed from the velocity."""
+        """Return the speed from the velocity."""
         # return np.linalg.norm(self.velocity)
         return self.velocity[0]

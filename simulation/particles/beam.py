@@ -75,12 +75,18 @@ class NeutronBeam:
             polarisation = np.array([x, 0.95, z])
 
             if distribution:
-                pos_y = round(random.gauss(0, self.beamsize / 5), ndigits=-int(np.log10(self.incrementsize)))
-                pos_z = round(random.gauss(0, self.beamsize / 5), ndigits=-int(np.log10(self.incrementsize)))
+
+                pos_y = random.gauss(0, self.beamsize / 5)
+                pos_z = random.gauss(0, self.beamsize / 5)
+
+                # pos_y = round(random.gauss(0, self.beamsize / 5), ndigits=-int(np.log10(self.incrementsize)))
+                # pos_z = round(random.gauss(0, self.beamsize / 5), ndigits=-int(np.log10(self.incrementsize)))
 
                 speed = random.gauss(self.speed, 0.02 * self.speed)
-                neutron_velocity = np.array([speed, 0, 0])
-                # neutron_velocity = np.array([speed, speed * 0.01, speed * 0.01])
+                # neutron_velocity = np.array([speed, 0, 0])
+                neutron_velocity = np.array([speed,
+                                             speed * random.gauss(0, 0.1),
+                                             speed * random.gauss(0, 0.1)])
 
             else:
                 pos_y = 0
@@ -129,7 +135,7 @@ class NeutronBeam:
 
     def load_magnetic_field(self):
         """Load the magnetic field data."""
-        self.b_map = load_obj('../data/data')
+        self.b_map = load_obj('../../data/data_magnetic_field')
 
     def compute_beam(self):
         """Compute the polarisation of the beam along the trajectory."""
@@ -140,10 +146,10 @@ class NeutronBeam:
                 # self.check_neutron_in_beam(neutron)
 
                 time = self._time_in_field(velocity=neutron.speed)
-                print(j)
+                # print(j)
                 neutron.set_position_x(j)
                 neutron.compute_position_yz(time)
-                print(neutron.position)
+                # print(neutron.position)
 
                 neutron.polarisation = self._polarisation_change(
                     neutron,
@@ -153,10 +159,12 @@ class NeutronBeam:
                                 )],
                     time)
 
+                neutron.trajectory.append(neutron.position)
+
             self.polarisation[tuple(self.get_neutron_position())] = self.get_pol()
 
-            print(self.get_pol())
-            print(self.get_neutron_position())
+            # print(self.get_pol())
+            print(self.neutrons[0].trajectory)
 
     def check_neutron_in_beam(self, neutron):
         """Check if it is in the calculated beam profile (y,z plane)"""

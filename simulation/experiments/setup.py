@@ -17,7 +17,7 @@ import matplotlib.cm as cm
 
 
 from utils.helper_functions import read_data_from_file, find_nearest, add_earth_magnetic_field, save_data_to_file, \
-    save_metadata_to_file
+    save_metadata_to_file, save_obj
 
 # Create a custom logger
 logger = logging.getLogger(__name__)
@@ -327,3 +327,4 @@ class Setup:
         """Save the computed field data and its metadata to two separate files."""
         save_data_to_file(self.b, file_name=filename)
         save_metadata_to_file(metadata=self.meta_data, filename=filename)
+        save_obj(self.b, filename)

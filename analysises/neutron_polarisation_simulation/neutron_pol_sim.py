@@ -9,10 +9,11 @@
 """Main script that computes the flow of the particles through the magnetic field."""
 
 import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import axes3d, Axes3D #<-- Note the capitalization!
 
 from simulation.particles.beam import NeutronBeam
 
-from simulation.experiments.mieze import startpoint, beamend, beamsize, step_x, speed
+from simulation.experiments.mieze.parameters import startpoint, beamend, beamsize, step_x, speed
 
 from utils.helper_functions import save_data_to_file, read_data_from_file
 
@@ -58,17 +59,28 @@ def main():
     simulation.load_magnetic_field()
 
     # Initialize the neutrons and set their polarisation
-    simulation.create_neutrons(number_of_neutrons=1, distribution=False)
+    simulation.create_neutrons(number_of_neutrons=10, distribution=True)
     simulation.reset_pol()
 
     # Simulate the actual beam trajectory and the polarisation thereof
     simulation.compute_beam()
 
     # Save data to file and plot
-    save_data_to_file(simulation.polarisation, '../data/data_polarisation')
+    save_data_to_file(simulation.polarisation, '../../data/data_polarisation')
 
-    plotter = MyPlotter(magnetic_field_data='../data/data.csv', polarisation_data='../data/data_polarisation.csv')
-    plotter.plot_field_3d(normalize=True, length=0.025)
+    # plotter = MyPlotter(magnetic_field_data='../../data/data_magnetic_field.csv',
+    #                     polarisation_data='../../data/data_polarisation.csv')
+    # plotter.plot_field_3d(normalize=True, length=0.025)
+
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+    for neutron in simulation.neutrons:
+        for point in neutron.trajectory:
+            ax.scatter(point[0], point[1], point[2], marker='o')
+    # ax.set_ylim3d(-0.005, +0.005)
+    # ax.set_zlim3d(-0.005, +0.005)
+
+    plt.show()
 
 
 if __name__ == "__main__":
