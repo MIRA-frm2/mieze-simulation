@@ -15,6 +15,8 @@ The part of the setup that actually does the MIEZE condition is the Set of coils
     coils.
 """
 
+from numpy import array
+
 from simulation.elements.base import BasicElement
 from simulation.elements.coils import Coil
 
@@ -126,28 +128,28 @@ class CoilSet(BasicElement):
         self.elements.append(coil_outer_1)
         self.elements.append(coil_outer_2)
 
-    def b_field(self, x, y=0, z=0):
+    def b_field(self, r: '(x, y, z)'):
         """Compute the magnetic field for one specific position.
 
         Parameters
         ----------
-        x: float
-        y: float
-        z: float
+        r: list, array
+            Position where the magnetic field is supposed to be calculated at.
 
         Returns
         -------
         b_field: float
             The value of the magnetic field.
         """
-        b_field = 0
+        x, y, z = r
+        b_field = array([0., 0., 0.])
         for element in self.elements:
-            b_field += element.b_field(x, y, z)[0]
+            b_field += element.b_field([x, y, z])
         return b_field
 
     def compute_b_field(self, x_positions):
         """Compute the magnetic field for the array of positions."""
         b_values = list()
         for x in x_positions:
-            b_values.append(self.b_field(x, 0, 0))
+            b_values.append(self.b_field([x, 0, 0]))
         return b_values

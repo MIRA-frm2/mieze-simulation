@@ -47,12 +47,13 @@ class Polariser(BasicElement):
         x += self.c
         return x
 
-    def b_field(self, x, y, z):
+    def b_field(self, r: '(x, y, z)'):
         """Compute the magnetic field."""
+        x, y, z = r
         if type(x) not in (int, float, np.float64):
             b_field = list()
             for item in x:
-                b_field.append(np.abs(self.b_field(item, 0, 0)[1]))
+                b_field.append(np.abs(self.b_field([item, 0, 0])[1]))
             return np.asarray(b_field)
         else:
             x = self._rectify_x_position(x)

@@ -33,5 +33,5 @@ class BasicElement(object):
             self.position_y = 0
 
     @abstractmethod
-    def b_field(self, x, y, z):
+    def b_field(self, r: '(x, y, z)'):
         raise NotImplementedError

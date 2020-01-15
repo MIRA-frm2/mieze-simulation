@@ -176,7 +176,7 @@ class BaseCoil(BasicElement):
         """Compute m function."""
         return 4.0 * self.r * rho / self.beta(rho, x, s) ** 2
 
-    def b_field(self, x, y, z):
+    def b_field(self, r: '(x, y, z)'):
         raise NotImplementedError
 
 
@@ -260,8 +260,9 @@ class Coil(BaseCoil):
         return self.zeta(x, s) / self.beta(rho, x, s) \
             * ((rho - self.r) / (rho + self.r) * self._p(n, self.m(rho, x, s)) - self._k(self.m(rho, x, s)))
 
-    def b_field(self, x, y, z):
+    def b_field(self, r: '(x, y, z)'):
         """Compute the magnetic field given the position in cartesian coordinates."""
+        x, y, z = r
         r = np.sqrt(z ** 2 + y ** 2)
 
         phi = get_phi(y, z)
@@ -338,9 +339,10 @@ class RealCoil(Coil):
             * ((rho - self.r) / (rho + self.r) * self._p(n, self.m(rho, x, s)) - self._k(self.m(rho, x, s)))\
                
 
-    def b_field(self, x, y, z):
+    def b_field(self, r: '(x, y, z)'):
         """Compute the magnetic field given the position in cartesian coordinates."""
         self.iteration += 1
+        x, y, z = r
 
         field = np.array([0., 0., 0.])
         r = np.sqrt(y ** 2 + z ** 2)
@@ -406,14 +408,14 @@ class RectangularCoil(BaseCoil):
         """Fix coordinates for the equations that have the coordinate axes reversed."""
         return np.array([z, y, x])
 
-    def b_field(self, x, y, z):
+    def b_field(self, r: '(x, y, z)'):
         """Compute the magnetic field.
 
         Returns
         -------
         magnetic field in cartesian coordinates
         """
-        # self.x, self.y, self.z = x, y, z
+        x, y, z = r
         self.x, self.y, self.z = self._reverse_coordinates(x, y, z)
 
         field = self.check_physical_coil_overlap()

@@ -40,8 +40,8 @@ class HelmholtzPair(BasicElement):
     def meta_data(self):
         return {"position": self.position_x, "coil_type": self.coil_type.name}
 
-    def b_field(self, x, y, z):
+    def b_field(self, r: '(x, y, z)'):
         """Compute the magnetic field given the position."""
-        b1 = self.coil2.b_field(x, y, z)
-        b2 = self.coil2.b_field(x, y, z)
+        b1 = self.coil2.b_field(r)
+        b2 = self.coil2.b_field(r)
         return (b1 + b2) * self.adjustment_factor

@@ -84,7 +84,7 @@ def main_mieze(grid_size=default_beam_grid,
     # print(output)
 
     # Save the obtained data to a file
-    experiment.save_data_to_file(filename=filename)
+    # experiment.save_total_data_to_file(filename=filename)
 
     # Plot results
     # experiment.set_plot_ticks(set_ticks=False)

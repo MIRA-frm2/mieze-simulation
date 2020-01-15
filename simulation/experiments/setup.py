@@ -82,21 +82,6 @@ class Setup:
 
         return field
 
-    def b_field(self, r: '(x, y, z)'):
-        """Compute magnetic field."""
-        self.computation_number += 1
-
-        field = np.array((0., 0., 0.))
-
-        for element in self.elements:
-            np.add(field, element.b_field(*r), out=field)
-
-        # logger.error(f'{self.computation_number}: Computed total magnetic field for point {r} is {field}')
-
-        field = add_earth_magnetic_field(field, flag=self.consider_earth_field)
-
-        return field
-
     def change_current(self, current):
         """Change the current value."""
         self.current = current
@@ -124,19 +109,53 @@ class Setup:
     def calculate_b_field(self, point=None):
         """Calculate the magnetic field."""
         if point:
-            return self.b_field(point)
+
+            return self.b_field_point(point)
         else:
             # logger.error(f'{self.x_range}, {self.y_range}, {self.z_range}')
             positions = list(itertools.product(self.x_range, self.y_range, self.z_range))
             logger.error(f'{len(positions)} calculations')
             logger.info('calculate')
 
-            with Pool(4) as p:
-                result = p.map(self.b_field, positions)
+            self.b = dict()
 
-            logger.info('calculation finished')
+            i = 0
+            for element in self.elements:
+                result = list()
+                # with Pool(4) as p:
+                #     result = p.map(element.b_field, positions)
+                for value in positions:
+                    result.append(element.b_field(value))
 
-            self.b = dict(zip(positions, result))
+                b = dict(zip(positions, result))
+
+                print(f'calculation for element {element.name} finished')
+
+                save_data_to_file(b, file_name=f'data/elements_magnetic_fields/data_magnetic_field_{element.name}')
+
+                if i == 0:
+                    self.b = b.copy()
+                    i += 1
+                else:
+                    for k in self.b.keys():
+                        self.b[k] += b[k]
+
+            print(self.b)
+            save_data_to_file(self.b, file_name=f'data/data_magnetic_field')
+
+    def b_field_point(self, r: '(x, y, z)'):
+        """Compute magnetic field."""
+
+        field = np.array((0., 0., 0.))
+
+        for element in self.elements:
+            np.add(field, element.b_field(*r), out=field)
+
+        # logger.error(f'{self.computation_number}: Computed total magnetic field for point {r} is {field}')
+
+        field = add_earth_magnetic_field(field, flag=self.consider_earth_field)
+
+        return field
 
     def get_b_vec(self):
         """Returns the magnetic field as a vector."""
@@ -323,7 +342,7 @@ class Setup:
                 self.x_ticks.append(element.position_x)
                 self.x_ticks_labels.append(element.name)
 
-    def save_data_to_file(self, filename):
+    def save_total_data_to_file(self, filename):
         """Save the computed field data and its metadata to two separate files."""
         save_data_to_file(self.b, file_name=filename)
         save_metadata_to_file(metadata=self.meta_data, filename=filename)
