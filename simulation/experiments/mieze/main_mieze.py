@@ -10,10 +10,9 @@
 
 from simulation.experiments.setup import Setup
 from simulation.experiments.mieze.parameters import (
-    I_hsf1, POLARISATOR, R_HSF, default_beam_grid, CoilSet_position,
-    COIL_SET_PARAMETERS, ELEMENTS_POSITIONS, SPIN_FLIPPER_PARAMETERS)
-
-from utils.helper_functions import save_data_to_file
+    default_beam_grid, CoilSet_position,
+    COIL_SET_PARAMETERS, ELEMENTS_POSITIONS_ABSOLUTE, ELEMENTS_POSITIONS_RELATIVE, HELMHOLTZCOILS_PARAMETERS,
+    SPIN_FLIPPER_PARAMETERS)
 
 
 from simulation.elements.coils import Coil
@@ -38,13 +37,13 @@ class Mieze(Setup):
         """Create the elements for the setup."""
 
         self.create_element(element_class=Polariser,
-                            position=(POLARISATOR, 0, 0))
+                            position=(ELEMENTS_POSITIONS_ABSOLUTE["polariser"], 0, 0))
 
         self.create_element(coil_type=Coil,
-                            current=I_hsf1,
+                            current=HELMHOLTZCOILS_PARAMETERS["CURRENT"],
                             element_class=HelmholtzPair,
-                            position=(self.spin_flipper_distance, 0, 0),
-                            radius=R_HSF)
+                            position=(HELMHOLTZCOILS_PARAMETERS["position"], 0, 0),
+                            radius=HELMHOLTZCOILS_PARAMETERS["RADIUS"])
 
         self.create_element(current=SPIN_FLIPPER_PARAMETERS["I_sf1"],
                             element_class=SpinFlipper,
@@ -62,14 +61,18 @@ class Mieze(Setup):
 
 
 def main_mieze(grid_size=default_beam_grid,
-               coil_set_distance=ELEMENTS_POSITIONS["coil_set_distance"],
-               spin_flipper_distance=ELEMENTS_POSITIONS["spin_flipper_distance"],
-               filename='data/data_magnetic_field'):
+               coil_set_distance=ELEMENTS_POSITIONS_RELATIVE["coil_set_distance"],
+               spin_flipper_distance=ELEMENTS_POSITIONS_RELATIVE["spin_flipper_distance"],
+               filename='data/data_magnetic_field',
+               save_individual_data_sets=False):
+
+
 
     # Initialize an object from the MIEZE class
     experiment = Mieze(coil_type=Coil,
                        spin_flipper_distance=spin_flipper_distance,
-                       coil_set_distance=coil_set_distance)
+                       coil_set_distance=coil_set_distance,
+                       save_individual_data_sets=save_individual_data_sets)
 
     # Create the components of the beamline with their parameters
     experiment.create_setup()
@@ -84,12 +87,11 @@ def main_mieze(grid_size=default_beam_grid,
     # print(output)
 
     # Save the obtained data to a file
-    # experiment.save_total_data_to_file(filename=filename)
+    experiment.save_total_data_to_file(filename=filename)
 
     # Plot results
     # experiment.set_plot_ticks(set_ticks=False)
 
-    experiment.plot_field_1d_scalar(component='x')
+    # experiment.plot_field_1d_scalar(component='x')
     # experiment.plot_field_1d_scalar(component='y')
     # experiment.plot_field_1d_scalar(component='z')
-

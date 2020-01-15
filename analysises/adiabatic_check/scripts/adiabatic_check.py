@@ -11,7 +11,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-from simulation.experiments.mieze.parameters import HelmholtzSpinFlipper_position_HSF1, lambda_n, step_x
+from simulation.experiments.mieze.parameters import HelmholtzSpinFlipper_position_HSF1, wavelength, step_x
 
 from utils.helper_functions import append_column_to_csv, convert_between_m_and_cm, read_data_from_file
 from utils.physics_constants import factor_T_to_G
@@ -34,7 +34,7 @@ def compute_adiabatic_condition(b_values):
         Depending on the input, either the array or a single value.
     """
     factor_gauss_to_militesla = 1e3 / factor_T_to_G
-    return 2.65 * lambda_n * np.asarray(b_values) * factor_gauss_to_militesla
+    return 2.65 * wavelength * np.asarray(b_values) * factor_gauss_to_militesla
 
 
 def get_b_field_magnitude(bx, by):

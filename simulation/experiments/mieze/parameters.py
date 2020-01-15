@@ -1,9 +1,6 @@
 import numpy as np
 
 # Variables are stored as tuples with numerical value and units
-I_hsf1 = 1.6  # [A]
-lambda_n = 4.3  # [Angstrom]
-
 I_real_coil = 10  # [A]
 
 startpoint = 0.000  # [m]
@@ -18,7 +15,6 @@ default_beam_grid = {'x_start': startpoint, 'x_end': beamend, 'x_step': step_x,
 
 
 # MIEZE coil set values
-
 
 # Inner coils
 LENGTH_COIL_INNER = 86 * 1e-3  # [m]
@@ -51,7 +47,6 @@ COIL_SET_CURRENT = 5  # [A]
 
 WIDTH_CBOX = 2 * (LENGTH_COIL_OUTER + LENGTH_COIL_INNER) + DISTANCE_BETWEEN_INNER_COILS  # [m]
 
-
 # Square coil Parameters
 SQUARE_COIL_POSITION_1ST = 0.1   # [m]
 SQUARE_COIL_POSITION_2ND = 1   # [m]
@@ -80,13 +75,13 @@ COIL_B = COIL_A + L1
 distance_between_HSF1_coilset = 0.0
 CoilSet_position = SpinFlipper_position1 + R_HSF / 2.0 + WIDTH_CBOX/2
 
-
 # Beam properties
 beamsize = 0.02
 number_of_neutrons = 1000
 
 # Neutron wavelength and speed properties
-wavelength = 4.5
+wavelength = 4.3  # [Angstrom]
+
 wavelength_min = 3.5
 wavelength_max = 6
 
@@ -105,6 +100,13 @@ COIL_SET_PARAMETERS = {
     "CURRENT": 100,  # [A]
 }
 
+HELMHOLTZCOILS_PARAMETERS = {
+    "CURRENT": 1.6,  # [A],
+    "position": HelmholtzSpinFlipper_position_HSF1,
+    "RADIUS": R_HSF
+}
+
+
 SPIN_FLIPPER_PARAMETERS = {
     "I_sf1": 1.6,  # [A]
     "SpinFlipper_position1": SpinFlipper_position1,
@@ -115,8 +117,14 @@ SPIN_FLIPPER_PARAMETERS = {
     "WIRE_D":  5 * 1e-3  # [m]
 }
 
-ELEMENTS_POSITIONS = {
+ELEMENTS_POSITIONS_RELATIVE = {
     "coil_set_distance": distance_between_HSF1_coilset,
-    "spin_flipper_distance": HelmholtzSpinFlipper_position_HSF1
+    "spin_flipper_distance": HelmholtzSpinFlipper_position_HSF1,
+    "polariser": POLARISATOR
 }
 
+ELEMENTS_POSITIONS_ABSOLUTE = {
+    "coil_set": CoilSet_position,
+    "spin_flipper": HelmholtzSpinFlipper_position_HSF1,
+    "polariser": POLARISATOR
+}

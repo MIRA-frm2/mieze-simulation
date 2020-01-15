@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
 
 class Setup:
     """Class that simulates a physical setup."""
-    def __init__(self, consider_earth_field=False):
+    def __init__(self, consider_earth_field=False, save_individual_data_sets=False):
         self.elements = []
         self.b = None
         self.b_cartesian = None
@@ -53,6 +53,8 @@ class Setup:
         self.consider_earth_field = consider_earth_field
 
         self.meta_data = dict()
+
+        self.save_individual_data_sets = save_individual_data_sets
 
     def create_setup(self):
         raise NotImplementedError
@@ -131,7 +133,8 @@ class Setup:
 
                 print(f'calculation for element {element.name} finished')
 
-                save_data_to_file(b, file_name=f'data/elements_magnetic_fields/data_magnetic_field_{element.name}')
+                if self.save_individual_data_sets:
+                    save_data_to_file(b, file_name=f'data/elements_magnetic_fields/data_magnetic_field_{element.name}')
 
                 if i == 0:
                     self.b = b.copy()
@@ -139,9 +142,6 @@ class Setup:
                 else:
                     for k in self.b.keys():
                         self.b[k] += b[k]
-
-            print(self.b)
-            save_data_to_file(self.b, file_name=f'data/data_magnetic_field')
 
     def b_field_point(self, r: '(x, y, z)'):
         """Compute magnetic field."""

@@ -43,7 +43,7 @@ class MyPlotter:
 
 
 def find_edges():
-    data_file = "ideal_position_b_field_values.csv"
+    data_file = "../ideal_position_b_field_values.csv"
 
     plotter = MyPlotter(data_file=data_file)
     # print(WIDTH_CBOX/2)
