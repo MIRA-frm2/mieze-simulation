@@ -9,9 +9,10 @@
 """Main script that computes the flow of the particles through the magnetic field."""
 
 import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import axes3d, Axes3D #<-- Note the capitalization!
+import numpy as np
+from mpl_toolkits.mplot3d import axes3d, Axes3D  # <-- Note the capitalization!
 
-from simulation.particles.beam import NeutronBeam
+from simulation.beamline.beamline_mieze import MiezeBeamline
 
 from simulation.experiments.mieze.parameters import startpoint, beamend, beamsize, step_x, speed
 
@@ -44,10 +45,10 @@ class MyPlotter:
 
 
 def main():
-    simulation = NeutronBeam(beamsize=beamsize,
-                             incrementsize=step_x,
-                             speed=speed,
-                             totalflightlength=beamend)
+    simulation = MiezeBeamline(beamsize=beamsize,
+                               incrementsize=step_x,
+                               speed=speed,
+                               totalflightlength=beamend)
 
     # Define computational space
     grid_size = {'x_start': startpoint, 'x_end': beamend, 'x_step': step_x,
@@ -59,7 +60,13 @@ def main():
     simulation.load_magnetic_field()
 
     # Initialize the neutrons and set their polarisation
-    simulation.create_neutrons(number_of_neutrons=10, distribution=True)
+    c = 0.31225  # sqrt(1-polarisierung²)
+    x = c * np.random.rand()
+    z = np.sqrt(c ** 2 - x ** 2)
+
+    polarisation = np.array([x, 0.95, z])
+
+    simulation.create_neutrons(number_of_neutrons=10, distribution=True, polarisation=polarisation)
     simulation.reset_pol()
 
     # Simulate the actual beam trajectory and the polarisation thereof

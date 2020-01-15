@@ -89,7 +89,7 @@ def main_mieze(grid_size=default_beam_grid,
     # Plot results
     # experiment.set_plot_ticks(set_ticks=False)
 
-    # experiment.plot_field_1d_scalar(component='x')
+    experiment.plot_field_1d_scalar(component='x')
     # experiment.plot_field_1d_scalar(component='y')
     # experiment.plot_field_1d_scalar(component='z')
 

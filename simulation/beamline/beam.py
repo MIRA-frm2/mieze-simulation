@@ -1,22 +1,18 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of MIEZE simulation.
-# Copyright (C) 2019 TUM FRM2 E21 Research Group.
+# Copyright (C) 2019, 2020 TUM FRM2 E21 Research Group.
 #
 # This is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
 
-"""Neutron class."""
+"""General beamline class implementation."""
 
 import numpy as np
-import numpy.random as r
 import os
-import random
+from abc import abstractmethod
 
-from simulation.particles.neutron import Neutron
-
-from utils.helper_functions import load_obj, find_nearest, rotate, get_phi
-from simulation.experiments.mieze.parameters import angular_distribution_in_radians, speed_std
+from utils.helper_functions import load_obj, find_nearest, rotate
 
 
 cwd = os.getcwd()
@@ -42,7 +38,10 @@ class NeutronBeam:
         self.z_range = None
 
     def initialize_computational_space(self, **kwargs):
-        """Initialize the 3d discretized computational space."""
+        """Initialize the 3d discretized computational space.
+
+        It should be identical (or at least similar) to the computed magnetic field values.
+        """
         x_start = kwargs.pop('x_start', 0)
         x_end = kwargs.pop('x_end', 1)
         x_step = kwargs.pop('x_step', 0.1)
@@ -57,64 +56,9 @@ class NeutronBeam:
         self.y_range = np.arange(y_start, y_end + yz_step, yz_step)
         self.z_range = np.arange(z_start, z_end + yz_step, yz_step)
 
-    def create_neutrons(self, number_of_neutrons, distribution=True):
-        """Initialize the neutrons with a specific distribution.
-
-        Parameters
-        ----------
-        number_of_neutrons: int
-            Number of neutrons to be simulated.
-        distribution: boolean, optional
-            If True, then the neutrons are uniformly distributed.
-            If False, then the neutrons are not spread and all start at 0.
-            Defaults to True.
-        """
-        while len(self.neutrons) < number_of_neutrons:
-            c = 0.31225  # sqrt(1-polarisierung²)
-            x = c * r.rand()
-            z = np.sqrt(c ** 2 - x ** 2)
-
-            polarisation = np.array([x, 0.95, z])
-
-            if distribution:
-
-                pos_y = random.gauss(0, self.beamsize / 5)
-                pos_z = random.gauss(0, self.beamsize / 5)
-
-                # ToDo: cut to less digits for the position
-                # pos_y = round(random.gauss(0, self.beamsize / 5), ndigits=-int(np.log10(self.incrementsize)))
-                # pos_z = round(random.gauss(0, self.beamsize / 5), ndigits=-int(np.log10(self.incrementsize)))
-
-                # ToDo: Randomized velocities
-                # speed = random.gauss(self.speed, speed_std)
-                #
-                # radial_speed = speed * random.gauss(0, np.tan(angular_distribution_in_radians))
-                # phi = get_phi(pos_y, pos_z)
-                #
-                # neutron_velocity = np.array([speed,
-                #                              radial_speed * np.cos(phi),
-                #                              radial_speed * np.sin(phi)])
-
-                speed = random.gauss(self.speed, speed_std)
-
-                radial_speed = speed * np.tan(angular_distribution_in_radians)
-                phi = get_phi(pos_y, pos_z)
-
-                neutron_velocity = np.array([speed,
-                                             radial_speed * np.cos(phi),
-                                             radial_speed * np.sin(phi)])
-
-            else:
-                pos_y = 0
-                pos_z = 0
-
-                neutron_velocity = np.array([self.speed, 0, 0])
-
-            position = np.asarray([0, pos_y, pos_z])
-
-            neutron = Neutron(polarisation=polarisation, position=position, velocity=neutron_velocity)
-
-            self.neutrons.append(neutron)
+    @abstractmethod
+    def create_neutrons(self, number_of_neutrons, polarisation, distribution):
+        pass
 
     def _time_in_field(self, velocity):
         """Compute the time spent in the field."""
