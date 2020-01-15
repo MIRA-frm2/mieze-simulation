@@ -15,7 +15,9 @@ import random
 
 from simulation.particles.neutron import Neutron
 
-from utils.helper_functions import load_obj, find_nearest, rotate
+from utils.helper_functions import load_obj, find_nearest, rotate, get_phi
+from simulation.experiments.mieze.parameters import angular_distribution_in_radians, speed_std
+
 
 cwd = os.getcwd()
 
@@ -79,21 +81,34 @@ class NeutronBeam:
                 pos_y = random.gauss(0, self.beamsize / 5)
                 pos_z = random.gauss(0, self.beamsize / 5)
 
+                # ToDo: cut to less digits for the position
                 # pos_y = round(random.gauss(0, self.beamsize / 5), ndigits=-int(np.log10(self.incrementsize)))
                 # pos_z = round(random.gauss(0, self.beamsize / 5), ndigits=-int(np.log10(self.incrementsize)))
 
-                speed = random.gauss(self.speed, 0.02 * self.speed)
-                # neutron_velocity = np.array([speed, 0, 0])
+                # ToDo: Randomized velocities
+                # speed = random.gauss(self.speed, speed_std)
+                #
+                # radial_speed = speed * random.gauss(0, np.tan(angular_distribution_in_radians))
+                # phi = get_phi(pos_y, pos_z)
+                #
+                # neutron_velocity = np.array([speed,
+                #                              radial_speed * np.cos(phi),
+                #                              radial_speed * np.sin(phi)])
+
+                speed = random.gauss(self.speed, speed_std)
+
+                radial_speed = speed * np.tan(angular_distribution_in_radians)
+                phi = get_phi(pos_y, pos_z)
+
                 neutron_velocity = np.array([speed,
-                                             speed * random.gauss(0, 0.1),
-                                             speed * random.gauss(0, 0.1)])
+                                             radial_speed * np.cos(phi),
+                                             radial_speed * np.sin(phi)])
 
             else:
                 pos_y = 0
                 pos_z = 0
 
-                speed = self.speed
-                neutron_velocity = np.array([speed, 0, 0])
+                neutron_velocity = np.array([self.speed, 0, 0])
 
             position = np.asarray([0, pos_y, pos_z])
 

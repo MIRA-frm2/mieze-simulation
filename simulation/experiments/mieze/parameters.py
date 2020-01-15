@@ -84,8 +84,21 @@ CoilSet_position = SpinFlipper_position1 + R_HSF / 2.0 + WIDTH_CBOX/2
 # Beam properties
 beamsize = 0.02
 number_of_neutrons = 1000
-speed = 3956 / 4.5
+
+# Neutron wavelength and speed properties
+wavelength = 4.5
+wavelength_min = 3.5
+wavelength_max = 6
+
+speed = 3956 / wavelength
+speed_min = 3956 / wavelength_max
+speed_max = 3956 / wavelength_min
+speed_std = (speed_max - speed_min) / 4
+
+
+# Angular distribution
 angular_distribution = 45  # minutes
+angular_distribution_in_radians = angular_distribution * np.pi / (60 * 180)
 
 
 COIL_SET_PARAMETERS = {
