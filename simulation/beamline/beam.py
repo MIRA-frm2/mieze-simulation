@@ -147,3 +147,18 @@ class NeutronBeam:
     def get_neutron_position(self, index=0):
         """Return the position of the neutron at index in the neutron list."""
         return self.neutrons[index].position
+
+    def collimate_neutrons(self, max_angle):
+        """Apply a cut on the neutrons based on their angular distribution."""
+        for neutron in self.neutrons:
+            radial_speed = neutron.velocity[1] + neutron.velocity[2]
+            angle = np.arctan(radial_speed/neutron.velocity[0])
+
+            if angle > max_angle:
+                self.neutrons.remove(neutron)
+
+    def monochromate_neutrons(self, wavelength_min, wavelength_max):
+        """Apply a cut on the neutrons based on their wavelength/speed distribution."""
+        for neutron in self.neutrons:
+            if neutron.wavelength > wavelength_max or neutron.wavelength < wavelength_min:
+                self.neutrons.remove(neutron)

@@ -39,6 +39,7 @@ class Neutron:
         """
         self.velocity = velocity
         self.polarisation = polarisation
+        self.wavelength = 3956 / self.speed
 
         self.position = np.asarray(position)
         self.trajectory = list()

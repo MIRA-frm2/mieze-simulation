@@ -14,7 +14,8 @@ from mpl_toolkits.mplot3d import axes3d, Axes3D  # <-- Note the capitalization!
 
 from simulation.beamline.beamline_mieze import MiezeBeamline
 
-from simulation.experiments.mieze.parameters import startpoint, beamend, beamsize, step_x, speed
+from simulation.experiments.mieze.parameters import startpoint, beamend, beamsize, step_x, speed, \
+    angular_distribution_in_radians, wavelength_min, wavelength_max
 
 from utils.helper_functions import save_data_to_file, read_data_from_file
 
@@ -68,6 +69,10 @@ def main():
 
     simulation.create_neutrons(number_of_neutrons=10, distribution=True, polarisation=polarisation)
     simulation.reset_pol()
+
+    # Adjust the beam
+    simulation.collimate_neutrons(max_angle=angular_distribution_in_radians)
+    simulation.monochromate_neutrons(wavelength_min=wavelength_min, wavelength_max=wavelength_max)
 
     # Simulate the actual beam trajectory and the polarisation thereof
     simulation.compute_beam()
