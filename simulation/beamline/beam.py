@@ -21,7 +21,11 @@ cwd = os.getcwd()
 class NeutronBeam:
     """Implements neutrons and its properties."""
 
-    def __init__(self):
+    def __init__(self, beamsize, speed):
+
+        self.beamsize = beamsize
+        self.speed = speed
+
         self.neutrons = []
         self.number_of_neutrons = None
 
@@ -33,11 +37,18 @@ class NeutronBeam:
         self.y_range = None
         self.z_range = None
 
+        self.x_end = None
+
         self.x_step = None
+
         self.y_start = None
         self.y_end = None
+
         self.z_start = None
         self.z_end = None
+
+        self.t_step = None
+        self.t_end = None
 
     def initialize_computational_space(self, **kwargs):
         """Initialize the 3d discretized computational space.
@@ -45,7 +56,7 @@ class NeutronBeam:
         It should be identical (or at least similar) to the computed magnetic field values.
         """
         x_start = kwargs.pop('x_start', 0)
-        x_end = kwargs.pop('x_end', 1)
+        self.x_end = kwargs.pop('x_end', 1)
         self.x_step = kwargs.pop('x_step', 0.1)
 
         self.y_start = kwargs.pop('y_start', 0)
@@ -55,17 +66,23 @@ class NeutronBeam:
 
         yz_step = kwargs.pop('yz_step', 0.1)
 
-        self.x_range = np.arange(x_start, x_end + self.x_step, self.x_step)
+        self.x_range = np.arange(x_start, self.x_end + self.x_step, self.x_step)
         self.y_range = np.arange(self.y_start, self.y_end + yz_step, yz_step)
         self.z_range = np.arange(self.z_start, self.z_end + yz_step, yz_step)
+
+    def initialize_time_evolution_space(self):
+        self.t_step = self.x_step / self.speed
+        self.t_end = self.x_end / self.speed
+
+        print(f'{self.t_step} {self.t_end}')
 
     @abstractmethod
     def create_neutrons(self, number_of_neutrons, polarisation, distribution):
         pass
 
-    def _time_in_field(self, velocity):
+    def _time_in_field(self, speed):
         """Compute the time spent in the field."""
-        return self.x_step / velocity
+        return self.x_step / speed
 
     @staticmethod
     def _omega(b):
@@ -102,16 +119,15 @@ class NeutronBeam:
     def compute_beam(self):
         """Compute the polarisation of the beam along the trajectory."""
 
-        for j in self.x_range:
+        for t_j in np.linspace(0, self.t_end, num=int(self.t_end / self.t_step)):
             for neutron in self.neutrons:
 
                 self.check_neutron_in_beam(neutron)
 
-                time = self._time_in_field(velocity=neutron.speed)
-                # print(j)
-                neutron.set_position_x(j)
+                time = self._time_in_field(speed=neutron.speed)
+
+                neutron.set_position_x(t_j * neutron.speed)
                 neutron.compute_position_yz(time)
-                # print(neutron.position)
 
                 magnetic_field_value = self.get_magnetic_field_value_at_neutron_position(neutron)
 
