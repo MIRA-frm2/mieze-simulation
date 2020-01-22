@@ -90,6 +90,8 @@ speed_min = 3956 / wavelength_max
 speed_max = 3956 / wavelength_min
 speed_std = (speed_max - speed_min) / 4
 
+total_simulation_time = 1  # beamend / speed
+
 
 # Angular distribution
 angular_distribution = 45  # minutes

@@ -21,10 +21,11 @@ cwd = os.getcwd()
 class NeutronBeam:
     """Implements neutrons and its properties."""
 
-    def __init__(self, beamsize, speed):
+    def __init__(self, beamsize, speed, total_simulation_time):
 
         self.beamsize = beamsize
         self.speed = speed
+        self.total_simulation_time = total_simulation_time
 
         self.neutrons = []
         self.number_of_neutrons = None
@@ -37,6 +38,7 @@ class NeutronBeam:
         self.y_range = None
         self.z_range = None
 
+        self.x_start = None
         self.x_end = None
 
         self.x_step = None
@@ -55,7 +57,7 @@ class NeutronBeam:
 
         It should be identical (or at least similar) to the computed magnetic field values.
         """
-        x_start = kwargs.pop('x_start', 0)
+        self.x_start = kwargs.pop('x_start', 0)
         self.x_end = kwargs.pop('x_end', 1)
         self.x_step = kwargs.pop('x_step', 0.1)
 
@@ -66,14 +68,12 @@ class NeutronBeam:
 
         yz_step = kwargs.pop('yz_step', 0.1)
 
-        self.x_range = np.arange(x_start, self.x_end + self.x_step, self.x_step)
+        self.x_range = np.arange(self.x_start, self.x_end + self.x_step, self.x_step)
         self.y_range = np.arange(self.y_start, self.y_end + yz_step, yz_step)
         self.z_range = np.arange(self.z_start, self.z_end + yz_step, yz_step)
 
     def initialize_time_evolution_space(self):
         self.t_step = self.x_step / self.speed
-        self.t_end = self.x_end / self.speed
-
         print(f'{self.t_step} {self.t_end}')
 
     @abstractmethod
@@ -119,7 +119,7 @@ class NeutronBeam:
     def compute_beam(self):
         """Compute the polarisation of the beam along the trajectory."""
 
-        for t_j in np.linspace(0, self.t_end, num=int(self.t_end / self.t_step)):
+        for t_j in np.linspace(0, self.total_simulation_time, num=int(self.total_simulation_time / self.t_step)):
             for neutron in self.neutrons:
 
                 self.check_neutron_in_beam(neutron)
@@ -138,7 +138,12 @@ class NeutronBeam:
 
                 neutron.trajectory.append(neutron.position)
             print(neutron.position)
-            self.polarisation[tuple(neutron.position)] = self.get_pol()
+            # The following handles the case when there are no more neutrons in the beam
+            if self.neutrons:
+                self.polarisation[tuple(neutron.position)] = self.get_pol()
+            else:
+                break
+
 
     def get_magnetic_field_value_at_neutron_position(self, neutron):
         """Returns the magnetic field at the location of the magnetic field.
@@ -155,8 +160,10 @@ class NeutronBeam:
 
     def check_neutron_in_beam(self, neutron):
         """Check if neutron is in the calculated beam profile (y,z plane)"""
-        if not (self.y_start <= neutron.position[1] <= self.y_end) \
-                or not (self.z_start <= neutron.position[2] <= self.z_end):
+        x_condition = self.x_start <= neutron.position[0] <= self.x_end
+        y_condition = self.y_start <= neutron.position[1] <= self.y_end
+        z_condition = self.z_start <= neutron.position[2] <= self.z_end
+        if not x_condition or not y_condition or not z_condition:
             print("removed neutron")
             self.neutrons.remove(neutron)
 

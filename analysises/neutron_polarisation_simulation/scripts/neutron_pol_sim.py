@@ -13,14 +13,14 @@ import numpy as np
 from simulation.beamline.beamline_mieze import MiezeBeamline
 
 from simulation.experiments.mieze.parameters import angular_distribution_in_radians, default_beam_grid, \
-    number_of_neutrons, wavelength_min, wavelength_max, beamsize, speed
+    number_of_neutrons, wavelength_min, wavelength_max, beamsize, speed, total_simulation_time
 
 from utils.helper_functions import save_data_to_file
 
 
 def compute_neutron_beam():
     """Simulate the neutrons trajectories in the beamline."""
-    simulation = MiezeBeamline(beamsize=beamsize, speed=speed)
+    simulation = MiezeBeamline(beamsize=beamsize, speed=speed, total_simulation_time=total_simulation_time)
 
     # Define computational space
     # grid_size = {'x_start': startpoint, 'x_end': beamend, 'x_step': step_x,
