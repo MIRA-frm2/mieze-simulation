@@ -21,13 +21,9 @@ cwd = os.getcwd()
 class NeutronBeam:
     """Implements neutrons and its properties."""
 
-    def __init__(self, beamsize, incrementsize, speed, totalflightlength):
+    def __init__(self):
         self.neutrons = []
         self.number_of_neutrons = None
-        self.speed = speed
-        self.incrementsize = incrementsize
-        self.totalflightlength = totalflightlength
-        self.beamsize = beamsize
 
         self.polarisation = dict()
 
@@ -37,6 +33,7 @@ class NeutronBeam:
         self.y_range = None
         self.z_range = None
 
+        self.x_step = None
         self.y_start = None
         self.y_end = None
         self.z_start = None
@@ -49,7 +46,7 @@ class NeutronBeam:
         """
         x_start = kwargs.pop('x_start', 0)
         x_end = kwargs.pop('x_end', 1)
-        x_step = kwargs.pop('x_step', 0.1)
+        self.x_step = kwargs.pop('x_step', 0.1)
 
         self.y_start = kwargs.pop('y_start', 0)
         self.y_end = kwargs.pop('y_end', 1)
@@ -58,7 +55,7 @@ class NeutronBeam:
 
         yz_step = kwargs.pop('yz_step', 0.1)
 
-        self.x_range = np.arange(x_start, x_end + x_step, x_step)
+        self.x_range = np.arange(x_start, x_end + self.x_step, self.x_step)
         self.y_range = np.arange(self.y_start, self.y_end + yz_step, yz_step)
         self.z_range = np.arange(self.z_start, self.z_end + yz_step, yz_step)
 
@@ -68,7 +65,7 @@ class NeutronBeam:
 
     def _time_in_field(self, velocity):
         """Compute the time spent in the field."""
-        return self.incrementsize / velocity
+        return self.x_step / velocity
 
     @staticmethod
     def _omega(b):

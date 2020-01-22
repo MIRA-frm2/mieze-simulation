@@ -77,7 +77,7 @@ CoilSet_position = SpinFlipper_position1 + R_HSF / 2.0 + WIDTH_CBOX/2
 
 # Beam properties
 beamsize = 0.02
-number_of_neutrons = 1e4
+number_of_neutrons = 1e1
 
 # Neutron wavelength and speed properties
 wavelength = 4.3  # [Angstrom]
