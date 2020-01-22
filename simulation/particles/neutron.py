@@ -54,9 +54,9 @@ class Neutron:
 
     def set_position_x(self, x_val):
         """Set the neutron position."""
-        print(f'Set x position to neutron as : {x_val}')
+        # print(f'Set x position to neutron as : {x_val}')
         self.position = np.array([x_val, self.position[1], self.position[2]])
-        print(f'Neutron position is: {self.position}')
+        # print(f'Neutron position is: {self.position}')
 
     def get_position_x(self):
         """Return the neutron position."""

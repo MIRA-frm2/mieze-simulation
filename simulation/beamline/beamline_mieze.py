@@ -30,9 +30,9 @@ class MiezeBeamline(NeutronBeam):
         Parameters
         ----------
         distribution: boolean, optional
+            # ToDo: Requires more testing!
             If True, then the neutrons are uniformly distributed.
             If False, then the neutrons are not spread and all start at 0.
-            Defaults to True.
         number_of_neutrons: int
             Number of neutrons to be simulated.
         polarisation: np.array
@@ -42,6 +42,8 @@ class MiezeBeamline(NeutronBeam):
         while len(self.neutrons) < number_of_neutrons:
             if distribution:
 
+                # ToDo:
+                # Make sure tha the magnetic field is computed at the computational grid required point.
                 pos_y = random.gauss(0, self.beamsize / 5)
                 pos_z = random.gauss(0, self.beamsize / 5)
 
@@ -61,7 +63,9 @@ class MiezeBeamline(NeutronBeam):
 
                 speed = random.gauss(self.speed, speed_std)
 
-                radial_speed = speed * np.tan(angular_distribution_in_radians)
+                # Todo: Implement radial velocity such that some neutrons are still within the beamline at th end
+                # radial_speed = speed * np.tan(angular_distribution_in_radians)
+                radial_speed = 0
                 phi = get_phi(pos_y, pos_z)
 
                 neutron_velocity = np.array([speed,

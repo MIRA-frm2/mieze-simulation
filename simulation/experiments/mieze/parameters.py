@@ -4,7 +4,7 @@ import numpy as np
 I_real_coil = 10  # [A]
 
 startpoint = 0.000  # [m]
-beamend = 1.0  # [m]  # Positions.get_position_coilA()
+beamend = 1.0  # [m]
 
 npoints = 200
 absolute_x_position = np.linspace(startpoint, beamend, num=npoints)
@@ -77,7 +77,7 @@ CoilSet_position = SpinFlipper_position1 + R_HSF / 2.0 + WIDTH_CBOX/2
 
 # Beam properties
 beamsize = 0.02
-number_of_neutrons = 1000
+number_of_neutrons = 1e4
 
 # Neutron wavelength and speed properties
 wavelength = 4.3  # [Angstrom]

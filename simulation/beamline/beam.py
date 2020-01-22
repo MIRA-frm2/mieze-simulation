@@ -37,6 +37,11 @@ class NeutronBeam:
         self.y_range = None
         self.z_range = None
 
+        self.y_start = None
+        self.y_end = None
+        self.z_start = None
+        self.z_end = None
+
     def initialize_computational_space(self, **kwargs):
         """Initialize the 3d discretized computational space.
 
@@ -46,15 +51,16 @@ class NeutronBeam:
         x_end = kwargs.pop('x_end', 1)
         x_step = kwargs.pop('x_step', 0.1)
 
-        y_start = kwargs.pop('y_start', 0)
-        y_end = kwargs.pop('y_end', 1)
-        z_start = kwargs.pop('z_start', 0)
-        z_end = kwargs.pop('z_end', 1)
+        self.y_start = kwargs.pop('y_start', 0)
+        self.y_end = kwargs.pop('y_end', 1)
+        self.z_start = kwargs.pop('z_start', 0)
+        self.z_end = kwargs.pop('z_end', 1)
+
         yz_step = kwargs.pop('yz_step', 0.1)
 
         self.x_range = np.arange(x_start, x_end + x_step, x_step)
-        self.y_range = np.arange(y_start, y_end + yz_step, yz_step)
-        self.z_range = np.arange(z_start, z_end + yz_step, yz_step)
+        self.y_range = np.arange(self.y_start, self.y_end + yz_step, yz_step)
+        self.z_range = np.arange(self.z_start, self.z_end + yz_step, yz_step)
 
     @abstractmethod
     def create_neutrons(self, number_of_neutrons, polarisation, distribution):
@@ -102,7 +108,7 @@ class NeutronBeam:
         for j in self.x_range:
             for neutron in self.neutrons:
 
-                # self.check_neutron_in_beam(neutron)
+                self.check_neutron_in_beam(neutron)
 
                 time = self._time_in_field(velocity=neutron.speed)
                 # print(j)
@@ -110,34 +116,56 @@ class NeutronBeam:
                 neutron.compute_position_yz(time)
                 # print(neutron.position)
 
+                magnetic_field_value = self.get_magnetic_field_value_at_neutron_position(neutron)
+
                 neutron.polarisation = self._polarisation_change(
                     neutron,
-                    self.b_map[(find_nearest(self.x_range, neutron.position[0], index=False),
-                                find_nearest(self.y_range, neutron.position[1], index=False),
-                                find_nearest(self.z_range, neutron.position[2], index=False),
-                                )],
+                    magnetic_field_value,
                     time)
 
                 neutron.trajectory.append(neutron.position)
+            print(neutron.position)
+            self.polarisation[tuple(neutron.position)] = self.get_pol()
 
-            self.polarisation[tuple(self.get_neutron_position())] = self.get_pol()
+    def get_magnetic_field_value_at_neutron_position(self, neutron):
+        """Returns the magnetic field at the location of the magnetic field.
 
-            # print(self.get_pol())
-            print(self.neutrons[0].trajectory)
+        Handles the case when the magnetic field does not contain a value at the required point.
+        """
+        try:
+            return self.b_map[(find_nearest(self.x_range, neutron.position[0], index=False),
+                               find_nearest(self.y_range, neutron.position[1], index=False),
+                               find_nearest(self.z_range, neutron.position[2], index=False))]
+        except KeyError:
+            raise Exception(f'Could not find the magnetic field at the neutron position: {neutron.position}\n'
+                            f'It is most probable that the magnetic field needs to be reevaluated.')
 
     def check_neutron_in_beam(self, neutron):
-        """Check if it is in the calculated beam profile (y,z plane)"""
-        # if not (neutron.position[0], neutron.position[1], neutron.position[2]) in self.b_map:
-        #     self.neutrons.remove(neutron)
-        pass
+        """Check if neutron is in the calculated beam profile (y,z plane)"""
+        if not (self.y_start <= neutron.position[1] <= self.y_end) \
+                or not (self.z_start <= neutron.position[2] <= self.z_end):
+            print("removed neutron")
+            self.neutrons.remove(neutron)
 
     def get_pol(self):
         """Get the average polarisation for the beam."""
-        xpol = np.average([neutron.polarisation[0] for neutron in self.neutrons])
-        ypol = np.average([neutron.polarisation[1] for neutron in self.neutrons])
-        zpol = np.average([neutron.polarisation[2] for neutron in self.neutrons])
+        # print([neutron.polarisation for neutron in self.neutrons])
+        pol_x, pol_y, pol_z = 0, 0, 0
+        n = len(self.neutrons)
+        for neutron in self.neutrons:
+            pol_x += neutron.polarisation[0]
+            pol_y += neutron.polarisation[1]
+            pol_z += neutron.polarisation[2]
+        pol_x /= n
+        pol_y /= n
+        pol_z /= n
 
-        return xpol, ypol, zpol
+        # ToDo: compare which method is more computationally efficient
+        # pol_x = np.average([neutron.polarisation[0] for neutron in self.neutrons])
+        # pol_y = np.average([neutron.polarisation[1] for neutron in self.neutrons])
+        # pol_z = np.average([neutron.polarisation[2] for neutron in self.neutrons])
+
+        return pol_x, pol_y, pol_z
 
     def reset_pol(self):
         """Reset the polarisation for each neutron to the initial polarisation."""
