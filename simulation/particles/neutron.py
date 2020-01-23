@@ -58,6 +58,16 @@ class Neutron:
         self.position = np.array([x_val, self.position[1], self.position[2]])
         # print(f'Neutron position is: {self.position}')
 
+    def update_position(self, time_increment):
+        """Update the neutron position.
+
+        Parameters
+        ----------
+        time_increment: float
+            Time increment for the simulation.
+        """
+        self.position += np.array([time_increment * self.speed, 0, 0])
+
     def get_position_x(self):
         """Return the neutron position."""
         return self.position[0]

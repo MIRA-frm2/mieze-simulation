@@ -11,7 +11,7 @@
 import numpy as np
 import os
 from abc import abstractmethod
-
+from copy import deepcopy
 from utils.helper_functions import load_obj, find_nearest, rotate
 
 
@@ -78,6 +78,7 @@ class NeutronBeam:
 
     @abstractmethod
     def create_neutrons(self, number_of_neutrons, polarisation, distribution):
+        """Abstact method. Neutrons are created for each beamline setup differently."""
         pass
 
     def _time_in_field(self, speed):
@@ -112,7 +113,7 @@ class NeutronBeam:
         phi = self._precession_angle(time, b)
         return rotate(vector=neutron.polarisation, phi=phi, axis=b)
 
-    def compute_beam(self, t_j):
+    def compute_beam(self):
         """Compute the polarisation of the beam along the trajectory."""
 
         for neutron in self.neutrons:
@@ -121,31 +122,49 @@ class NeutronBeam:
 
             time = self._time_in_field(speed=neutron.speed)
 
-            neutron.set_position_x(t_j * neutron.speed)
+            neutron.update_position(self.t_step)
             neutron.compute_position_yz(time)
 
-            magnetic_field_value = self.get_magnetic_field(neutron.position, time)
-
-            neutron.polarisation = self._polarisation_change(
-                neutron,
-                magnetic_field_value,
-                time)
+            magnetic_field_value = self.get_magnetic_field(neutron.position)
+            neutron.polarisation = self._polarisation_change(neutron, magnetic_field_value, time)
 
             neutron.trajectory.append(neutron.position)
 
-            # The following handles the case when there are no more neutrons in the beam
-            if self.neutrons:
-                self.polarisation[tuple(neutron.position)] = self.get_pol()
-            else:
-                break
+    def compute_average_polarisation(self):
+        """Compute the polarisation for the entire setup."""
+        neutron_list = deepcopy(self.neutrons)
+        for position_x in self.x_range:
+            neutrons_in_cell = 0
 
-    def get_magnetic_field(self, neutron_position, time):
+            for neutron in neutron_list:
+                # Check whether the neutron is in the cell, defined from the left edge
+                if neutron.position[0] < position_x:
+                    continue
+                # neutron can be in only one cell, so once it is past the cell, exit loop
+                elif neutron.position[0] >= position_x + self.x_step:
+                    break
+                else:
+                    if neutrons_in_cell == 0:
+                        self.polarisation[position_x, 0, 0] = neutron.polarisation
+                    else:
+                        self.polarisation[position_x, 0, 0] += neutron.polarisation
+
+                    neutrons_in_cell += 1
+
+                    # Do this to increase speed
+                    neutron_list.remove(neutron)
+
+            # Compute the polarisation only if at least one neutron is in the respective cell.
+            if neutrons_in_cell:
+                # print(f'neutrons in cell: {neutrons_in_cell}')
+                self.polarisation[position_x, 0, 0] /= neutrons_in_cell
+
+    def get_magnetic_field(self, neutron_position):
         """Return the magnetic field at the specified position and time instance.
 
         Parameters
         ----------
         neutron_position: ndarray
-        time: float
 
         Returns
         -------
@@ -153,7 +172,7 @@ class NeutronBeam:
         """
         return self.get_magnetic_field_value_at_neutron_position(neutron_position)
 
-    def load_magnetic_field(self, time, data_file_at_time_instance=f'../../data/data_magnetic_field', b_map=None):
+    def load_magnetic_field(self, data_file_at_time_instance=f'../../data/data_magnetic_field', b_map=None):
         """Load the magnetic field data."""
         if b_map:
             self.b_map = b_map

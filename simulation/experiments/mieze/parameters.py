@@ -6,7 +6,7 @@ I_real_coil = 10  # [A]
 startpoint = 0.000  # [m]
 beamend = 1.0  # [m]
 
-npoints = 1000
+npoints = 100
 absolute_x_position = np.linspace(startpoint, beamend, num=npoints)
 step_x = (absolute_x_position[1] - absolute_x_position[0])
 
@@ -75,9 +75,11 @@ COIL_B = COIL_A + L1
 distance_between_HSF1_coilset = 0.0
 CoilSet_position = SpinFlipper_position1 + R_HSF / 2.0 + WIDTH_CBOX/2
 
+
 # Beam properties
 beamsize = 0.02
 number_of_neutrons = 1
+
 
 # Neutron wavelength and speed properties
 wavelength = 4.3  # [Angstrom]
@@ -97,6 +99,12 @@ x = c * np.random.rand()
 z = np.sqrt(c ** 2 - x ** 2)
 
 initial_polarisation = np.array([x, 0.95, z])
+
+BEAM_PROPERTIES = {
+    'beamsize': beamsize,
+    'number_of_neutrons': number_of_neutrons,
+    'speed': speed
+}
 
 
 # Angular distribution

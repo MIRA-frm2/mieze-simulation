@@ -143,6 +143,20 @@ class Setup:
                     for k in self.b.keys():
                         self.b[k] += b[k]
 
+    def calculate_varying_magnetic_field(self):
+        """Calculate the varying RF magnetic field at each grid position."""
+        for position in self.b.keys():
+            self.b[position] += self.compute_rf_field(position)
+
+    def compute_rf_field(self, position):
+        """Compute the RF magnetic field for the required position.
+
+        Parameters
+        ----------
+        position: ndarray
+        """
+        return np.array([0, 0, 0])
+
     def b_field_point(self, r: '(x, y, z)'):
         """Compute magnetic field."""
 

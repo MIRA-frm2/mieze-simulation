@@ -38,8 +38,8 @@ class MiezeBeamline(NeutronBeam):
         polarisation: np.array
             The initial polarisation of neutrons.
         """
-
-        while len(self.neutrons) < number_of_neutrons:
+        created_neutrons = 0
+        while created_neutrons < number_of_neutrons:
             if distribution:
 
                 # ToDo:
@@ -73,13 +73,15 @@ class MiezeBeamline(NeutronBeam):
                                              radial_speed * np.sin(phi)])
 
             else:
-                pos_y = 0
-                pos_z = 0
+                pos_y = 0.
+                pos_z = 0.
 
                 neutron_velocity = np.array([self.speed, 0, 0])
 
-            position = np.asarray([0, pos_y, pos_z])
+            position = np.asarray([0., pos_y, pos_z])
 
             neutron = Neutron(polarisation=polarisation, position=position, velocity=neutron_velocity)
 
             self.neutrons.append(neutron)
+
+            created_neutrons += 1
