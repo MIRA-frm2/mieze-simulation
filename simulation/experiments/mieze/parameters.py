@@ -90,7 +90,13 @@ speed_min = 3956 / wavelength_max
 speed_max = 3956 / wavelength_min
 speed_std = (speed_max - speed_min) / 4
 
-total_simulation_time = 1  # beamend / speed
+total_simulation_time = beamend / speed
+
+c = 0.31225  # sqrt(1-polarisierung²)
+x = c * np.random.rand()
+z = np.sqrt(c ** 2 - x ** 2)
+
+initial_polarisation = np.array([x, 0.95, z])
 
 
 # Angular distribution

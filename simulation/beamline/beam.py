@@ -73,8 +73,8 @@ class NeutronBeam:
         self.z_range = np.arange(self.z_start, self.z_end + yz_step, yz_step)
 
     def initialize_time_evolution_space(self):
+        """Set the time variables."""
         self.t_step = self.x_step / self.speed
-        print(f'{self.t_step} {self.t_end}')
 
     @abstractmethod
     def create_neutrons(self, number_of_neutrons, polarisation, distribution):
@@ -112,50 +112,65 @@ class NeutronBeam:
         phi = self._precession_angle(time, b)
         return rotate(vector=neutron.polarisation, phi=phi, axis=b)
 
-    def load_magnetic_field(self):
-        """Load the magnetic field data."""
-        self.b_map = load_obj('../../data/data_magnetic_field')
-
-    def compute_beam(self):
+    def compute_beam(self, t_j):
         """Compute the polarisation of the beam along the trajectory."""
 
-        for t_j in np.linspace(0, self.total_simulation_time, num=int(self.total_simulation_time / self.t_step)):
-            for neutron in self.neutrons:
+        for neutron in self.neutrons:
 
-                self.check_neutron_in_beam(neutron)
+            self.check_neutron_in_beam(neutron)
 
-                time = self._time_in_field(speed=neutron.speed)
+            time = self._time_in_field(speed=neutron.speed)
 
-                neutron.set_position_x(t_j * neutron.speed)
-                neutron.compute_position_yz(time)
+            neutron.set_position_x(t_j * neutron.speed)
+            neutron.compute_position_yz(time)
 
-                magnetic_field_value = self.get_magnetic_field_value_at_neutron_position(neutron)
+            magnetic_field_value = self.get_magnetic_field(neutron.position, time)
 
-                neutron.polarisation = self._polarisation_change(
-                    neutron,
-                    magnetic_field_value,
-                    time)
+            neutron.polarisation = self._polarisation_change(
+                neutron,
+                magnetic_field_value,
+                time)
 
-                neutron.trajectory.append(neutron.position)
-            print(neutron.position)
+            neutron.trajectory.append(neutron.position)
+
             # The following handles the case when there are no more neutrons in the beam
             if self.neutrons:
                 self.polarisation[tuple(neutron.position)] = self.get_pol()
             else:
                 break
 
+    def get_magnetic_field(self, neutron_position, time):
+        """Return the magnetic field at the specified position and time instance.
 
-    def get_magnetic_field_value_at_neutron_position(self, neutron):
+        Parameters
+        ----------
+        neutron_position: ndarray
+        time: float
+
+        Returns
+        -------
+        out: ndarray
+        """
+        return self.get_magnetic_field_value_at_neutron_position(neutron_position)
+
+    def load_magnetic_field(self, time, data_file_at_time_instance=f'../../data/data_magnetic_field', b_map=None):
+        """Load the magnetic field data."""
+        if b_map:
+            self.b_map = b_map
+        elif data_file_at_time_instance:
+            self.b_map = load_obj(data_file_at_time_instance)
+
+    def get_magnetic_field_value_at_neutron_position(self, neutron_position):
         """Returns the magnetic field at the location of the magnetic field.
 
         Handles the case when the magnetic field does not contain a value at the required point.
         """
         try:
-            return self.b_map[(find_nearest(self.x_range, neutron.position[0], index=False),
-                               find_nearest(self.y_range, neutron.position[1], index=False),
-                               find_nearest(self.z_range, neutron.position[2], index=False))]
+            return self.b_map[(find_nearest(self.x_range, neutron_position[0], index=False),
+                               find_nearest(self.y_range, neutron_position[1], index=False),
+                               find_nearest(self.z_range, neutron_position[2], index=False))]
         except KeyError:
-            raise Exception(f'Could not find the magnetic field at the neutron position: {neutron.position}\n'
+            raise Exception(f'Could not find the magnetic field at the neutron position: {neutron_position}\n'
                             f'It is most probable that the magnetic field needs to be reevaluated.')
 
     def check_neutron_in_beam(self, neutron):

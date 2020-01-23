@@ -11,27 +11,45 @@
 
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import axes3d, Axes3D  # <-- Note the capitalization!
+import numpy as np
 
 from utils.helper_functions import read_data_from_file
 
 
-def plot_polarisation_vector(polarisation_data='../../data/data_polarisation.csv', **kwargs):
+def plot_polarisation_vector(polarisation_data=None, polarisation_data_file='../../data/data_polarisation.csv', **kwargs):
     """Plot the polarisation vector along the beamline trajectory."""
-    x_range, y_range, z_range, px, py, pz = read_data_from_file(polarisation_data)
 
     # 3d figure
     fig = plt.figure()
     ax = fig.gca(projection='3d')
 
-    # Plot the magnetic field
-    ax.quiver(x_range, y_range, z_range,
-              px, py, pz,
-              color='g', **kwargs)
-
     plt.xlabel('x')
     plt.ylabel('y')
 
-    plt.show()
+    # Plot the magnetic field
+    if polarisation_data:
+        for keys, values in polarisation_data.items():
+            ax.quiver(keys[0], keys[1], keys[2],
+                      values[0], values[1], values[2],
+                      color='g', **kwargs)
+
+
+        # Used to return the plot as an image rray
+        fig.canvas.draw()       # draw the canvas, cache the renderer
+        image = np.frombuffer(fig.canvas.tostring_rgb(), dtype='uint8')
+        image = image.reshape(fig.canvas.get_width_height()[::-1] + (3,))
+
+        plt.close(fig)
+
+        return image
+
+    elif polarisation_data_file:
+        x_range, y_range, z_range, px, py, pz = read_data_from_file(polarisation_data)
+        ax.quiver(x_range, y_range, z_range,
+                  px, py, pz,
+                  color='g', **kwargs)
+        plt.show()
+
 
 
 def plot_neutron_trajectories(simulation):

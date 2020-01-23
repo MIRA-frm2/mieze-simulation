@@ -10,7 +10,7 @@
 
 import matplotlib.pyplot as plt
 
-from simulation.experiments.mieze.main_mieze import main_mieze
+from simulation.experiments.mieze.main_mieze import compute_magnetic_field_mieze
 from analysises.adiabatic_check.scripts.adiabatic_check import MyPlotter
 
 from utils.helper_functions import convert_between_m_and_cm
@@ -24,7 +24,7 @@ def find_relative_distance(iteration_values):
     for val in iteration_values:
         data_file = f'./data/test_data_{int(val*100)}.csv'
 
-        main_mieze(filename=data_file, spin_flipper_distance=val)
+        compute_magnetic_field_mieze(filename=data_file, spin_flipper_distance=val)
 
         # Using the existing Plotter class, read values and compute values
         plottter = MyPlotter(data_file=data_file)

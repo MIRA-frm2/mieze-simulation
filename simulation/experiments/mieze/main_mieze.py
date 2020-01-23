@@ -59,13 +59,15 @@ class Mieze(Setup):
                             name='CoilSet',
                             position=CoilSet_position + self.coil_set_distance)
 
+        self.update_metadata()
 
-def main_mieze(grid_size=default_beam_grid,
-               coil_set_distance=ELEMENTS_POSITIONS_RELATIVE["coil_set_distance"],
-               spin_flipper_distance=ELEMENTS_POSITIONS_RELATIVE["spin_flipper_distance"],
-               filename='data/data_magnetic_field',
-               save_individual_data_sets=False):
 
+
+def compute_magnetic_field_mieze(grid_size=default_beam_grid,
+                                 coil_set_distance=ELEMENTS_POSITIONS_RELATIVE["coil_set_distance"],
+                                 spin_flipper_distance=ELEMENTS_POSITIONS_RELATIVE["spin_flipper_distance"],
+                                 filename='data/data_magnetic_field',
+                                 save_individual_data_sets=False):
 
 
     # Initialize an object from the MIEZE class
@@ -76,7 +78,6 @@ def main_mieze(grid_size=default_beam_grid,
 
     # Create the components of the beamline with their parameters
     experiment.create_setup()
-    experiment.update_metadata()
 
     # Initialize the computational space (grid) and compute the magnetic field for it
     experiment.initialize_computational_space(**grid_size)

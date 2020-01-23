@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-from simulation.experiments.mieze.main_mieze import main_mieze
+from simulation.experiments.mieze.main_mieze import compute_magnetic_field_mieze
 from simulation.experiments.mieze.parameters import HelmholtzSpinFlipper_position_HSF1, WIDTH_CBOX
 
 from utils.helper_functions import read_data_from_file, find_nearest
@@ -57,7 +57,7 @@ def find_relative_distance_coilset_sf(iteration_values):
     for val in iteration_values:
         data_file = f'./data/test_data_{int(val*100)}.csv'
 
-        main_mieze(filename=data_file, coil_set_distance=val)
+        compute_magnetic_field_mieze(filename=data_file, coil_set_distance=val)
 
         # Using the existing Plotter class, read values and compute values
         plotter = MyPlotter(data_file=data_file)

@@ -30,9 +30,6 @@ def compute_neutron_beam():
     simulation.initialize_computational_space(**grid_size)
     simulation.initialize_time_evolution_space()
 
-    # Load magnetic field values
-    simulation.load_magnetic_field()
-
     # Initialize the neutrons and set their polarisation
     c = 0.31225  # sqrt(1-polarisierung²)
     x = c * np.random.rand()
