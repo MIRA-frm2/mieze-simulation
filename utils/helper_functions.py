@@ -258,7 +258,27 @@ def unit_square(x_min, x_max, grid):
 
 
 def rotate(vector, phi, axis):
-    """Rotate the vector with an angle phi with respect to the axis."""
+    """Rotate the vector with an angle phi with respect to the axis.
+
+    Parameters
+    ----------
+    vector: ndarray, list
+        Vector to be rotated.
+    phi: float
+        Angle to be rotate by, in radians, e.g. a rotation of np.pi/2 corresponds to 90 degrees.
+    axis: np.array, list
+        Axis to be rotated from.
+
+    Returns
+    -------
+    out: ndarray
+        Rotated vector by phi with respect to axis.
+
+    >>> rotate([1, 0, 0], np.pi/2, [0, 1, 0])
+    array([ 6.123234e-17,  0.000000e+00, -1.000000e+00])
+    >>> rotate([1, 0, 0], np.pi, [0, 1, 0])
+    array([-1.0000000e+00,  0.0000000e+00, -1.2246468e-16])
+    """
     n = axis / np.linalg.norm(axis)
     c = np.cos(phi)
     s = np.sin(phi)

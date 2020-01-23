@@ -6,7 +6,7 @@ I_real_coil = 10  # [A]
 startpoint = 0.000  # [m]
 beamend = 1.0  # [m]
 
-npoints = 200
+npoints = 1000
 absolute_x_position = np.linspace(startpoint, beamend, num=npoints)
 step_x = (absolute_x_position[1] - absolute_x_position[0])
 
