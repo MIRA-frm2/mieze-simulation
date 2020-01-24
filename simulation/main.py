@@ -33,7 +33,7 @@ def main():
 
     # Initialize the computational space (grid) and compute the magnetic field for it
     experiment.initialize_computational_space(**default_beam_grid)
-    experiment.calculate_b_field()
+    experiment.calculate_static_b_field()
 
     # Initialize the neutron beam
     simulation = MiezeBeamline(beamsize=BEAM_PROPERTIES['beamsize'],
@@ -45,16 +45,18 @@ def main():
 
     # Simulate the actual beam trajectory and the polarisation thereof
     images = list()
-    for t_j in np.linspace(0, simulation.total_simulation_time,
-                           num=int(simulation.total_simulation_time / simulation.t_step)):
+    time_factor = 2
+    for t_j in np.linspace(0, time_factor * simulation.total_simulation_time,
+                           num=time_factor * int(simulation.total_simulation_time / simulation.t_step)):
         # Show progress
         print(int(t_j/simulation.t_step))
 
         # Compute varying magnetic field
+        experiment.calculate_varying_magnetic_field(t_j)
         simulation.load_magnetic_field(b_map=experiment.b)
-        experiment.calculate_varying_magnetic_field()
+        # print(f'b:{experiment.b}')
 
-        # Initialize the neutrons and set their polarisation
+        # Create neutrons at each time step for the neutron beam
         simulation.create_neutrons(number_of_neutrons=number_of_neutrons, distribution=False,
                                    polarisation=initial_polarisation)
 
@@ -67,9 +69,11 @@ def main():
 
         # Compute the average polarisation, at a fixed location (and time)
         simulation.compute_average_polarisation()
+        # print(f'pol:{simulation.polarisation}')
 
         # Add image
-        images.append(plot_polarisation_vector(simulation.polarisation, normalize=True, length=0.025))
+        if simulation.polarisation:
+            images.append(plot_polarisation_vector(simulation.polarisation, time=t_j, normalize=True, length=0.025))
 
     # Put all images together
     imageio.mimsave('./test.gif', images, fps=10)

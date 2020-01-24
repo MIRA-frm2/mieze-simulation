@@ -27,7 +27,8 @@ class Setup:
     """Class that simulates a physical setup."""
     def __init__(self, consider_earth_field=False, save_individual_data_sets=False):
         self.elements = []
-        self.b = None
+        self.b = dict()
+        self.b_static = dict()
         self.b_cartesian = None
 
         self.setup_changed = False
@@ -108,7 +109,7 @@ class Setup:
         self.y_range = np.arange(y_start, y_end + yz_step, yz_step)
         self.z_range = np.arange(z_start, z_end + yz_step, yz_step)
 
-    def calculate_b_field(self, point=None):
+    def calculate_static_b_field(self, point=None):
         """Calculate the magnetic field."""
         if point:
 
@@ -119,42 +120,54 @@ class Setup:
             logger.error(f'{len(positions)} calculations')
             logger.info('calculate')
 
-            self.b = dict()
+            self.b_static = dict()
 
-            i = 0
-            for element in self.elements:
+            if self.elements:
+                i = 0
+                for element in self.elements:
+                    result = list()
+                    # with Pool(4) as p:
+                    #     result = p.map(element.b_field, positions)
+                    for value in positions:
+                        result.append(element.b_field(value))
+
+                    b = dict(zip(positions, result))
+
+                    print(f'calculation for element {element.name} finished')
+
+                    if self.save_individual_data_sets:
+                        save_data_to_file(b, file_name=f'data/elements_magnetic_fields/data_magnetic_field_{element.name}')
+
+                    if i == 0:
+                        self.b_static = b.copy()
+                        i += 1
+                    else:
+                        for k in self.b_static.keys():
+                            self.b_static[k] += b[k]
+            else:
                 result = list()
-                # with Pool(4) as p:
-                #     result = p.map(element.b_field, positions)
                 for value in positions:
-                    result.append(element.b_field(value))
+                    result.append([0, 0, 0])
+                self.b_static = dict(zip(positions, result))
 
-                b = dict(zip(positions, result))
-
-                print(f'calculation for element {element.name} finished')
-
-                if self.save_individual_data_sets:
-                    save_data_to_file(b, file_name=f'data/elements_magnetic_fields/data_magnetic_field_{element.name}')
-
-                if i == 0:
-                    self.b = b.copy()
-                    i += 1
-                else:
-                    for k in self.b.keys():
-                        self.b[k] += b[k]
-
-    def calculate_varying_magnetic_field(self):
+    def calculate_varying_magnetic_field(self, t_j):
         """Calculate the varying RF magnetic field at each grid position."""
-        for position in self.b.keys():
-            self.b[position] += self.compute_rf_field(position)
+        for position in self.b_static.keys():
+            self.b[position] = self.b_static[position] + self.compute_rf_field(position, t_j)
 
-    def compute_rf_field(self, position):
+    def compute_rf_field(self, position, t_j):
         """Compute the RF magnetic field for the required position.
 
         Parameters
         ----------
         position: ndarray
         """
+        # Mock a magnetic field for testing purposes.
+        # if t_j:
+        #     varying_magnetic_field = np.array(position) * (t_j * 1000)
+        #     return varying_magnetic_field
+        # else:
+        #     return np.array(position)
         return np.array([0, 0, 0])
 
     def b_field_point(self, r: '(x, y, z)'):
@@ -173,9 +186,9 @@ class Setup:
 
     def get_b_vec(self):
         """Returns the magnetic field as a vector."""
-        bx = [self.b[x, 0, 0][0] for x in self.x_range]
-        by = [self.b[x, 0, 0][1] for x in self.x_range]
-        bz = [self.b[x, 0, 0][2] for x in self.x_range]
+        bx = [self.b_static[x, 0, 0][0] for x in self.x_range]
+        by = [self.b_static[x, 0, 0][1] for x in self.x_range]
+        bz = [self.b_static[x, 0, 0][2] for x in self.x_range]
         return bx, by, bz
 
     def _get_plane_position(self, component, plane_position):
@@ -204,7 +217,7 @@ class Setup:
             return b[:, :, plane_idx]
 
     def _get_b_field_values(self):
-        return np.array([[[self.b[(x, y, z)] for z in self.z_range]
+        return np.array([[[self.b_static[(x, y, z)] for z in self.z_range]
                         for y in self.y_range] for x in self.x_range])
 
     def get_magnetic_field_value(self, component, plane_position):
@@ -253,7 +266,7 @@ class Setup:
         plot_x_values = list()
         plot_y_values = list()
 
-        for point, b_field in self.b.items():
+        for point, b_field in self.b_static.items():
             x_value = point[0]
             if x_value not in plot_x_values:
                 plot_x_values.append(x_value)
@@ -292,7 +305,7 @@ class Setup:
 
             ax = fig.add_subplot(111, projection='3d')
 
-            for point, b_field in self.b.items():
+            for point, b_field in self.b_static.items():
                 ax.quiver(point[0], point[1], point[2],
                           b_field[0], b_field[1], b_field[2],
                           # pivot='tip', length=vlength, arrow_length_ratio=0.3/vlength
@@ -309,7 +322,7 @@ class Setup:
         elif _type == '2d':
             xi, yi = np.meshgrid(self.x_range, 0, indexing='ij')
             for x in self.x_range:
-                v = self.b[x, 0, 0]
+                v = self.b_static[x, 0, 0]
                 print(v)
                 # plt.axes([0.065, 0.065, 0.9, 0.9])
                 plt.quiver(xi, yi, v[0], v[2], alpha=.5)
@@ -326,10 +339,10 @@ class Setup:
         plt.show()
 
     def get_2d_vec_plot_data(self):
-        by = np.array([[[self.b[(x, y, z)][0] for z in self.z_range]
+        by = np.array([[[self.b_static[(x, y, z)][0] for z in self.z_range]
                        for y in self.y_range] for x in self.x_range])[:, 0]
 
-        bz = np.array([[[self.b[(x, y, z)][1] for z in self.z_range]
+        bz = np.array([[[self.b_static[(x, y, z)][1] for z in self.z_range]
                        for y in self.y_range] for x in self.x_range])[:, :, 0]
         return by, bz
 
@@ -358,6 +371,6 @@ class Setup:
 
     def save_total_data_to_file(self, filename):
         """Save the computed field data and its metadata to two separate files."""
-        save_data_to_file(self.b, file_name=filename)
+        save_data_to_file(self.b_static, file_name=filename)
         save_metadata_to_file(metadata=self.meta_data, filename=filename)
-        save_obj(self.b, filename)
+        save_obj(self.b_static, filename)

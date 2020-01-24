@@ -279,18 +279,22 @@ def rotate(vector, phi, axis):
     >>> rotate([1, 0, 0], np.pi, [0, 1, 0])
     array([-1.0000000e+00,  0.0000000e+00, -1.2246468e-16])
     """
-    n = axis / np.linalg.norm(axis)
-    c = np.cos(phi)
-    s = np.sin(phi)
+    norm = np.linalg.norm(axis)
+    if norm:
+        n = axis / norm
+        c = np.cos(phi)
+        s = np.sin(phi)
 
-    n1 = n[0]
-    n2 = n[1]
-    n3 = n[2]
+        n1 = n[0]
+        n2 = n[1]
+        n3 = n[2]
 
-    r = [[n1 ** 2 * (1 - c) + c, n1 * n2 * (1 - c) - n3 * s, n1 * n3 * (1 - c) + n2 * s],
-         [n2 * n1 * (1 - c) + n3 * s, n2 ** 2 * (1 - c) + c, n2 * n3 * (1 - c) - n1 * s],
-         [n3 * n1 * (1 - c) - n2 * s, n3 * n2 * (1 - c) + n1 * s, n3 ** 2 * (1 - c) + c]]
-    return np.dot(r, vector)
+        r = [[n1 ** 2 * (1 - c) + c, n1 * n2 * (1 - c) - n3 * s, n1 * n3 * (1 - c) + n2 * s],
+             [n2 * n1 * (1 - c) + n3 * s, n2 ** 2 * (1 - c) + c, n2 * n3 * (1 - c) - n1 * s],
+             [n3 * n1 * (1 - c) - n2 * s, n3 * n2 * (1 - c) + n1 * s, n3 ** 2 * (1 - c) + c]]
+        return np.dot(r, vector)
+    else:
+        return vector
 
 
 def save_data_to_file(data, file_name, extension='.csv'):

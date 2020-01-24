@@ -72,7 +72,7 @@ class Neutron:
         """Return the neutron position."""
         return self.position[0]
 
-    def compute_position_yz(self, time):
+    def update_position_yz(self, time):
         """Compute the position on the yz axes, based on the time spent in the cell on x axis.
 
         Parameters

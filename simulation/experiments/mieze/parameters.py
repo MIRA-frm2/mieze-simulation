@@ -1,3 +1,13 @@
+# -*- coding: utf-8 -*-
+#
+# This file is part of MIEZE simulation.
+# Copyright (C) 2019 TUM FRM2 E21 Research Group.
+#
+# This is free software; you can redistribute it and/or modify it
+# under the terms of the MIT License; see LICENSE file for more details.
+
+"""Parameters for the neutron beam simulatoin for the MIEZE setup."""
+
 import numpy as np
 
 # Variables are stored as tuples with numerical value and units
@@ -6,7 +16,7 @@ I_real_coil = 10  # [A]
 startpoint = 0.000  # [m]
 beamend = 1.0  # [m]
 
-npoints = 100
+npoints = 500
 absolute_x_position = np.linspace(startpoint, beamend, num=npoints)
 step_x = (absolute_x_position[1] - absolute_x_position[0])
 

@@ -10,20 +10,23 @@
 
 
 import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import axes3d, Axes3D  # <-- Note the capitalization!
+# Needed implicitly for the 3d plots, although not explicitly used
+from mpl_toolkits.mplot3d import axes3d, Axes3D
 import numpy as np
 
 from utils.helper_functions import read_data_from_file
 
 
-def plot_polarisation_vector(polarisation_data=None, polarisation_data_file='../../data/data_polarisation.csv', **kwargs):
+def plot_polarisation_vector(polarisation_data=None, time=None,
+                             polarisation_data_file='../../data/data_polarisation.csv', **kwargs):
     """Plot the polarisation vector along the beamline trajectory."""
 
     # 3d figure
     fig = plt.figure()
     ax = fig.gca(projection='3d')
 
-    plt.xlabel('x')
+    plt.title(f'Time: {time}')
+    plt.xlabel('x [m]')
     plt.ylabel('y')
 
     # Plot the magnetic field
@@ -32,7 +35,6 @@ def plot_polarisation_vector(polarisation_data=None, polarisation_data_file='../
             ax.quiver(keys[0], keys[1], keys[2],
                       values[0], values[1], values[2],
                       color='g', **kwargs)
-
 
         # Used to return the plot as an image rray
         fig.canvas.draw()       # draw the canvas, cache the renderer
@@ -49,7 +51,6 @@ def plot_polarisation_vector(polarisation_data=None, polarisation_data_file='../
                   px, py, pz,
                   color='g', **kwargs)
         plt.show()
-
 
 
 def plot_neutron_trajectories(simulation):

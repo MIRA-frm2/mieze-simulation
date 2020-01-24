@@ -10,10 +10,10 @@ def compute_bfield(params):
     setup.create_element(**params['element_kwargs'])
 
     setup.initialize_computational_space(**params['grid_size'])
-    setup.calculate_b_field()
+    setup.calculate_static_b_field()
 
-    save_data_to_file(setup.b, '../data/data')
-    save_obj(setup.b, '../data/data')
+    save_data_to_file(setup.b_static, '../data/data')
+    save_obj(setup.b_static, '../data/data')
 
 
 if __name__ == "__main__":
