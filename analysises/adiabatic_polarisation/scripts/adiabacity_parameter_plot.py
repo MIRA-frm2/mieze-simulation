@@ -11,11 +11,12 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-from simulation.experiments.mieze.parameters import step_x, neutron_speed
+from simulation.experiments.mieze.parameters import neutron_speed, absolute_x_position, step_x
+from simulation.particles.neutron import Neutron
 
 from analysises.adiabatic_check.scripts.adiabatic_check import get_b_field_magnitude
 
-from utils.helper_functions import read_data_from_file, convert_between_m_and_cm
+from utils.helper_functions import convert_between_m_and_cm, rotate
 
 
 def compute_dtheta_dy(bx, by):
@@ -48,63 +49,115 @@ def compute_adiabatic_parameter_e(b_field, d_theta):
     -------
     out: float, ndarray
     """
-    gyromagnetic_ratio = - 1.8324717143e8  # [rad/(s *T)]
+    gyromagnetic_ratio = - 1.8324717143e8  # [rad/(s * T)]
+    conversion_factor_radian_to_degrees = 180 / np.pi
     conversion_factor_angstrom_to_m = 1e10
     conversion_factor_cm_to_m = 1e2
 
-    amplification_factor = 100
+    amplification_factor = 200
 
-    prefactor = - gyromagnetic_ratio / (neutron_speed * conversion_factor_angstrom_to_m / conversion_factor_cm_to_m)
+    prefactor = - (gyromagnetic_ratio * conversion_factor_radian_to_degrees) \
+        / (neutron_speed * conversion_factor_angstrom_to_m / conversion_factor_cm_to_m)
     prefactor *= amplification_factor
     return prefactor * b_field / d_theta
 
 
-def main():
-    """Plot the adiabatic parameter E."""
-    data_file_magnetic_field = '../data/ideal_magnetic_field_data.csv'
-    x_range_bfield, y_range, z_range, bx, by, bz = read_data_from_file(data_file_magnetic_field)
-    data_file_polarisation = '../data/data_polarisation.csv'
-    x_range_pol, y_range, z_range, pol_x, pol_y, pol_z = read_data_from_file(data_file_polarisation)
+def compute_polarisation(polarisation_vector, magnetic_field_vector):
+    """Compute the polarisation from the vectors.
 
-    dtheta_dy_values = compute_dtheta_dy(bx, by)
-    b_values = get_b_field_magnitude(bx, by)
-    adiabatic_parameter_e = list(compute_adiabatic_parameter_e(b_values, dtheta_dy_values))
+    Parameters
+    ----------
+    polarisation_vector: ndarray
+        3D polarisation vector
+    magnetic_field_vector: ndarray
+        3D magnetic field vector
 
-    polarisation_data = list()
+    Returns
+    -------
+    polarisation: float
+        Value between -1 and 1, specifying the polarisation.
+    """
+    normalisation = np.linalg.norm(polarisation_vector) * np.linalg.norm(magnetic_field_vector)
+    polarisation = np.dot(magnetic_field_vector, polarisation_vector) / normalisation
+    return polarisation
 
-    n = len(x_range_pol)
-    for i in range(n):
-        i = n - 1 - i
-        b_vec = np.array([bx[i], by[i], bz[i]])
-        pol_vec = np.array([pol_x[i], pol_y[i], pol_z[i]])
 
-        normalisation = np.linalg.norm(pol_vec) * np.linalg.norm(b_vec)
-        print(f'b_vec: {b_vec}\npol_vec: {pol_vec}')
-        polarisation = np.dot(b_vec, pol_vec) / normalisation
-
-        polarisation_data.append(polarisation)
-
-        if x_range_bfield[i] not in x_range_pol:
-            adiabatic_parameter_e.pop(i)
-    adiabatic_parameter_e.pop(0)
-
+def plot_polarisation_and_adiabatic_parameter_against_beamline(polarisation_data, adiabatic_parameter_e):
     fig, ax1 = plt.subplots()
 
     color = 'tab:red'
     ax1.set_xlabel('x beamline [m]')
     ax1.set_ylabel('Polarisation', color=color)
-    ax1.plot(x_range_pol, polarisation_data, color=color)
+    ax1.plot(absolute_x_position, polarisation_data, color=color)
     ax1.tick_params(axis='y', labelcolor=color)
 
     ax2 = ax1.twinx()  # instantiate a second axes that shares the same x-axis
 
     color = 'tab:blue'
     ax2.set_ylabel('Adiabatic Parameter E', color=color)  # we already handled the x-label with ax1
-    ax2.plot(x_range_pol, adiabatic_parameter_e, color=color)
+    ax2.plot(absolute_x_position, adiabatic_parameter_e, color=color)
     ax2.tick_params(axis='y', labelcolor=color)
 
     fig.tight_layout()  # otherwise the right y-label is slightly clipped
     plt.show()
+
+
+def plot_polarisation_against_adiabatic_parameter(adiabatic_parameter_e_data, final_polarisation_data):
+    plt.plot(adiabatic_parameter_e_data, final_polarisation_data, color='tab:red')
+    plt.xlabel('Adiabatic parameter (E)')
+    plt.ylabel('Neutron Polarisation')
+    plt.show()
+
+
+def main():
+    """Plot the adiabatic parameter E."""
+    final_polarisation_data = list()
+    adiabatic_parameter_e_data = list()
+
+    magnetic_field_values = np.linspace(0, 10, 200)
+
+    for max_b_value in magnetic_field_values:
+        initial_b_field = np.array([0, max_b_value, 0])
+        bx, by, bz = list(), list(), list()
+        initial_polarisation = np.array([0, 1, 0])
+
+        polarisation_data = list()
+
+        neutron = Neutron(velocity=np.array([neutron_speed, 0, 0]),
+                          position=np.array([0, 0, 0]), polarisation=initial_polarisation)
+
+        for pos_x in absolute_x_position:
+            angle = pos_x * 10
+            magnetic_field_vector = rotate(initial_b_field, angle, np.array([0, 0, 1]))
+            # print(f'magnetic field vector: {magnetic_field_vector}')
+
+            bx.append(magnetic_field_vector[0])
+            by.append(magnetic_field_vector[1])
+            bz.append(magnetic_field_vector[2])
+
+            neutron.set_position_x(pos_x)
+            cell_time = step_x/neutron_speed
+            polarisation_vector = neutron.compute_polarisation(magnetic_field_vector=magnetic_field_vector,
+                                                               time=cell_time)
+
+            polarisation = compute_polarisation(polarisation_vector, np.asarray(magnetic_field_vector))
+
+            polarisation_data.append(polarisation)
+
+        dtheta_dy_values = compute_dtheta_dy(np.asarray(bx), np.asarray(by))
+        b_values = get_b_field_magnitude(np.asarray(bx), np.asarray(by), np.asarray(bz))
+        adiabatic_parameter_e = list(compute_adiabatic_parameter_e(b_values, dtheta_dy_values))
+        # Repair the adiabatic parameter list as the first two values are badly computed
+        adiabatic_parameter_e[0:2] = adiabatic_parameter_e[-3:-1]
+
+        # Assign final values
+        adiabatic_parameter_e_data.append(adiabatic_parameter_e[-1])
+        final_polarisation_data.append(polarisation_data[-1])
+
+        # print('Finished computing one magnetic field value.')
+
+    # plot_polarisation_and_adiabatic_parameter_against_beamline(polarisation_data, adiabatic_parameter_e)
+    plot_polarisation_against_adiabatic_parameter(adiabatic_parameter_e_data, final_polarisation_data)
 
 
 if __name__ == '__main__':

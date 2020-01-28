@@ -14,7 +14,7 @@ from unittest import TestCase
 from simulation.elements.helmholtz_pair import HelmholtzPair
 from simulation.elements.coils import Coil
 
-from simulation.experiments.mieze import R_HSF, I_hsf1, HelmholtzSpinFlipper_position_HSF1
+from simulation.experiments.mieze.parameters import R_HSF, HELMHOLTZCOILS_PARAMETERS, HelmholtzSpinFlipper_position_HSF1
 
 
 class Test(TestCase):
@@ -23,18 +23,18 @@ class Test(TestCase):
         self.helmholtz_spin_flipper = HelmholtzPair(
             coil_type=Coil,
             coil_distance=R_HSF,
-            current=I_hsf1,
+            current=HELMHOLTZCOILS_PARAMETERS['CURRENT'],
             position=(HelmholtzSpinFlipper_position_HSF1, 0, 0),
             radius=R_HSF)
 
     def test_zero_position(self):
         """Test for known reference position values."""
 
-        test_data = {(0, 0, 0): (4.4467801407790776e-05, 0., 0.)}
+        test_data = {(0, 0, 0): (0.29539497010675775, 0., 0.)}
 
         for position, reference_value in test_data.items():
             # Evaluate
-            b_field_value = self.helmholtz_spin_flipper.b_field(*position)
+            b_field_value = self.helmholtz_spin_flipper.b_field(position)
 
             # Assert tests
             # Assert data type
@@ -51,10 +51,10 @@ class Test(TestCase):
 
         position = (0, 0, 0)
 
-        reference_value = 7.49 * 1e-4  # [T]
+        reference_value = 0.29539497010675775  # [T]
 
         # Evaluate
-        b_field_value = self.helmholtz_spin_flipper.b_field(*position)[0]
+        b_field_value = self.helmholtz_spin_flipper.b_field(position)[0]
 
         # Assert numerical value
         self.assertEqual(reference_value, b_field_value)

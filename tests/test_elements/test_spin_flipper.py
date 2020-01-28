@@ -16,18 +16,17 @@ from simulation.elements.spin_flipper import SpinFlipper
 class Test(TestCase):
 
     def setUp(self) -> None:
-        self.spin_flipper = SpinFlipper()
+        self.spin_flipper = SpinFlipper(name='TestSpinFlipper', current=1, r_eff=1, windings=1, length=1, width=1, height=1)
 
     def test_zero_position(self):
         """Test for known reference values."""
 
-        test_data = {1.0: -0.0019916348542965423}
+        test_data = {1.0: -0.00023420086393421903}
 
         for position, reference_value in test_data.items():
             # Evaluate
-            b_field_value = self.spin_flipper.sf(sf_name='sf1', z_position=position)
-            # print(b_field_value)
+            b_field_value = self.spin_flipper.b_field([position, 0, 0])
+            # print(f'{b_field_value} {reference_value}')
 
             # Assert numerical value
-            self.assertEqual(reference_value, b_field_value)
-
+            self.assertEqual(reference_value, b_field_value[0])

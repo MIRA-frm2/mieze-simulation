@@ -37,22 +37,28 @@ def compute_adiabatic_condition(b_values):
     return 2.65 * wavelength * np.asarray(b_values) * factor_gauss_to_militesla
 
 
-def get_b_field_magnitude(bx, by):
+def get_b_field_magnitude(bx, by, bz=None):
     """Compute the magnetic field magnitude from x and y components only.
 
     Parameters
     ----------
-    bx: np.array, float
+    bx: ndarray, float
         Magnetic field on x axis.
-    by: np.array, float
+    by: ndarray, float
         Magnetic field on y axis.
+    bz: ndarray, float, optional
+        Magnetic field on z axis.
+        By default, set to None, to compute the magnitude from only two components.
 
     Returns
     -------
     out: np.array, float
         Magnetic field magnitude computed from x and y components only.
     """
-    return np.sqrt(np.power(np.asarray(bx), 2) + np.power(np.asarray(by), 2))
+    if bz is not None:
+        return np.sqrt(np.power(np.asarray(bx), 2) + np.power(np.asarray(by), 2) + np.power(np.asarray(bz), 2))
+    else:
+        return np.sqrt(np.power(np.asarray(bx), 2) + np.power(np.asarray(by), 2))
 
 
 class MyPlotter:

@@ -11,30 +11,17 @@
 import numpy as np
 
 from simulation.experiments.mieze.parameters import absolute_x_position
-from utils.helper_functions import save_obj, save_data_to_file
-
-
-def compute_ideal_b_field(x):
-    """Compute an ideal magnetic field.
-
-    Parameters
-    ----------
-    x: float, ndarray
-
-    Returns
-    -------
-    out: float, ndarray
-    """
-    strong_b_field = 10
-    return np.array([20 * x, strong_b_field - 20 * x, 0])
+from utils.helper_functions import save_obj, save_data_to_file, rotate
 
 
 def main():
     """Compute and save the magnetic field."""
 
     data = dict()
+    initial_b_field = np.array([0, 1, 0])
     for pos_x in absolute_x_position:
-        data[pos_x, 0, 0] = compute_ideal_b_field(pos_x)
+        angle = pos_x
+        data[pos_x, 0, 0] = rotate(initial_b_field, angle, np.array([0, 0, 1]))
 
     save_data_to_file(data, '../data/ideal_magnetic_field_data.csv')
     save_obj(data, '../data/ideal_magnetic_field_data')

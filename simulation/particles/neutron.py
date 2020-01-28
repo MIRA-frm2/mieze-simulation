@@ -12,6 +12,7 @@ import numpy as np
 import numpy.random as r
 import os
 
+from utils.helper_functions import rotate
 
 cwd = os.getcwd()
 
@@ -44,14 +45,13 @@ class Neutron:
         self.position = np.asarray(position)
         self.trajectory = list()
 
-    def get_pol(self):
-        """Return the polarisation of the neutron."""
-        return self.polarisation
+    @property
+    def speed(self):
+        """Return the speed from the velocity."""
+        # return np.linalg.norm(self.velocity)
+        return self.velocity[0]
 
-    def reset_pol(self):
-        """Reset the polarisation to the initial value."""
-        self.polarisation = initial_polarisation
-
+    # Position related methods
     def set_position_x(self, x_val):
         """Set the neutron position."""
         # print(f'Set x position to neutron as : {x_val}')
@@ -83,8 +83,35 @@ class Neutron:
         self.position[1] += time * self.velocity[1]
         self.position[2] += time * self.velocity[2]
 
-    @property
-    def speed(self):
-        """Return the speed from the velocity."""
-        # return np.linalg.norm(self.velocity)
-        return self.velocity[0]
+    # Polarisation related methods
+    def get_pol(self):
+        """Return the polarisation of the neutron."""
+        return self.polarisation
+
+    def reset_pol(self):
+        """Reset the polarisation to the initial value."""
+        self.polarisation = initial_polarisation
+
+    @staticmethod
+    def _precession_angle(time, b):
+        """Compute the precession angle."""
+        gamma = 1.83247172e4
+        return gamma * np.linalg.norm(b) * time
+
+    def compute_polarisation(self, magnetic_field_vector, time):
+        """Change the neutron polarisation.
+
+        Parameters
+        ----------
+        magnetic_field_vector: np.array
+            Array of the magnetic field.
+        time: float
+            Time spent in this magnetic field cell.
+
+        Returns
+        -------
+
+        """
+        phi = self._precession_angle(time, b=magnetic_field_vector)
+        self.polarisation = rotate(vector=self.polarisation, phi=phi, axis=magnetic_field_vector)
+        return np.asarray(self.polarisation)
