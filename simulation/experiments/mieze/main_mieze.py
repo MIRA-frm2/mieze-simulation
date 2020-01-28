@@ -109,3 +109,7 @@ def compute_magnetic_field_mieze(grid_size=default_beam_grid,
     # experiment.plot_field_1d_scalar(component='x')
     # experiment.plot_field_1d_scalar(component='y')
     # experiment.plot_field_1d_scalar(component='z')
+
+
+if __name__ == '__main__':
+    compute_magnetic_field_mieze(filename='../../../analysises/adiabatic_polarisation/data/data_magnetic_field_mieze')

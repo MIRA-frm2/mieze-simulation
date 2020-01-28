@@ -1,17 +1,14 @@
 # -*- coding: utf-8 -*-
 #
-# This file is part of REANA.
-# Copyright (C) 2017, 2018, 2019 CERN.
+# This file is part of MIEZE simulation.
+# Copyright (C) 2019 TUM FRM2 E21 Research Group.
 #
-# REANA is free software; you can redistribute it and/or modify it
+# This is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
 
-"""REANA client"""
+"""MIEZE simulation."""
 
 from __future__ import absolute_import, print_function
-
-import os
-import re
 
 from setuptools import find_packages, setup
 
@@ -29,16 +26,8 @@ install_requires = [
 packages = find_packages()
 
 
-# Get the version string. Cannot be done with import!
-with open(os.path.join('reana_client', 'version.py'), 'rt') as f:
-    version = re.search(
-        '__version__\s*=\s*"(?P<version>.*)"\n',
-        f.read()
-    ).group('version')
-
 setup(
     name='mieze-simulation',
-    version=version,
     description=__doc__,
     long_description=readme,
     author='FRM2',

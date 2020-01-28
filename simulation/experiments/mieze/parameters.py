@@ -16,7 +16,7 @@ I_real_coil = 10  # [A]
 startpoint = 0.000  # [m]
 beamend = 1.0  # [m]
 
-npoints = 500
+npoints = 100
 absolute_x_position = np.linspace(startpoint, beamend, num=npoints)
 step_x = (absolute_x_position[1] - absolute_x_position[0])
 
@@ -97,12 +97,12 @@ wavelength = 4.3  # [Angstrom]
 wavelength_min = 3.5
 wavelength_max = 6
 
-speed = 3956 / wavelength
+neutron_speed = 3956 / wavelength
 speed_min = 3956 / wavelength_max
 speed_max = 3956 / wavelength_min
 speed_std = (speed_max - speed_min) / 4
 
-total_simulation_time = beamend / speed
+total_simulation_time = beamend / neutron_speed
 
 c = 0.31225  # sqrt(1-polarisierung²)
 x = c * np.random.rand()
@@ -113,7 +113,7 @@ initial_polarisation = np.array([x, 0.95, z])
 BEAM_PROPERTIES = {
     'beamsize': beamsize,
     'number_of_neutrons': number_of_neutrons,
-    'speed': speed
+    'speed': neutron_speed
 }
 
 

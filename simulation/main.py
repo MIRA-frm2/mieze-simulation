@@ -76,7 +76,7 @@ def main():
             images.append(plot_polarisation_vector(simulation.polarisation, time=t_j, normalize=True, length=0.025))
 
     # Put all images together
-    imageio.mimsave('./test.gif', images, fps=10)
+    imageio.mimsave('./polarisation_vector.gif', images, fps=10)
 
 
 if __name__ == "__main__":
