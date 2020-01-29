@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of MIEZE simulation.
-# Copyright (C) 2019 TUM FRM2 E21 Research Group.
+# Copyright (C) 2019, 2020 TUM FRM2 E21 Research Group.
 #
 # This is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
@@ -18,6 +18,8 @@ from utils.physics_constants import MU_0, pi
 
 class SpinFlipper(RectangularCoil):
     """Class that implements a SpinFlipper coil."""
+
+    class_name = 'SpinFlipper'
 
     def __init__(self, name='SpinFlipper', position=(SpinFlipper_position1, 0, 0), **kwargs):
         super(SpinFlipper, self).__init__(position, name=name, **kwargs)

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of MIEZE simulation.
-# Copyright (C) 2019 TUM FRM2 E21 Research Group.
+# Copyright (C) 2019, 2020 TUM FRM2 E21 Research Group.
 #
 # This is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
@@ -14,6 +14,7 @@ from simulation.plotting_scripts.plotter import Plotter
 
 
 def main():
+    """Main program that plots the magnetic field of the elements in the MIEZE setup."""
     element_1 = Plotter(filename='../../data/elements_magnetic_fields/data_magnetic_field_Polariser.csv')
     element_2 = Plotter(filename='../../data/elements_magnetic_fields/data_magnetic_field_HelmHoltzSpinFlipper1.csv')
     element_3 = Plotter(filename='../../data/elements_magnetic_fields/data_magnetic_field_SpinFlipper.csv')
