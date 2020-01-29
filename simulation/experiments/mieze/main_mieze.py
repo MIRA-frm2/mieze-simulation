@@ -46,14 +46,8 @@ class Mieze(Setup):
                             position=(HELMHOLTZCOILS_PARAMETERS["position"], 0, 0),
                             radius=HELMHOLTZCOILS_PARAMETERS["RADIUS"])
 
-        self.create_element(current=SPIN_FLIPPER_PARAMETERS["I_sf1"],
-                            element_class=SpinFlipper,
-                            height=SPIN_FLIPPER_PARAMETERS["RECTANGULAR_COIL_HEIGHT"],
-                            length=SPIN_FLIPPER_PARAMETERS["RECTANGULAR_COIL_LENGTH"],
-                            position=(SPIN_FLIPPER_PARAMETERS["SpinFlipper_position1"], 0, 0),
-                            width=SPIN_FLIPPER_PARAMETERS["RECTANGULAR_COIL_WIDTH"],
-                            windings=SPIN_FLIPPER_PARAMETERS["WINDINGS"],
-                            wire_d=SPIN_FLIPPER_PARAMETERS["WIRE_D"])
+        self.create_element(element_class=SpinFlipper,
+                            **SPIN_FLIPPER_PARAMETERS)
 
         self.create_element(element_class=CoilSet,
                             current=COIL_SET_PARAMETERS["CURRENT"],  # [A]

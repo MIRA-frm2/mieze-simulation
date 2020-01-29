@@ -386,6 +386,7 @@ class RectangularCoil(BaseCoil):
 
         self.width = kwargs.get('width', None)
         self.height = kwargs.get('height', None)
+        self.length = kwargs.get('length', None)
 
         self.prefactor *= 1 / (4 * np.pi) * self.windings * self.current / self.length
 
@@ -395,21 +396,20 @@ class RectangularCoil(BaseCoil):
         If the magnetic field has to be numerically computed at the position of the coil, this implies a division by
         0 leading to numerical errors. This function is used to handle such cases by setting the magnetic field to 0.
         """
-        # print(self.x, self.y, self.z, self.width, self.height)
         numerical_error_acceptance = min(self.width, self.height) * 1e-2
-
+        # print(f'{self.y} {self.width}')
         if abs(self.y - self.width) < numerical_error_acceptance \
                 or abs(self.y + self.width) < numerical_error_acceptance:
             return True
 
-        if abs(self.x - self.height) < numerical_error_acceptance\
+        if abs(self.x - self.height).all() < numerical_error_acceptance\
                 or abs(self.x + self.height) < numerical_error_acceptance:
             return True
 
     @staticmethod
-    def _reverse_coordinates(x, y, z):
-        """Fix coordinates for the equations that have the coordinate axes reversed."""
-        return np.array([z, y, x])
+    def _change_coordinates(x, y, z):
+        """Fix coordinates for the equations, as they have the axes pointing differently compared to the setup."""
+        return np.array([-z, x, -y])
 
     def b_field(self, r: '(x, y, z)'):
         """Compute the magnetic field.
@@ -418,20 +418,24 @@ class RectangularCoil(BaseCoil):
         -------
         magnetic field in cartesian coordinates
         """
+        # print(f'{r}')
         x, y, z = r
-        self.x, self.y, self.z = self._reverse_coordinates(x, y, z)
+
+        # "Shift" the coil to the computational "0".
+        x -= self.position_x
+
+        self.x, self.y, self.z = self._change_coordinates(x, y, z)
+        # print(f'{self.x} {self.y} {self.z}')
 
         field = self.check_physical_coil_overlap()
         if field:
             return np.array([0, 0, 0])
 
-        self.x -= self.position_x
-
         field = self.prefactor * np.array([self.sum_element_x, self.sum_element_y, self.sum_element_z])
 
         field = adjust_field(field)
 
-        return factor_T_to_G * self._reverse_coordinates(*self.sanitize_output(field))
+        return factor_T_to_G * self._change_coordinates(*self.sanitize_output(field))
 
     @staticmethod
     def sanitize_output(field):

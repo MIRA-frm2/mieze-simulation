@@ -25,7 +25,7 @@ class BasicElement(object):
         """
         self.name = name
 
-        if type(position) == tuple:
+        if isinstance(position, tuple):
             self.position_x, self.position_y, self.position_z = position
         else:
             self.position_x = position

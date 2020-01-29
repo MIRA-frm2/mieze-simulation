@@ -132,15 +132,14 @@ HELMHOLTZCOILS_PARAMETERS = {
     "RADIUS": R_HSF
 }
 
-
 SPIN_FLIPPER_PARAMETERS = {
-    "I_sf1": 1.6,  # [A]
-    "SpinFlipper_position1": SpinFlipper_position1,
-    "RECTANGULAR_COIL_LENGTH": 1 * 1e-2,   # [m]
-    "RECTANGULAR_COIL_WIDTH": 10 * 1e-2,  # [m]
-    "RECTANGULAR_COIL_HEIGHT": 13 * 1e-2,  # [m]
-    "WINDINGS": 1,
-    "WIRE_D":  5 * 1e-3  # [m]
+    "current": 1.6,  # [A]
+    "position": (SpinFlipper_position1, 0, 0),
+    "length": 1 * 1e-2,   # [m]
+    "width": 1 * 1e-2,  # [m]
+    "height": 1 * 1e-3,  # [m]
+    "windings": 1,
+    "wire_d":  5 * 1e-3  # [m]
 }
 
 ELEMENTS_POSITIONS_RELATIVE = {

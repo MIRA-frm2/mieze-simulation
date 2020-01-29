@@ -41,21 +41,22 @@ class SpinFlipper(RectangularCoil):
         b_eff = n * MU_0 * current / pi * angle
         return b_eff
     
-    def b_field_approx(self, x):
+    def b_field_approx(self, position):
         """Compute an approximation of the magnetic field along the beam axis.
 
         Parameters
         ----------
-        x: int, float
+        position: ndarray, list
             Position along the beam axis.
 
         Returns
         -------
-        out: int, float
-            Magnetic field value
+        out: ndarray, list
+            Magnetic field vector
         """
+        x = position[0]
         y = x - self.position_x
 
         b1 = self._sf_th(self.current, y + self.thickness / 2.0)
         b2 = -self._sf_th(self.current, y - self.thickness / 2.0)
-        return (b1 + b2) * 1e4
+        return [0, (b1 + b2) * 1e4, 0]
