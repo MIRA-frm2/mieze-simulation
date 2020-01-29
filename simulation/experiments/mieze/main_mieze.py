@@ -27,7 +27,10 @@ class Mieze(Setup):
 
     def __init__(self, coil_type=Coil, **kwargs):
 
-        super(Mieze, self).__init__()
+        consider_earth_field = kwargs.get('consider_earth_field', False)
+        save_individual_data_sets = kwargs.get('save_individual_data_sets', False)
+
+        super(Mieze, self).__init__(consider_earth_field, save_individual_data_sets)
 
         self.spin_flipper_distance = kwargs.get('spin_flipper_distance')
         self.coil_set_distance = kwargs.get('coil_set_distance')
@@ -49,10 +52,10 @@ class Mieze(Setup):
         self.create_element(element_class=SpinFlipper,
                             **SPIN_FLIPPER_PARAMETERS)
 
-        self.create_element(element_class=CoilSet,
-                            current=COIL_SET_PARAMETERS["CURRENT"],  # [A]
-                            name='CoilSet',
-                            position=CoilSet_position + self.coil_set_distance)
+        # self.create_element(element_class=CoilSet,
+        #                     current=COIL_SET_PARAMETERS["CURRENT"],  # [A]
+        #                     name='CoilSet',
+        #                     position=CoilSet_position + self.coil_set_distance)
 
         self.update_metadata()
 
@@ -61,7 +64,7 @@ def compute_magnetic_field_mieze(grid_size=default_beam_grid,
                                  coil_set_distance=ELEMENTS_POSITIONS_RELATIVE["coil_set_distance"],
                                  spin_flipper_distance=ELEMENTS_POSITIONS_RELATIVE["spin_flipper_distance"],
                                  filename='data/data_magnetic_field',
-                                 save_individual_data_sets=False):
+                                 save_individual_data_sets=True):
     """Compute the magnetic field for the MIEZE setup.
 
     Parameters
@@ -107,3 +110,4 @@ def compute_magnetic_field_mieze(grid_size=default_beam_grid,
 
 if __name__ == '__main__':
     compute_magnetic_field_mieze(filename='../../../analysises/adiabatic_polarisation/data/data_magnetic_field_mieze')
+    # compute_magnetic_field_mieze(filename='./../../../data/data_magnetic_field')

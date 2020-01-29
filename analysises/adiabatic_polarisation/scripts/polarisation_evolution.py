@@ -53,8 +53,8 @@ def main():
         print(int(t_j/simulation.t_step))
 
         # Compute varying magnetic field
-        # experiment.calculate_varying_magnetic_field(t_j)
-        simulation.load_magnetic_field(data_file_at_time_instance='./data/ideal_magnetic_field_data')
+        simulation.load_magnetic_field(data_file_at_time_instance='../data/data_magnetic_field_mieze')
+        # simulation.load_magnetic_field(data_file_at_time_instance='./../../../data/data_magnetic_field')
 
         # Create neutrons at each time step for the neutron beam
         simulation.create_neutrons(number_of_neutrons=1, distribution=False,
@@ -77,9 +77,9 @@ def main():
             images.append(plot_polarisation_vector(simulation.polarisation, time=t_j, normalize=True, length=0.025))
 
     # Put all images together
-    imageio.mimsave('./polarisation_vector.gif', images, fps=10)
+    imageio.mimsave('../results/polarisation_vector.gif', images, fps=10)
 
-    save_data_to_file(simulation.polarisation, './data/data_polarisation.csv')
+    # save_data_to_file(simulation.polarisation, './data/data_polarisation.csv')
 
 
 if __name__ == "__main__":

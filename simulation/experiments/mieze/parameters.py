@@ -13,16 +13,6 @@ import numpy as np
 # Variables are stored as tuples with numerical value and units
 I_real_coil = 10  # [A]
 
-startpoint = 0.000  # [m]
-beamend = 1.0  # [m]
-
-npoints = 100
-absolute_x_position = np.linspace(startpoint, beamend, num=npoints)
-step_x = (absolute_x_position[1] - absolute_x_position[0])
-
-default_beam_grid = {'x_start': startpoint, 'x_end': beamend, 'x_step': step_x,
-                     'y_start': -0.0, 'y_end': 0.0, 'z_start': -0.0, 'z_end': 0.0, 'yz_step': 0.1}
-
 
 # MIEZE coil set values
 
@@ -102,7 +92,6 @@ speed_min = 3956 / wavelength_max
 speed_max = 3956 / wavelength_min
 speed_std = (speed_max - speed_min) / 4
 
-total_simulation_time = beamend / neutron_speed
 
 c = 0.31225  # sqrt(1-polarisierung²)
 x = c * np.random.rand()
@@ -153,3 +142,15 @@ ELEMENTS_POSITIONS_ABSOLUTE = {
     "spin_flipper": HelmholtzSpinFlipper_position_HSF1,
     "polariser": POLARISATOR
 }
+
+startpoint = 0.000  # [m]
+beamend = CoilSet_position + 0.05  # [m]
+
+npoints = 100
+absolute_x_position = np.linspace(startpoint, beamend, num=npoints)
+step_x = (absolute_x_position[1] - absolute_x_position[0])
+
+default_beam_grid = {'x_start': startpoint, 'x_end': beamend, 'x_step': step_x,
+                     'y_start': -0.0, 'y_end': 0.0, 'z_start': -0.0, 'z_end': 0.0, 'yz_step': 0.1}
+
+total_simulation_time = beamend / neutron_speed

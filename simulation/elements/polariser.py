@@ -78,4 +78,4 @@ class Polariser(BasicElement):
 
         # Modelled as an ideal dipole magnetic field (note: it is divergent at 0)
         b = prefactor * (elem1 - elem2) / r**3
-        return b * factor_T_to_G
+        return np.abs(b * factor_T_to_G)
