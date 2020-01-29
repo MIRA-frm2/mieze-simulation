@@ -17,13 +17,15 @@ from utils.physics_constants import MU_0, pi
 
 
 class SpinFlipper(RectangularCoil):
+    """Class that implements a SpinFlipper coil."""
 
-    def __init__(self, position=(SpinFlipper_position1, 0, 0), **kwargs):
-        super(SpinFlipper, self).__init__(position, name='SpinFlipper', **kwargs)
+    def __init__(self, name='SpinFlipper', position=(SpinFlipper_position1, 0, 0), **kwargs):
+        super(SpinFlipper, self).__init__(position, name=name, **kwargs)
 
         self.thickness = kwargs.get('thickness', 1e-2)  # [m], thickness of the coil
 
     def meta_data(self):
+        """Return meta data."""
         return {"position": self.position_x, "coil_type": "RectangularCoil"}
 
     def _sf_th(self, current, position):

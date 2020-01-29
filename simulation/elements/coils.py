@@ -384,6 +384,9 @@ class RectangularCoil(BaseCoil):
 
         self.x, self.y, self.z = None, None, None
 
+        self.width = kwargs.get('width', None)
+        self.height = kwargs.get('height', None)
+
         self.prefactor *= 1 / (4 * np.pi) * self.windings * self.current / self.length
 
     def check_physical_coil_overlap(self):
