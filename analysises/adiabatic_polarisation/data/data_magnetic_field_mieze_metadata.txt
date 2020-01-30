@@ -1,0 +1,4 @@
+The ../../../analysises/adiabatic_polarisation/data/data_magnetic_field_mieze file has been generated using the following parameters: 
+
+HelmHoltzSpinFlipper1
+{"position": 0.4769, "coil_type": "Coil"}

@@ -65,7 +65,8 @@ R_HSF = 53.8 * 1e-3   # [m]  # radius of helmholtz coils at the spin flippers; a
 POLARISATOR = 0.0
 
 # distance between polariser and first coil of hsf1
-POLARISER_HSF1 = 0.125
+POLARISER_HSF1 = 0.45  # Value used for testing
+# POLARISER_HSF1 = 0.125  # Real, experimental value
 HelmholtzSpinFlipper_position_HSF1 = POLARISATOR + POLARISER_HSF1 + R_HSF / 2.0
 SpinFlipper_position1 = HelmholtzSpinFlipper_position_HSF1
 
@@ -144,10 +145,13 @@ ELEMENTS_POSITIONS_ABSOLUTE = {
 }
 
 startpoint = 0.000  # [m]
-beamend = CoilSet_position + 0.05  # [m]
+# beamend = CoilSet_position + 0.05  # [m]
+beamend = HelmholtzSpinFlipper_position_HSF1 + 0.25  # [m]
 
-npoints = 100
+npoints = 200
+
 absolute_x_position = np.linspace(startpoint, beamend, num=npoints)
+
 step_x = (absolute_x_position[1] - absolute_x_position[0])
 
 default_beam_grid = {'x_start': startpoint, 'x_end': beamend, 'x_step': step_x,

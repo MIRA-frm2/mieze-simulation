@@ -45,7 +45,7 @@ def main():
 
     # Simulate the actual beam trajectory and the polarisation thereof
     images = list()
-    time_factor = 2
+    time_factor = 1
     for t_j in np.linspace(0, time_factor * simulation.total_simulation_time,
                            num=time_factor * int(simulation.total_simulation_time / simulation.t_step)):
         # Show progress

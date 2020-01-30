@@ -6,7 +6,7 @@
 # This is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
 
-"""Main script that computes the polarisation for a given setup."""
+"""Main script that computes the polarisation evolution for a given setup for testing."""
 
 import imageio
 import numpy as np
@@ -16,23 +16,10 @@ from analysises.neutron_polarisation_simulation.scripts.plotting_scripts import 
 
 from simulation.experiments.mieze.parameters import default_beam_grid, BEAM_PROPERTIES, \
     total_simulation_time, angular_distribution_in_radians, wavelength_min, wavelength_max
-from utils.helper_functions import save_data_to_file
 
 
 def main():
     """Main program that computes the neutron beam in the MIEZE setup."""
-
-    # # Initialize an object from the MIEZE class
-    # experiment = Mieze(spin_flipper_distance=ELEMENTS_POSITIONS_RELATIVE["spin_flipper_distance"],
-    #                    coil_set_distance=ELEMENTS_POSITIONS_RELATIVE["coil_set_distance"],
-    #                    save_individual_data_sets=False)
-    #
-    # # Create the components of the beamline with their parameters
-    # experiment.create_setup()
-    #
-    # # Initialize the computational space (grid) and compute the magnetic field for it
-    # experiment.initialize_computational_space(**default_beam_grid)
-    # experiment.calculate_static_b_field()
 
     # Initialize the neutron beam
     simulation = MiezeBeamline(beamsize=BEAM_PROPERTIES['beamsize'],
@@ -71,9 +58,7 @@ def main():
         simulation.compute_average_polarisation()
         if simulation.polarisation:
             print(f'pol:{list(simulation.polarisation.values())[-1]}')
-
-        # Add image
-        if simulation.polarisation:
+            # Add image
             images.append(plot_polarisation_vector(simulation.polarisation, time=t_j, normalize=True, length=0.025))
 
     # Put all images together

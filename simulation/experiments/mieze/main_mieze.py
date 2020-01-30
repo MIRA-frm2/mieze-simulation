@@ -39,9 +39,9 @@ class Mieze(Setup):
 
     def create_setup(self):
         """Create the elements for the setup."""
-
-        self.create_element(element_class=Polariser,
-                            position=(ELEMENTS_POSITIONS_ABSOLUTE["polariser"], 0, 0))
+        #
+        # self.create_element(element_class=Polariser,
+        #                     position=(ELEMENTS_POSITIONS_ABSOLUTE["polariser"], 0, 0))
 
         self.create_element(coil_type=Coil,
                             current=HELMHOLTZCOILS_PARAMETERS["CURRENT"],
@@ -49,8 +49,8 @@ class Mieze(Setup):
                             position=(HELMHOLTZCOILS_PARAMETERS["position"], 0, 0),
                             radius=HELMHOLTZCOILS_PARAMETERS["RADIUS"])
 
-        self.create_element(element_class=SpinFlipper,
-                            **SPIN_FLIPPER_PARAMETERS)
+        # self.create_element(element_class=SpinFlipper,
+        #                     **SPIN_FLIPPER_PARAMETERS)
 
         # self.create_element(element_class=CoilSet,
         #                     current=COIL_SET_PARAMETERS["CURRENT"],  # [A]

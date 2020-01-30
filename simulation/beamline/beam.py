@@ -96,22 +96,22 @@ class NeutronBeam:
         gamma = 1.83247172e4
         return gamma * np.linalg.norm(b) * time
 
-    def _polarisation_change(self, neutron, b, time):
+    def _polarisation_change(self, neutron, magnetic_field_vector, time):
         """Change the polarisation for the respective neutron.
 
         Parameters
         ----------
         neutron:
             Instance of Neutron class
-        b: np.array
+        magnetic_field_vector: np.array
             Array of the magnetic field.
 
         Returns
         -------
 
         """
-        phi = self._precession_angle(time, b)
-        return rotate(vector=neutron.polarisation, phi=phi, axis=b)
+        phi = self._precession_angle(time, magnetic_field_vector)
+        return rotate(vector=neutron.polarisation, phi=phi, axis=magnetic_field_vector)
 
     def compute_beam(self):
         """Compute the polarisation of the beam along the trajectory."""
@@ -157,7 +157,6 @@ class NeutronBeam:
             if neutrons_in_cell:
                 # print(f'neutrons in cell: {neutrons_in_cell}')
                 self.polarisation[position_x, 0, 0] /= neutrons_in_cell
-        # print(self.polarisation)
 
     def get_magnetic_field(self, neutron_position):
         """Return the magnetic field at the specified position and time instance.

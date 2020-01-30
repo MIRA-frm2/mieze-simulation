@@ -22,8 +22,9 @@ from utils.helper_functions import get_phi
 
 
 class MiezeBeamline(NeutronBeam):
+    """Class implementing the beamline for the MIEZE setup."""
 
-    def create_neutrons(self, distribution, number_of_neutrons, polarisation):
+    def create_neutrons(self, distribution, number_of_neutrons, polarisation, starting_position_x=0.):
 
         """Initialize the neutrons with a specific distribution.
 
@@ -37,6 +38,9 @@ class MiezeBeamline(NeutronBeam):
             Number of neutrons to be simulated.
         polarisation: np.array
             The initial polarisation of neutrons.
+        starting_position_x: float, optional
+            The starting position for the neutrons along the beamline.
+            Defaults to 0.
         """
         created_neutrons = 0
         while created_neutrons < number_of_neutrons:
@@ -52,21 +56,15 @@ class MiezeBeamline(NeutronBeam):
                 # pos_z = round(random.gauss(0, self.beamsize / 5), ndigits=-int(np.log10(self.incrementsize)))
 
                 # ToDo: Randomized velocities
-                # speed = random.gauss(self.speed, speed_std)
-                #
-                # radial_speed = speed * random.gauss(0, np.tan(angular_distribution_in_radians))
-                # phi = get_phi(pos_y, pos_z)
-                #
-                # neutron_velocity = np.array([speed,
-                #                              radial_speed * np.cos(phi),
-                #                              radial_speed * np.sin(phi)])
+                speed = random.gauss(self.speed, speed_std)
+
+                # radial_speed = 0
+                radial_speed = speed * random.gauss(0, np.tan(angular_distribution_in_radians))
+                phi = get_phi(pos_y, pos_z)
 
                 speed = random.gauss(self.speed, speed_std)
 
                 # Todo: Implement radial velocity such that some neutrons are still within the beamline at th end
-                # radial_speed = speed * np.tan(angular_distribution_in_radians)
-                radial_speed = 0
-                phi = get_phi(pos_y, pos_z)
 
                 neutron_velocity = np.array([speed,
                                              radial_speed * np.cos(phi),
@@ -76,9 +74,12 @@ class MiezeBeamline(NeutronBeam):
                 pos_y = 0.
                 pos_z = 0.
 
-                neutron_velocity = np.array([self.speed, 0, 0])
+                speed = self.speed
+                # speed = random.gauss(self.speed, speed_std)
 
-            position = np.asarray([0., pos_y, pos_z])
+                neutron_velocity = np.array([speed, 0, 0])
+
+            position = np.asarray([starting_position_x, pos_y, pos_z])
 
             neutron = Neutron(polarisation=polarisation, position=position, velocity=neutron_velocity)
 
