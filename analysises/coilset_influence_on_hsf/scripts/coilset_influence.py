@@ -1,8 +1,8 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-from simulation.experiments.mieze.main_mieze import compute_magnetic_field_mieze
-from simulation.experiments.mieze.parameters import HelmholtzSpinFlipper_position_HSF1, WIDTH_CBOX
+from experiments.mieze.main_mieze import compute_magnetic_field_mieze
+from experiments.mieze.parameters import HelmholtzSpinFlipper_position_HSF1, WIDTH_CBOX
 
 from utils.helper_functions import read_data_from_file, find_nearest
 

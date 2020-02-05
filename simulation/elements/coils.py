@@ -6,7 +6,7 @@
 # This is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
 
-"""Individual magnetic elements (coils) for the setup."""
+"""Individual magnetic elements (coils) for the experimental_setup."""
 
 import json
 import logging
@@ -408,7 +408,7 @@ class RectangularCoil(BaseCoil):
 
     @staticmethod
     def _change_coordinates(x, y, z):
-        """Fix coordinates for the equations, as they have the axes pointing differently compared to the setup."""
+        """Fix coordinates for the equations, as they have the axes pointing differently compared to the experimental_setup."""
         return np.array([-z, x, -y])
 
     def b_field(self, r: '(x, y, z)'):

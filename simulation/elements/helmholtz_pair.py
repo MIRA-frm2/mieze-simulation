@@ -8,7 +8,7 @@
 
 """An implementation of the Helmholtz Spin Flipper."""
 
-from simulation.experiments.mieze.parameters import HelmholtzSpinFlipper_position_HSF1
+from experiments.mieze.parameters import HelmholtzSpinFlipper_position_HSF1
 
 from simulation.elements.base import BasicElement
 from simulation.elements.coils import Coil
@@ -16,6 +16,7 @@ from simulation.elements.coils import Coil
 
 class HelmholtzPair(BasicElement):
     adjustment_factor = 1
+    class_name = 'HelmholtzPair'
 
     def __init__(self, position=(HelmholtzSpinFlipper_position_HSF1, 0, 0), **kwargs):
         """Inherit init from base class and define additional parameters."""
@@ -34,14 +35,15 @@ class HelmholtzPair(BasicElement):
         self.coil1 = self.coil_type(name='HSF1', current=current, length=width, position=pos1, r_eff=radius,
                                     windings=windings, wire_d=0)
 
-        self.coil2 = self.coil_type(name='HSF2', current=current, length=width, windings=windings, position=pos2,
-                                    r_eff=radius, wire_d=0)
+        self.coil2 = self.coil_type(name='HSF2', current=current, length=width, position=pos2, r_eff=radius,
+                                    windings=windings, wire_d=0)
 
     def meta_data(self):
+        """Return object metadata."""
         return {"position": self.position_x, "coil_type": self.coil_type.name}
 
     def b_field(self, r: '(x, y, z)'):
         """Compute the magnetic field given the position."""
-        b1 = self.coil2.b_field(r)
+        b1 = self.coil1.b_field(r)
         b2 = self.coil2.b_field(r)
         return (b1 + b2) * self.adjustment_factor

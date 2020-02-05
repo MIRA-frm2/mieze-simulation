@@ -14,7 +14,7 @@ import numpy as np
 from scipy.stats import chisquare
 
 from simulation.elements.coil_set import CoilSet
-from simulation.experiments.mieze.parameters import LENGTH_COIL_INNER, DISTANCE_BETWEEN_INNER_COILS
+from experiments.mieze.parameters import LENGTH_COIL_INNER, DISTANCE_BETWEEN_INNER_COILS
 
 
 from utils.helper_functions import unit_square, save_data_to_file

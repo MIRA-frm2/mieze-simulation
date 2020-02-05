@@ -11,7 +11,8 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-from simulation.experiments.mieze.parameters import neutron_speed, absolute_x_position, step_x
+from simulation.beamline.beamline_properties import neutron_speed
+from simulation.parameters_simulation import absolute_x_position, step_x
 from simulation.particles.neutron import Neutron
 
 from analysises.adiabatic_check.scripts.adiabatic_check import get_b_field_magnitude

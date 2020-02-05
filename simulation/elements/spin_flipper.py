@@ -8,7 +8,7 @@
 
 """An implementation of the Spin Flipper."""
 
-from simulation.experiments.mieze.parameters import SpinFlipper_position1
+from experiments.mieze.parameters import SpinFlipper_position1
 from numpy import arctan
 
 from simulation.elements.coils import RectangularCoil

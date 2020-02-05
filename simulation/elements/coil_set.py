@@ -8,7 +8,7 @@
 
 """The two pairs of coils for the MIEZE condition.
 
-The part of the setup that actually does the MIEZE condition is the Set of coils, that consists of:
+The part of the experimental_setup that actually does the MIEZE condition is the Set of coils, that consists of:
 
 * A pair of inner thicker coils that create a magnetic field close to a pedestal.
 * A pair of outer thinner coils that improve the pedestal by reducing the tails of the magnetic field from the inner
@@ -20,7 +20,7 @@ from numpy import array
 from simulation.elements.base import BasicElement
 from simulation.elements.coils import Coil
 
-from simulation.experiments.mieze.parameters import (
+from experiments.mieze.parameters import (
     COIL_SET_CURRENT, DISTANCE_BETWEEN_INNER_COILS, LENGTH_COIL_INNER, LENGTH_COIL_OUTER, N_WINDINGS_COIL_INNER,
     N_WINDINGS_COIL_OUTER, RADIAL_LAYERS, RADIUS_COIL_INNER_MAX, RADIUS_COIL_INNER_MIN, RADIUS_COIL_OUTER_MAX,
     RADIUS_COIL_OUTER_MIN, WIRE_D, WIRE_SPACING)
@@ -52,6 +52,7 @@ class CoilSet(BasicElement):
         # current2 = current * self.detector_distance / (self.detector_distance - self.coil_distance)
 
     def meta_data(self):
+        """Return metadata for the given class."""
         return {"position": self.position_x, "coil_type": self.coil_type.name}
 
     def _create_coil_set(self):

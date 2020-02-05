@@ -17,15 +17,16 @@ import numpy as np
 from utils.helper_functions import read_data_from_file
 
 
-def plot_polarisation_vector(polarisation_data=None, time=None,
-                             polarisation_data_file='../../data/data_polarisation.csv', **kwargs):
+def plot_polarisation_vector(save_image=True, polarisation_data=None, time=None,
+                             polarisation_data_file='../../data/data_polarisation.csv'):
     """Plot the polarisation vector along the beamline trajectory."""
 
     # 3d figure
     fig = plt.figure()
     ax = fig.gca(projection='3d')
 
-    plt.title(f'Time: {time}')
+    if time:
+        plt.title(f'Time: {time}')
     plt.xlabel('x [m]')
     plt.ylabel('y')
 
@@ -34,22 +35,25 @@ def plot_polarisation_vector(polarisation_data=None, time=None,
         for keys, values in polarisation_data.items():
             ax.quiver(keys[0], keys[1], keys[2],
                       values[0], values[1], values[2],
-                      color='g', **kwargs)
+                      color='g', length=0.025, normalize=True)
 
-        # Used to return the plot as an image rray
-        fig.canvas.draw()       # draw the canvas, cache the renderer
-        image = np.frombuffer(fig.canvas.tostring_rgb(), dtype='uint8')
-        image = image.reshape(fig.canvas.get_width_height()[::-1] + (3,))
+        if save_image:
+            # Used to return the plot as an image rray
+            fig.canvas.draw()       # draw the canvas, cache the renderer
+            image = np.frombuffer(fig.canvas.tostring_rgb(), dtype='uint8')
+            image = image.reshape(fig.canvas.get_width_height()[::-1] + (3,))
 
-        plt.close(fig)
+            plt.close(fig)
 
-        return image
+            return image
+        else:
+            plt.show()
 
     elif polarisation_data_file:
         x_range, y_range, z_range, px, py, pz = read_data_from_file(polarisation_data)
         ax.quiver(x_range, y_range, z_range,
                   px, py, pz,
-                  color='g', **kwargs)
+                  color='g', length=0.025, normalize=True)
         plt.show()
 
 

@@ -36,7 +36,7 @@ def check():
 
     computed_values = list()
     for pos in length:
-        computed_values.append(np.abs(polariser.b_field(pos, 0, 0)))
+        computed_values.append(np.abs(polariser.b_field([pos, 0, 0])))
 
     fig, ax = plt.subplots()
     plt.plot(length, computed_values)

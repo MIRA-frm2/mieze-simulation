@@ -12,7 +12,7 @@ import logging
 import numpy as np
 
 from simulation.elements.base import BasicElement
-from simulation.experiments.mieze.parameters import POLARISATOR
+from experiments.mieze.parameters import POLARISATOR
 
 from utils.physics_constants import MU_0, factor_T_to_G
 

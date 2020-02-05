@@ -11,7 +11,9 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-from simulation.experiments.mieze.parameters import HelmholtzSpinFlipper_position_HSF1, wavelength, step_x
+from experiments.mieze.parameters import HelmholtzSpinFlipper_position_HSF1
+from simulation.parameters_simulation import step_x
+from simulation.beamline.beamline_properties import wavelength
 
 from utils.helper_functions import append_column_to_csv, convert_between_m_and_cm, read_data_from_file
 from utils.physics_constants import factor_T_to_G
@@ -108,6 +110,9 @@ class MyPlotter:
         fig1, ax1 = plt.subplots()
 
         color = 'tab:red'
+
+        ax1.set_title(f'Helmholtz Coils at position: {round(HelmholtzSpinFlipper_position_HSF1 *100, 2)} cm')
+
         ax1.set_xlabel('Neutron Trajectory (m)')
         ax1.set_ylabel('Magnetic field (G)', color=color)
 
@@ -128,8 +133,11 @@ class MyPlotter:
 
         # we already handled the x-label with ax1
         ax2.set_ylabel(r'$\theta$ (degree)', color=color)
+
         ax2.plot(self.x_range, self.theta_values, color=color)
+
         ax2.tick_params(axis='y', labelcolor=color)
+
         ax2.plot(x_pos, y_pos, color='black', marker='o')
         ax2.text(x_pos, y_pos * 0.9, '{:.1f}°'.format(y_pos))
 
@@ -144,12 +152,13 @@ class MyPlotter:
 
         ax.plot(self.x_range, self.dtheta_dy)
         ax.plot(self.x_range, self.b_values)
+
+        ax.set_title(f'Helmholtz Coils at position: {round(HelmholtzSpinFlipper_position_HSF1 *100, 2)} cm')
         ax.legend((r'$\frac{d\theta}{dy}$', r'$2.65\lambda B$'))
 
         ax.set_xlabel('Neutron Trajectory (m)')
         ax.set_ylabel("(degrees/cm)")
         ax.grid()
-        # fig1.tight_layout()
         plt.show()
         # plt.savefig('Adiabatic_Check.pdf')
         # plt.close()

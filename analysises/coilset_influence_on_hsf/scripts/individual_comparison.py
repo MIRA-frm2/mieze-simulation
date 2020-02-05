@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-from simulation.experiments.mieze.parameters import ELEMENTS_POSITIONS_ABSOLUTE
+from experiments.mieze.parameters import ELEMENTS_POSITIONS_ABSOLUTE
 
 from utils.helper_functions import read_data_from_file, find_nearest
 

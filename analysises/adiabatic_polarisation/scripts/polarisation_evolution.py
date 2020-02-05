@@ -6,25 +6,24 @@
 # This is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
 
-"""Main script that computes the polarisation evolution for a given setup for testing."""
+"""Main script that computes the polarisation evolution for a given experimental_setup for testing."""
 
 import imageio
 import numpy as np
 
-from simulation.beamline.beamline_mieze import MiezeBeamline
-from analysises.neutron_polarisation_simulation.scripts.plotting_scripts import plot_polarisation_vector
+from simulation.beamline.beam import NeutronBeam
+from simulation.beamline.beamline_properties import BEAM_PROPERTIES
 
-from simulation.experiments.mieze.parameters import default_beam_grid, BEAM_PROPERTIES, \
-    total_simulation_time, angular_distribution_in_radians, wavelength_min, wavelength_max
+from analysises.neutron_polarisation_simulation.scripts.plotting_scripts import plot_polarisation_vector
+from simulation.parameters_simulation import default_beam_grid, total_simulation_time
 
 
 def main():
-    """Main program that computes the neutron beam in the MIEZE setup."""
-
+    """Main program that computes the neutron beam in the MIEZE experimental_setup."""
     # Initialize the neutron beam
-    simulation = MiezeBeamline(beamsize=BEAM_PROPERTIES['beamsize'],
-                               speed=BEAM_PROPERTIES['speed'],
-                               total_simulation_time=total_simulation_time)
+    simulation = NeutronBeam(beamsize=BEAM_PROPERTIES['beamsize'],
+                             speed=BEAM_PROPERTIES['speed'],
+                             total_simulation_time=total_simulation_time)
 
     simulation.initialize_computational_space(**default_beam_grid)
     simulation.initialize_time_evolution_space()
@@ -48,18 +47,20 @@ def main():
                                    polarisation=initial_polarisation)
 
         # Adjust the beam
-        simulation.collimate_neutrons(max_angle=angular_distribution_in_radians)
-        simulation.monochromate_neutrons(wavelength_min=wavelength_min, wavelength_max=wavelength_max)
+        simulation.collimate_neutrons(max_angle=BEAM_PROPERTIES['max_angle'])
+        simulation.monochromate_neutrons(wavelength_min=BEAM_PROPERTIES['wavelength_min'],
+                                         wavelength_max=BEAM_PROPERTIES['wavelength_max'])
 
         # Compute the neutrons movement and polarisation in the beam
         simulation.compute_beam()
 
         # Compute the average polarisation, at a fixed location (and time)
         simulation.compute_average_polarisation()
+
         if simulation.polarisation:
             print(f'pol:{list(simulation.polarisation.values())[-1]}')
             # Add image
-            images.append(plot_polarisation_vector(simulation.polarisation, time=t_j, normalize=True, length=0.025))
+            images.append(plot_polarisation_vector(simulation.polarisation, time=t_j))
 
     # Put all images together
     imageio.mimsave('../results/polarisation_vector.gif', images, fps=10)

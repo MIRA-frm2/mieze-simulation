@@ -72,16 +72,16 @@ class Neutron:
         """Return the neutron position."""
         return self.position[0]
 
-    def update_position_yz(self, time):
+    def update_position_yz(self, time_increment):
         """Compute the position on the yz axes, based on the time spent in the cell on x axis.
 
         Parameters
         ----------
-        time: float
+        time_increment: float
             Time spent in the cell on x axis.
         """
-        self.position[1] += time * self.velocity[1]
-        self.position[2] += time * self.velocity[2]
+        self.position[1] += time_increment * self.velocity[1]
+        self.position[2] += time_increment * self.velocity[2]
 
     # Polarisation related methods
     def get_pol(self):

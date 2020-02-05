@@ -10,7 +10,7 @@
 
 import matplotlib.pyplot as plt
 
-from simulation.experiments.mieze.main_mieze import compute_magnetic_field_mieze
+from experiments.mieze.main_mieze import compute_magnetic_field_mieze
 from analysises.adiabatic_check.scripts.adiabatic_check import MyPlotter
 
 from utils.helper_functions import convert_between_m_and_cm

@@ -8,11 +8,16 @@
 
 """General beamline class implementation."""
 
+from copy import deepcopy
 import numpy as np
 import os
-from abc import abstractmethod
-from copy import deepcopy
-from utils.helper_functions import load_obj, find_nearest, rotate
+import random
+
+from simulation.particles.neutron import Neutron
+
+from utils.helper_functions import get_phi, find_nearest, load_obj, rotate
+
+from simulation.beamline.beamline_properties import angular_distribution_in_radians, speed_std
 
 
 cwd = os.getcwd()
@@ -20,6 +25,8 @@ cwd = os.getcwd()
 
 class NeutronBeam:
     """Implements neutrons and its properties."""
+
+    gamma = 1.83247172e4
 
     def __init__(self, beamsize, speed, total_simulation_time):
 
@@ -76,27 +83,93 @@ class NeutronBeam:
         """Set the time variables."""
         self.t_step = self.x_step / self.speed
 
-    @abstractmethod
-    def create_neutrons(self, number_of_neutrons, polarisation, distribution):
-        """Abstact method. Neutrons are created for each beamline setup differently."""
-        pass
+    def create_neutrons(self, distribution, number_of_neutrons, polarisation, starting_position_x=0.):
+
+        """Initialize the neutrons with a specific distribution.
+
+        Parameters
+        ----------
+        distribution: boolean, optional
+            # ToDo: Requires more testing!
+            If True, then the neutrons are uniformly distributed.
+            If False, then the neutrons are not spread and all start at 0.
+        number_of_neutrons: int
+            Number of neutrons to be simulated.
+        polarisation: np.array
+            The initial polarisation of neutrons.
+        starting_position_x: float, optional
+            The starting position for the neutrons along the beamline.
+            Defaults to 0.
+        """
+        created_neutrons = 0
+        while created_neutrons < number_of_neutrons:
+            if distribution:
+
+                # ToDo:
+                # Make sure tha the magnetic field is computed at the computational grid required point.
+                pos_y = random.gauss(0, self.beamsize / 5)
+                pos_z = random.gauss(0, self.beamsize / 5)
+
+                # ToDo: cut to less digits for the position
+                # pos_y = round(random.gauss(0, self.beamsize / 5), ndigits=-int(np.log10(self.incrementsize)))
+                # pos_z = round(random.gauss(0, self.beamsize / 5), ndigits=-int(np.log10(self.incrementsize)))
+
+                # ToDo: Randomized velocities
+                speed = random.gauss(self.speed, speed_std)
+
+                # radial_speed = 0
+                radial_speed = speed * random.gauss(0, np.tan(angular_distribution_in_radians))
+                phi = get_phi(pos_y, pos_z)
+
+                speed = random.gauss(self.speed, speed_std)
+
+                # Todo: Implement radial velocity such that some neutrons are still within the beamline at th end
+
+                neutron_velocity = np.array([speed,
+                                             radial_speed * np.cos(phi),
+                                             radial_speed * np.sin(phi)])
+
+            else:
+                pos_y = 0.
+                pos_z = 0.
+
+                speed = self.speed
+                # speed = random.gauss(self.speed, speed_std)
+
+                neutron_velocity = np.array([speed, 0, 0])
+
+            position = np.asarray([starting_position_x, pos_y, pos_z])
+
+            neutron = Neutron(polarisation=polarisation, position=position, velocity=neutron_velocity)
+
+            self.neutrons.append(neutron)
+
+            created_neutrons += 1
 
     def _time_in_field(self, speed):
         """Compute the time spent in the field."""
         return self.x_step / speed
 
-    @staticmethod
-    def _omega(b):
-        gamma = 1.83247172e4
-        return b * gamma
+    def _omega(self, b):
+        return b * self.gamma
 
-    @staticmethod
-    def _precession_angle(time, b):
-        """Compute the precession angle."""
-        gamma = 1.83247172e4
-        return gamma * np.linalg.norm(b) * time
+    def _precession_angle(self, time_increment, magnetic_field_vector):
+        """Compute the precession angle.
 
-    def _polarisation_change(self, neutron, magnetic_field_vector, time):
+        Parameters
+        ----------
+        time_increment: float
+            Time increment, corresponds the time the neutrons spent in the voxel of the magnetic field.
+        magnetic_field_vector: ndarray
+            Magnetic field vector.
+
+        Returns
+        -------
+
+        """
+        return self.gamma * np.linalg.norm(magnetic_field_vector) * time_increment
+
+    def _polarisation_change(self, neutron, magnetic_field_vector, time_increment):
         """Change the polarisation for the respective neutron.
 
         Parameters
@@ -110,7 +183,7 @@ class NeutronBeam:
         -------
 
         """
-        phi = self._precession_angle(time, magnetic_field_vector)
+        phi = self._precession_angle(time_increment, magnetic_field_vector)
         return rotate(vector=neutron.polarisation, phi=phi, axis=magnetic_field_vector)
 
     def compute_beam(self):
@@ -120,20 +193,20 @@ class NeutronBeam:
 
             self.check_neutron_in_beam(neutron)
 
-            time = self._time_in_field(speed=neutron.speed)
+            time_increment = self._time_in_field(speed=neutron.speed)
 
-            neutron.update_position(time)
-            neutron.update_position_yz(time)
+            neutron.update_position(time_increment)
+            neutron.update_position_yz(time_increment)
 
             magnetic_field_value = self.get_magnetic_field(neutron.position)
-            neutron.polarisation = self._polarisation_change(neutron, magnetic_field_value, time)
+            neutron.polarisation = self._polarisation_change(neutron, magnetic_field_value, time_increment)
 
             neutron.trajectory.append(neutron.position)
 
             # print(f'Magnetic field felt by neutron: {magnetic_field_value} at position {neutron.position}')
 
     def compute_average_polarisation(self):
-        """Compute the polarisation for the entire setup."""
+        """Compute the polarisation for the entire experimental_setup."""
         neutron_list = deepcopy(self.neutrons)
 
         for position_x in self.x_range:

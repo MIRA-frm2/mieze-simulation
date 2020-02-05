@@ -10,17 +10,20 @@
 
 import numpy as np
 
-from simulation.beamline.beamline_mieze import MiezeBeamline
+from simulation.beamline.beam import NeutronBeam
 
-from simulation.experiments.mieze.parameters import angular_distribution_in_radians, default_beam_grid, \
-    number_of_neutrons, wavelength_min, wavelength_max, beamsize, neutron_speed, total_simulation_time
+from simulation.beamline.beamline_properties import BEAM_PROPERTIES
+from simulation.parameters_simulation import beamend, default_beam_grid
 
 from utils.helper_functions import save_data_to_file
 
 
 def compute_neutron_beam():
     """Simulate the neutrons trajectories in the beamline."""
-    simulation = MiezeBeamline(beamsize=beamsize, speed=neutron_speed, total_simulation_time=total_simulation_time)
+    total_simulation_time = beamend / BEAM_PROPERTIES['neutron_speed']
+    simulation = NeutronBeam(beamsize=BEAM_PROPERTIES['beamsize'],
+                             speed=BEAM_PROPERTIES['neutron_speed'],
+                             total_simulation_time=total_simulation_time)
 
     # Define computational space
     # grid_size = {'x_start': startpoint, 'x_end': beamend, 'x_step': step_x,
@@ -37,12 +40,15 @@ def compute_neutron_beam():
 
     polarisation = np.array([x, 0.95, z])
 
-    simulation.create_neutrons(number_of_neutrons=number_of_neutrons, distribution=False, polarisation=polarisation)
+    simulation.create_neutrons(number_of_neutrons=BEAM_PROPERTIES['number_of_neutrons'],
+                               distribution=False,
+                               polarisation=polarisation)
     simulation.reset_pol()
 
     # Adjust the beam
-    simulation.collimate_neutrons(max_angle=angular_distribution_in_radians)
-    simulation.monochromate_neutrons(wavelength_min=wavelength_min, wavelength_max=wavelength_max)
+    simulation.collimate_neutrons(max_angle=BEAM_PROPERTIES['angular_distribution'])
+    simulation.monochromate_neutrons(wavelength_min=BEAM_PROPERTIES['wavelength_min'],
+                                     wavelength_max=BEAM_PROPERTIES['wavelength_max'])
 
     # Simulate the actual beam trajectory and the polarisation thereof
     simulation.compute_beam()

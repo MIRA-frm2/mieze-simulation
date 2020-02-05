@@ -11,8 +11,9 @@
 import matplotlib.pyplot as plt
 from copy import deepcopy
 
+from simulation.elements.helmholtz_pair import HelmholtzPair
 from simulation.elements.spin_flipper import SpinFlipper
-from simulation.experiments.mieze.parameters import absolute_x_position, SPIN_FLIPPER_PARAMETERS
+from experiments.mieze.parameters import absolute_x_position, SPIN_FLIPPER_PARAMETERS, HELMHOLTZCOILS_PARAMETERS
 
 
 def compute_element_magnetic_field(element_class, init_kwargs):
@@ -79,5 +80,14 @@ def plot_spin_flipper():
     plot_element_magnetic_field(element_class=SpinFlipper, init_kwargs=init_kwargs)
 
 
+def plot_helmholtz_coils():
+    """Plot the magnetic field for the Helmholtz Coils."""
+    init_kwargs = deepcopy(HELMHOLTZCOILS_PARAMETERS)
+    # init_kwargs['position'] = 0.5
+
+    plot_element_magnetic_field(element_class=HelmholtzPair, init_kwargs=init_kwargs)
+
+
 if __name__ == '__main__':
-    plot_spin_flipper()
+    # plot_spin_flipper()
+    plot_helmholtz_coils()

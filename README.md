@@ -12,7 +12,7 @@ Usage
 
 In the following, each file is shortly described. For its usage, please consult also the documentation in each file.
 
-The [main script](simulation/main.py) computes the magnetic field for the MIEZE experiment, which is saved in the 
+The [main script](simulation/simulate.py) computes the magnetic field for the MIEZE experiment, which is saved in the 
 [data_magnetifc_field](./data/data_magnetic_field.csv) file.
 
 The folder [analysis_scripts](analysises) contains several analysis scripts that have been used to 

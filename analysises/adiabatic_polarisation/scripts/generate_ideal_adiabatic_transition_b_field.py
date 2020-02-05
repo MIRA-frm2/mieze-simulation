@@ -10,7 +10,7 @@
 
 import numpy as np
 
-from simulation.experiments.mieze.parameters import absolute_x_position
+from simulation.parameters_simulation import absolute_x_position
 from utils.helper_functions import save_obj, save_data_to_file, rotate
 
 
