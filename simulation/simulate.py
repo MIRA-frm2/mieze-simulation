@@ -47,17 +47,16 @@ def simulate(experiment_class):
 
     # Simulate the actual beam trajectory and the polarisation thereof
 
-    for t_j in np.linspace(0, total_simulation_time, num=1):
+    for time_increment in np.linspace(0, total_simulation_time, num=1):
         positions = list(absolute_x_position)
-        for pos_x in absolute_x_position:
+        for position_x in absolute_x_position:
 
             # Show progress
-            print(f'Computing for position: {pos_x}')
+            print(f'Computing for position: {position_x}')
 
             # Compute varying magnetic field
-            experiment.calculate_varying_magnetic_field(t_j)
+            experiment.calculate_varying_magnetic_field(time_increment)
             simulation.load_magnetic_field(b_map=experiment.b)
-            # print(BEAM_PROPERTIES['initial_polarisation'])
 
             # Create neutrons at each time step for the neutron beam
             simulation.create_neutrons(number_of_neutrons=BEAM_PROPERTIES['number_of_neutrons'],
@@ -75,14 +74,14 @@ def simulate(experiment_class):
             # Compute the average polarisation, at a fixed location (and time)
             simulation.compute_average_polarisation()
 
-            magnetic_field_vector = simulation.get_magnetic_field(np.asarray([pos_x, 0, 0]))
+            magnetic_field_vector = simulation.get_magnetic_field(np.asarray([position_x, 0, 0]))
             if simulation.polarisation:
                 polarisation_vector = list(simulation.polarisation.values())[-1]
                 polarisation_value = compute_polarisation(polarisation_vector, magnetic_field_vector)
 
                 polarisation_data.append(polarisation_value)
             else:
-                positions.remove(pos_x)
+                positions.remove(position_x)
 
         plot_polarisation_vector(polarisation_data=simulation.polarisation, save_image=False)
 
