@@ -11,12 +11,9 @@ Welcome to mieze-simulation's documentation!
    :caption: Contents:
 
    introduction
-   gettingstarted
-   userguide
+   usage
    administratorguide
    developerguide
-   contributing
-   changes
    license
    authors
 

@@ -3,5 +3,7 @@
 Introduction
 ============
 
-.. include:: ../../README.md
-   :start-line: 7
+This project simulates the MIEZE geometry together, focusing on the magnetic field computation and neutron polarization
+evolution along the trajectory.
+
+

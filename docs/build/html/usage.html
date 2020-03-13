@@ -1,0 +1,132 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>Usage &#8212; mieze-simulation 1.0 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="usage">
+<span id="id1"></span><h1>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h1>
+<p>In the following, each file is shortly described. For its usage, please consult also the documentation in each file.</p>
+<p>The <a class="reference external" href="simulation/simulate.py">main script</a> computes the magnetic field for the MIEZE experiment, which is saved in the
+<a class="reference external" href="./data/data_magnetic_field.csv">data_magnetifc_field</a> file.</p>
+<p>The folder <a class="reference external" href="analysises">analysis_scripts</a> contains several analysis scripts that have been used to
+find the ideal position for several elements of the experiment, or the check whether other properties are satisfied or
+not.</p>
+<ul class="simple">
+<li><p><a class="reference external" href="analysises/adiabatic_check/scripts/adiabatic_check.py">Adiabatic Transition</a>:</p></li>
+</ul>
+<p>Plots the magnetic field and the adiabatic transition to check whether it is fulfilled or not.
+* <a class="reference external" href="analysises/coil_set_configuration/scripts/coil_set_positions.py">CoilSet Position</a>:
+Investigates what is the prefered position for the outer two coils such that the total magnetic field of the four coils
+is as close as possible to a unit function.
+* <a class="reference external" href="analysises/neutron_polarisation_simulation/neutron_pol_sim.py">Neutron Polarisation Simulation</a>:
+Computes the neutrons trajectories along the beam and their polarisation. It saved the data in the
+<a class="reference external" href="./data/data_polarisation.csv">data_polarisation</a> file.
+* <a class="reference external" href="analysises/polariser_adjustment/polariser_adjustment.py">Polariser Adjustment</a>:
+Interpolates the measured polariser data points and optimises its magnetic dipole function.</p>
+<p>The folder <a class="reference external" href="simulation/elements">elements</a> contains the individual elements that are placed along the beam, such as
+the beam trajectory, such as the:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="simulation/elements/coils.py">Coils</a>: Circular (Simple and Real) and Rectangular</p></li>
+<li><p><a class="reference external" href="simulation/elements/coil_set.py">CoilSet</a>: The set of four coils for the mieze setup</p></li>
+<li><p><a class="reference external" href="simulation/elements/helmholtz_pair.py">HelmholtzPair</a>: The pair of two coils in Helmholtz condition.</p></li>
+<li><p><a class="reference external" href="simulation/elements/coils.py">Polariser</a>: The Polariser (similar to a dipole&gt;)</p></li>
+<li><p><a class="reference external" href="simulation/elements/spin_flipper.py">SpinFlipper</a>: The Pi/2 Spin Flipper.</p></li>
+</ul>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">mieze-simulation</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="authors.html">Authors</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Daniel Prelipcean.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.4.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/usage.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

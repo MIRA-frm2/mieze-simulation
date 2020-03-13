@@ -34,41 +34,8 @@
             
   <div class="section" id="introduction">
 <span id="id1"></span><h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
-<p>evolution along the trajectory.</p>
-</div>
-<div class="section" id="usage">
-<h1>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h1>
-<p>In the following, each file is shortly described. For its usage, please consult also the documentation in each file.</p>
-<p>The [main script](simulation/simulate.py) computes the magnetic field for the MIEZE experiment, which is saved in the
-[data_magnetifc_field](./data/data_magnetic_field.csv) file.</p>
-<p>The folder [analysis_scripts](analysises) contains several analysis scripts that have been used to
-find the ideal position for several elements of the experiment, or the check whether other properties are satisfied or
-not.</p>
-<ul class="simple">
-<li><p>[Adiabatic Transition](analysises/adiabatic_check/scripts/adiabatic_check.py):</p></li>
-</ul>
-<p>Plots the magnetic field and the adiabatic transition to check whether it is fulfilled or not.
-* [CoilSet Position](analysises/coil_set_configuration/scripts/coil_set_positions.py):
-Investigates what is the prefered position for the outer two coils such that the total magnetic field of the four coils
-is as close as possible to a unit function.
-* [Neutron Polarisation Simulation](analysises/neutron_polarisation_simulation/neutron_pol_sim.py):
-Computes the neutrons trajectories along the beam and their polarisation. It saved the data in the
-[data_polarisation](./data/data_polarisation.csv) file.
-* [Polariser Adjustment](analysises/polariser_adjustment/polariser_adjustment.py):
-Interpolates the measured polariser data points and optimises its magnetic dipole function.</p>
-<p>The folder [elements](simulation/elements) contains the individual elements that are placed along the beam, such as
-the beam trajectory, such as the:</p>
-<ul class="simple">
-<li><p>[Coils](simulation/elements/coils.py): Circular (Simple and Real) and Rectangular</p></li>
-<li><p>[CoilSet](simulation/elements/coil_set.py): The set of four coils for the mieze setup</p></li>
-<li><p>[HelmholtzPair](simulation/elements/helmholtz_pair.py): The pair of two coils in Helmholtz condition.</p></li>
-<li><p>[Polariser](simulation/elements/coils.py): The Polariser (similar to a dipole)</p></li>
-<li><p>[SpinFlipper](simulation/elements/spin_flipper.py): The Pi/2 Spin Flipper.</p></li>
-</ul>
-</div>
-<div class="section" id="documentation-style">
-<h1>Documentation Style<a class="headerlink" href="#documentation-style" title="Permalink to this headline">¶</a></h1>
-<p>Most documentation is written withing the code base, such that it’s easily accessible and it matches the actual scripts.</p>
+<p>This project simulates the MIEZE geometry together, focusing on the magnetic field computation and neutron polarization
+evolution along the trajectory.</p>
 </div>
 
 
@@ -91,8 +58,6 @@ the beam trajectory, such as the:</p>
 <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Introduction</a></li>
-<li class="toctree-l1"><a class="reference internal" href="#usage">Usage</a></li>
-<li class="toctree-l1"><a class="reference internal" href="#documentation-style">Documentation Style</a></li>
 <li class="toctree-l1"><a class="reference internal" href="authors.html">Authors</a></li>
 </ul>
 
