@@ -14,6 +14,8 @@
     <script src="_static/language_data.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Administrator Guide" href="administratorguide.html" />
+    <link rel="prev" title="Introduction" href="introduction.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
@@ -32,6 +34,11 @@
             
   <div class="section" id="usage">
 <span id="id1"></span><h1>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="mieze-simulation">
+<h2>MIEZE Simulation<a class="headerlink" href="#mieze-simulation" title="Permalink to this headline">¶</a></h2>
+<p>The parameter space for computing the magnetic field of the MIEZE setup is represented by
+<a class="reference external" href="experimental_setup/mieze/parameters.py">this file</a>.</p>
+<p>Additional user input consists of defining the 3d computational grid in the <a class="reference external" href="simulate.py">main file</a>.</p>
 <p>In the following, each file is shortly described. For its usage, please consult also the documentation in each file.</p>
 <p>The <a class="reference external" href="simulation/simulate.py">main script</a> computes the magnetic field for the MIEZE experiment, which is saved in the
 <a class="reference external" href="./data/data_magnetic_field.csv">data_magnetifc_field</a> file.</p>
@@ -39,17 +46,11 @@
 find the ideal position for several elements of the experiment, or the check whether other properties are satisfied or
 not.</p>
 <ul class="simple">
-<li><p><a class="reference external" href="analysises/adiabatic_check/scripts/adiabatic_check.py">Adiabatic Transition</a>:</p></li>
+<li><p><a class="reference external" href="analysises/adiabatic_check/scripts/adiabatic_check.py">Adiabatic Transition</a>: Plots the magnetic field and the adiabatic transition to check whether it is fulfilled or not.</p></li>
+<li><p><a class="reference external" href="analysises/coil_set_configuration/scripts/coil_set_positions.py">CoilSet Position</a>: Investigates what is the prefered position for the outer two coils such that the total magnetic field of the four coils is as close as possible to a unit function.</p></li>
+<li><p><a class="reference external" href="analysises/neutron_polarisation_simulation/neutron_pol_sim.py">Neutron Polarisation Simulation</a>: Computes the neutrons trajectories along the beam and their polarisation. It saved the data in the <a class="reference external" href="./data/data_polarisation.csv">data_polarisation</a> file.</p></li>
+<li><p><a class="reference external" href="analysises/polariser_adjustment/polariser_adjustment.py">Polariser Adjustment</a>: Interpolates the measured polariser data points and optimises its magnetic dipole function.</p></li>
 </ul>
-<p>Plots the magnetic field and the adiabatic transition to check whether it is fulfilled or not.
-* <a class="reference external" href="analysises/coil_set_configuration/scripts/coil_set_positions.py">CoilSet Position</a>:
-Investigates what is the prefered position for the outer two coils such that the total magnetic field of the four coils
-is as close as possible to a unit function.
-* <a class="reference external" href="analysises/neutron_polarisation_simulation/neutron_pol_sim.py">Neutron Polarisation Simulation</a>:
-Computes the neutrons trajectories along the beam and their polarisation. It saved the data in the
-<a class="reference external" href="./data/data_polarisation.csv">data_polarisation</a> file.
-* <a class="reference external" href="analysises/polariser_adjustment/polariser_adjustment.py">Polariser Adjustment</a>:
-Interpolates the measured polariser data points and optimises its magnetic dipole function.</p>
 <p>The folder <a class="reference external" href="simulation/elements">elements</a> contains the individual elements that are placed along the beam, such as
 the beam trajectory, such as the:</p>
 <ul class="simple">
@@ -59,6 +60,88 @@ the beam trajectory, such as the:</p>
 <li><p><a class="reference external" href="simulation/elements/coils.py">Polariser</a>: The Polariser (similar to a dipole&gt;)</p></li>
 <li><p><a class="reference external" href="simulation/elements/spin_flipper.py">SpinFlipper</a>: The Pi/2 Spin Flipper.</p></li>
 </ul>
+</div>
+<div class="section" id="experiments">
+<h2>Experiments<a class="headerlink" href="#experiments" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="analysises">
+<h2>Analysises<a class="headerlink" href="#analysises" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id2">
+<h3>Adiabatic Transition<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<p>One crucial aspect of the MIEZE setup is that the polarization between the polariser and the helmholtz coils proceeds
+adiabatically (the adiabatic transition condition can be found in the literature, but for convenience we provide
+[two slides](docs/adiabatic_transition_literature.pdf) about it).</p>
+<p>The way the scripts work is that they take existing magnetic field data values from .csv files, then compute all
+required variables and perform the plots.</p>
+<p>This investigation is performed via an over-layer script called [perform_analysis.py](perform_analysis.py), where the
+user decides which analysis to perform. The two scripts to choose form are:</p>
+<ol class="arabic">
+<li><p>A [check](scripts/adiabatic_check.py) using the existing parameters.</p>
+<blockquote>
+<div><p>This condition is then plotted together with the actual change of the angle in the
+[Adiabatic transition plot](results/adiabatic_transition_condition.png).</p>
+<p>The magnetic field along x and y direction are plotted together with the angle change in [this plot](results/by_bx.png).</p>
+<p>There is no user input for this analysis.</p>
+</div></blockquote>
+</li>
+<li><p>An [investigation](scripts/find_relative_distance.py) trying to find what the optimal parameters are.</p>
+<blockquote>
+<div><p>The result is plotted [here](results/distance_investigation_for_the_adiabatic_transition_condition.png).</p>
+<p>Because the plot would be overcrowded if plotted in a similar fashion as for part 1, we define an adiabatic
+transition discriminant from the adiabatic condition inequality as just:</p>
+<p>$2.65 cdot B cdot lambda - dfrac{dtheta}{dy}$</p>
+<p>This quantity has to always be greater than 0 to fulfill the adiabatic transition.</p>
+<p>The user input for this analysis consits of an array of values to be iterated over for finding the ideal distance.</p>
+</div></blockquote>
+</li>
+</ol>
+</div>
+<div class="section" id="adiabatic-polarisation">
+<h3>Adiabatic Polarisation<a class="headerlink" href="#adiabatic-polarisation" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="coil-set-configuration">
+<h3>Coil Set Configuration<a class="headerlink" href="#coil-set-configuration" title="Permalink to this headline">¶</a></h3>
+<p>Each of the inner pail of coils creates a magnetic field that is roughly similar to a Gaussian. Adding two such fields
+with a small distance between them  almost produces a [resulting magnetic field](results/bfield_coils_inner.png) similar to a
+pedestal peak. In order to optimize this pedestal (that is, a flat top with straight edges),
+[two outer coils](results/bfield_coils_inner.png) with opposite current are used to remove and the tails.</p>
+<p>This script investigates what should the position of the outer coils relative to the inner coils should be to achieve a
+pedestal as good as possible, by iteratively moving the outer coils further away from the inner ones. The goodness of
+the fit is computed using a minimal squares approach, and the [result](results/coil_set_optimization.png) is plotted a 2d
+color map.</p>
+<p>The reference function is taken to be a perfect pedestal, as in [two outer coils](results/bfield_coil_set_0.png).</p>
+</div>
+<div class="section" id="results">
+<h3>Results<a class="headerlink" href="#results" title="Permalink to this headline">¶</a></h3>
+<p>The conclusion of this analysis is that the outer coils should be as close as possible to the inner coils.</p>
+</div>
+<div class="section" id="coil-set-influence-on-hsf">
+<h3>Coil Set Influence on HSF<a class="headerlink" href="#coil-set-influence-on-hsf" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="neutron-polarisation-evolution">
+<h3>Neutron polarisation evolution<a class="headerlink" href="#neutron-polarisation-evolution" title="Permalink to this headline">¶</a></h3>
+<p>The polarisation is computed for each voxel based on how much time the neutrons spends in the respective voxel, given
+its speed.</p>
+<p>The magnetic field and the polarisation vector are then plotted together.</p>
+<dl class="simple">
+<dt>For the magnetic field of the coil set only, the result is:</dt><dd><p>![here](./polarization_and_bfield_coilset.png)</p>
+</dd>
+</dl>
+</div>
+<div class="section" id="numerical-inconsistencies">
+<h3>Numerical inconsistencies<a class="headerlink" href="#numerical-inconsistencies" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="polariser-equation-adjustment">
+<h3>Polariser equation adjustment<a class="headerlink" href="#polariser-equation-adjustment" title="Permalink to this headline">¶</a></h3>
+<p>The magnetic field of the polariser on the y axis is a magnetic dipole, ideally. In practice however, there are some
+slight differences. The magnetic field of the polariser at several locations has been recored and it is used here to
+adjust the coefficients (a, n) of the the magnetic dipole equation: y = a * x ** n</p>
+<p>The result is plotted [here](./by_bx.png).</p>
+</div>
+</div>
+</div>
+<div class="section" id="data">
+<span id="usage-data"></span><h1>Data<a class="headerlink" href="#data" title="Permalink to this headline">¶</a></h1>
 </div>
 
 
@@ -79,8 +162,28 @@ the beam trajectory, such as the:</p>
 
 <h3>Navigation</h3>
 <p class="caption"><span class="caption-text">Contents:</span></p>
-<ul>
+<ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Usage</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#mieze-simulation">MIEZE Simulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#experiments">Experiments</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#analysises">Analysises</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id2">Adiabatic Transition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#adiabatic-polarisation">Adiabatic Polarisation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#coil-set-configuration">Coil Set Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#results">Results</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#coil-set-influence-on-hsf">Coil Set Influence on HSF</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#neutron-polarisation-evolution">Neutron polarisation evolution</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#numerical-inconsistencies">Numerical inconsistencies</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#polariser-equation-adjustment">Polariser equation adjustment</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="#data">Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="administratorguide.html">Administrator Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developerguide.html">Developer Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
 <li class="toctree-l1"><a class="reference internal" href="authors.html">Authors</a></li>
 </ul>
 
@@ -88,6 +191,8 @@ the beam trajectory, such as the:</p>
 <h3>Related Topics</h3>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="introduction.html" title="previous chapter">Introduction</a></li>
+      <li>Next: <a href="administratorguide.html" title="next chapter">Administrator Guide</a></li>
   </ul></li>
 </ul>
 </div>

@@ -1,24 +1,20 @@
-MIEZE Simulation
-================
+==================
+ MIEZE Simulation
+==================
 
-Introduction
-============
-
-.. include:: docs/source/introduction.rst
-
-Usage
-=====
-
-.. include:: docs/source/usage.rst
- 
-
-Documentation Style
-===================
-
-Most documentation is written withing the code base, such that it's easily accessible and it matches the actual scripts.
+.. image:: https://mieze-simulation.readthedocs.io/en/latest/
+   :target: https://mieze-simulation.readthedocs.io/en/latest/
 
 
-Usage
-=====
+About
+-----
 
-.. include:: docs/source/authors.rst
+This project simulates the MIEZE geometry together, focusing on the magnetic field computation and neutron polarization
+evolution along the trajectory.
+
+
+Features
+--------
+
+Useful links
+------------

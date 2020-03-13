@@ -1,5 +1,5 @@
 Neutron polarisation evolution
-==============================
+*******************************
 
 The polarisation is computed for each voxel based on how much time the neutrons spends in the respective voxel, given 
 its speed.

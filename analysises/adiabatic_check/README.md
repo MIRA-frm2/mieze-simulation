@@ -1,5 +1,5 @@
 Adiabatic Transition
-====================
+********************
 
 One crucial aspect of the MIEZE setup is that the polarization between the polariser and the helmholtz coils proceeds
 adiabatically (the adiabatic transition condition can be found in the literature, but for convenience we provide 

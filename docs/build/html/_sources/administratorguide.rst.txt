@@ -1,0 +1,4 @@
+.. administratorguide:
+
+Administrator Guide
+===================

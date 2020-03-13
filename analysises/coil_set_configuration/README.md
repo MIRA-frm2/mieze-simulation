@@ -1,5 +1,5 @@
 Coil Set Configuration
-======================
+***********************
 
 Each of the inner pail of coils creates a magnetic field that is roughly similar to a Gaussian. Adding two such fields
 with a small distance between them  almost produces a [resulting magnetic field](results/bfield_coils_inner.png) similar to a 
@@ -14,5 +14,5 @@ color map.
 The reference function is taken to be a perfect pedestal, as in [two outer coils](results/bfield_coil_set_0.png).
 
 Results
-=======
+***********************
 The conclusion of this analysis is that the outer coils should be as close as possible to the inner coils.
