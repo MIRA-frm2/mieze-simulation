@@ -6,6 +6,6 @@ its speed.
 
 The magnetic field and the polarisation vector are then plotted together.
 
-For the magnetic field of the coil set only, the result is:
- ![here](./polarization_and_bfield_coilset.png)
+For the magnetic field of the coil set only, the result is `here  <https://github.com/MIRA-frm2/mieze-simulation/blob/master/analysises/neutron_polarisation_simulation/results/polarization_and_bfield_coilset.png>`_.
+
 

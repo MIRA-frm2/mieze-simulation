@@ -3,7 +3,7 @@ Adiabatic Transition
 
 One crucial aspect of the MIEZE setup is that the polarization between the polariser and the helmholtz coils proceeds
 adiabatically (the adiabatic transition condition can be found in the literature, but for convenience we provide 
-`two slides <docs/adiabatic_transition_literature.pdf>`_ about it>`_. 
+`two slides <docs/adiabatic_transition_literature.pdf>`_ about it.
 
 The way the scripts work is that they take existing magnetic field data values from .csv files, then compute all 
 required variables and perform the plots.

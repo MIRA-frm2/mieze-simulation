@@ -14,7 +14,7 @@ from unittest import TestCase
 from simulation.elements.helmholtz_pair import HelmholtzPair
 from simulation.elements.coils import Coil
 
-from experiments.mieze.parameters import R_HSF, HELMHOLTZCOILS_PARAMETERS, HelmholtzSpinFlipper_position_HSF1
+from experiments.mieze.parameters import R_HSF, PARAMETERS_HELMHOLTZCOILS, HelmholtzSpinFlipper_position_HSF1
 
 
 class Test(TestCase):
@@ -23,7 +23,7 @@ class Test(TestCase):
         self.helmholtz_spin_flipper = HelmholtzPair(
             coil_type=Coil,
             coil_distance=R_HSF,
-            current=HELMHOLTZCOILS_PARAMETERS['CURRENT'],
+            current=PARAMETERS_HELMHOLTZCOILS['CURRENT'],
             position=(HelmholtzSpinFlipper_position_HSF1, 0, 0),
             radius=R_HSF)
 

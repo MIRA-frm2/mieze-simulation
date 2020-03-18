@@ -14,7 +14,7 @@ import logging
 import numpy as np
 import pandas as pd
 import pickle
-
+import os
 
 from utils.physics_constants import earth_field
 
@@ -90,7 +90,7 @@ def convert_between_m_and_cm(value, backwards=False):
         If True, converts from m to cm.
         If False, converts from cm to m.
 
-    >>> convert_between_m_and_cm(1, backwards=False)
+    >>> convert_between_m_and_cm(1)
     0.01
     >>> convert_between_m_and_cm(1, backwards=True)
     100.0
@@ -218,8 +218,9 @@ def read_data_from_file(file_name):
 
 
 def sanitize_output(func):
-    """Define a wrapper to sanitie ouputs from infinty values."""
+    """Define a wrapper to sanitize outputs from infinity values."""
     def wrapper_sanitize_output(*args, **kwargs):
+        """General wrapper for a function."""
         value = func(*args, **kwargs)
         if abs(value) > 10e4:
             value = 0
@@ -304,21 +305,28 @@ def save_data_to_file(data, file_name, extension='.csv'):
     else:
         full_filename = f'{file_name}{extension}'
 
-    with open(full_filename, 'w') as file:
+    try:
+        file = open(full_filename, 'w')
+    except FileNotFoundError:
+        # This handles analysises paths being one level below the normal simulation path.
+        full_filename = '../' + full_filename
+        file = open(full_filename, 'w')
 
-        logger.info(f'Writing data to file {full_filename}')
+    logger.info(f'Writing data to file {full_filename}')
 
-        csv_writer = csv.writer(file, delimiter=',')
-        csv_writer.writerow(["x", "y", "z", "Bx", "By", "Bz"])
+    csv_writer = csv.writer(file, delimiter=',')
+    csv_writer.writerow(["x", "y", "z", "Bx", "By", "Bz"])
 
-        for point, field in data.items():
-            # logger.debug(type(point))
-            if type(point) != np.float64:
-                point = list(point)
-                row = point + list((field[0], field[1], field[2]))
-            else:
-                row = list([point, field])
-            csv_writer.writerow(row)
+    for point, field in data.items():
+        # logger.debug(type(point))
+        if type(point) != np.float64:
+            point = list(point)
+            row = point + list((field[0], field[1], field[2]))
+        else:
+            row = list([point, field])
+        csv_writer.writerow(row)
+
+    file.close()
 
 
 def save_metadata_to_file(filename, metadata):
@@ -331,7 +339,10 @@ def save_metadata_to_file(filename, metadata):
     metadata: dict
         Dictionary containing the metadata to be written.
     """
-    with open(f'{filename}_metadata.txt', 'w') as f:
+    path = os.getcwd()
+    repository_name = 'mieze-simulation'
+    repository_path = path.split(repository_name, 1)[0]
+    with open(f'{repository_path}{repository_name}{filename}_metadata.txt', 'w') as f:
         description = f'The {filename} file has been generated using the following parameters: \n'
         f.write(description)
         for key, val in metadata.items():

@@ -8,12 +8,12 @@
 
 """Main script that computes the magnetic field for a given experiment in a time dependent manner."""
 
-import matplotlib.pyplot as plt
 import numpy as np
 
 from simulation.beamline.beam import NeutronBeam
 from analysises.adiabatic_polarisation.scripts.adiabacity_parameter_plot import compute_polarisation
-from analysises.neutron_polarisation_simulation.scripts.plotting_scripts import plot_polarisation_vector
+from analysises.neutron_polarisation_simulation.scripts.plotting_scripts import plot_polarisation_vector, \
+    plot_polatisation_absolute_value
 
 from simulation.beamline.beamline_properties import BEAM_PROPERTIES
 from simulation.parameters_simulation import absolute_x_position, default_beam_grid, total_simulation_time
@@ -84,5 +84,4 @@ def simulate(experiment_class, experiment_parameters):
 
         plot_polarisation_vector(polarisation_data=simulation.polarisation, save_image=False)
 
-        plt.plot(positions, polarisation_data)
-        plt.show()
+        plot_polatisation_absolute_value(positions, polarisation_data)

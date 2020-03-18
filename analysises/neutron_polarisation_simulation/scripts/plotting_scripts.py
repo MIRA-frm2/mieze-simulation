@@ -57,8 +57,18 @@ def plot_polarisation_vector(save_image=True, polarisation_data=None, time=None,
         plt.show()
 
 
+def plot_polatisation_absolute_value(positions, polarisation_data):
+    """Plot the beam polarisation in simulation."""
+    plt.plot(positions, polarisation_data)
+
+    plt.xlabel('Beamline [m]')
+    plt.ylabel('Polarisation value')
+
+    plt.show()
+
+
 def plot_neutron_trajectories(simulation):
-    """Plot the trajectoies of the neutron in simulation."""
+    """Plot the trajectories of the neutron in simulation."""
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
     for neutron in simulation.neutrons:

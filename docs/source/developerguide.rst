@@ -1,4 +1,0 @@
-.. developerguide:
-
-Developer Guide
-===============

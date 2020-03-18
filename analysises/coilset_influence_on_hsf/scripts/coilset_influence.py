@@ -55,7 +55,7 @@ def find_relative_distance_coilset_sf(iteration_values):
     influence_list = list()
 
     for val in iteration_values:
-        data_file = f'./data/test_data_{int(val*100)}.csv'
+        data_file = f'/data/test_data_{int(val*100)}.csv'
 
         compute_magnetic_field_mieze(filename=data_file, coil_set_distance=val)
 

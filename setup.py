@@ -18,9 +18,11 @@ setup_requires = [
 ]
 
 install_requires = [
-    'matplotlib>=3.1.2',
-    'mpmath>=1.1.0',
-    'pandas>=0.25.3'
+    'imageio',
+    'matplotlib',
+    'mpmath',
+    'numpy',
+    'pandas'
 ]
 
 packages = find_packages()
@@ -32,7 +34,7 @@ setup(
     long_description=readme,
     author='FRM2',
     author_email='daniel.prelipcean@frm2.tum.de',
-    url='https://github.com/dprelipcean/mieze-simulation',
+    url='https://github.com/MIRA-frm2/mieze-simulation',
     zip_safe=False,
     include_package_data=True,
     install_requires=install_requires,

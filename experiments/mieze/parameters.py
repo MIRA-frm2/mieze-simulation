@@ -77,18 +77,25 @@ CoilSet_position = SpinFlipper_position1 + R_HSF / 2.0 + WIDTH_CBOX/2
 
 CONSIDER_EARTH_FIELD = False
 
-COIL_SET_PARAMETERS = {
+PARAMETERS_POLARISER = {
+    "USE": True,
+}
+
+PARAMETERS_COIL_SET = {
+    "USE": True,
     "current": 100,  # [A]
     "position": CoilSet_position,
 }
 
-HELMHOLTZCOILS_PARAMETERS = {
+PARAMETERS_HELMHOLTZCOILS = {
+    "USE": True,
     "current": 1.6,  # [A],
     "position": HelmholtzSpinFlipper_position_HSF1,
     "radius": R_HSF
 }
 
-SPIN_FLIPPER_PARAMETERS = {
+PARAMETERS_SPIN_FLIPPER = {
+    "USE": True,
     "current": 1.6,  # [A]
     "position": (SpinFlipper_position1, 0, 0),
     "length": 1 * 1e-2,   # [m]

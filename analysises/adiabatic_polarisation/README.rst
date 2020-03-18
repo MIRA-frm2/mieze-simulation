@@ -3,11 +3,8 @@ Adiabatic Polarisation
 
 This analysis focuses on studying the adiabacity of the magnetic field.
 
-1. A  `check  <https://github.com/dprelipcean/mieze-simulation/blob/master/analysises/adiabatic_check/scripts/adiabatic_check.py>`_ using the existing parameters.
+1. A `script <https://github.com/MIRA-frm2/mieze-simulation/blob/master/analysises/adiabatic_polarisation/generate_ideal_adiabatic_transition_b_field.py>`_ that generates an ideal magnetic field for an adiabatic transition.
 
-    This condition is then plotted together with the actual change of the angle in the
-     `Adiabatic transition plot  <https://github.com/dprelipcean/mieze-simulation/blob/master/analysises/adiabatic_check/results/adiabatic_transition_condition.png>`_.
+2. A `script <https://github.com/MIRA-frm2/mieze-simulation/blob/master/analysises/adiabatic_polarisation/polarisation_evolution.py>`_ that plots the polarisation vector evolution.
 
-    The magnetic field along x and y direction are plotted together with the angle change in  `this plot  <results/by_bx.png>`_.
-
-    There is no user input for this analysis.
+3. A `script <https://github.com/MIRA-frm2/mieze-simulation/blob/master/analysises/adiabatic_polarisation/adiabatic_parameter_plot.py>`_ that plots the adiabatic parameter.

@@ -12,15 +12,5 @@ Welcome to mieze-simulation's documentation!
 
    introduction
    usage
-   administratorguide
-   developerguide
    license
    authors
-
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`

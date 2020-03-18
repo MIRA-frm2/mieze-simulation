@@ -5,5 +5,4 @@ The magnetic field of the polariser on the y axis is a magnetic dipole, ideally.
 slight differences. The magnetic field of the polariser at several locations has been recored and it is used here to 
 adjust the coefficients (a, n) of the the magnetic dipole equation: y = a * x ** n
 
-The result is plotted [here](./by_bx.png).
-
+The result is plotted `here <https://github.com/MIRA-frm2/mieze-simulation/blob/master/analysises/polariser_adjustment/polariser_function.png>`_.

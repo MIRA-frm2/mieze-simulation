@@ -134,6 +134,7 @@ class Setup:
                     print(f'calculation for element {element.name} finished')
 
                     if self.save_individual_data_sets:
+
                         file_name = f'../../data/elements_magnetic_fields/data_magnetic_field_{element.name}'
                         save_data_to_file(b, file_name=file_name)
 

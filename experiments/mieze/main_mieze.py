@@ -8,11 +8,11 @@
 
 """An implementation of the MIEZE experimental_setup."""
 
-from simulation.experimental_setup.setup import Setup
+from experiments.experimental_setup.setup import Setup
 
 from experiments.mieze.parameters import (
-    CONSIDER_EARTH_FIELD, COIL_SET_PARAMETERS, ELEMENTS_POSITIONS_ABSOLUTE, ELEMENTS_POSITIONS_RELATIVE,
-    HELMHOLTZCOILS_PARAMETERS, SPIN_FLIPPER_PARAMETERS
+    CONSIDER_EARTH_FIELD, PARAMETERS_COIL_SET, ELEMENTS_POSITIONS_ABSOLUTE, ELEMENTS_POSITIONS_RELATIVE,
+    PARAMETERS_HELMHOLTZCOILS, PARAMETERS_SPIN_FLIPPER, PARAMETERS_POLARISER
 )
 from simulation.parameters_simulation import default_beam_grid
 
@@ -40,23 +40,26 @@ class Mieze(Setup):
 
     def create_setup(self):
         """Create the elements for the experimental_setup."""
+        if PARAMETERS_POLARISER['USE']:
+            self.create_element(element_class=Polariser,
+                                position=(ELEMENTS_POSITIONS_ABSOLUTE["polariser"], 0, 0))
 
-        self.create_element(element_class=Polariser,
-                            position=(ELEMENTS_POSITIONS_ABSOLUTE["polariser"], 0, 0))
+        if PARAMETERS_HELMHOLTZCOILS['USE']:
+            self.create_element(coil_type=Coil,
+                                current=PARAMETERS_HELMHOLTZCOILS["current"],
+                                element_class=HelmholtzPair,
+                                position=(PARAMETERS_HELMHOLTZCOILS["position"], 0, 0),
+                                radius=PARAMETERS_HELMHOLTZCOILS["radius"])
 
-        self.create_element(coil_type=Coil,
-                            current=HELMHOLTZCOILS_PARAMETERS["current"],
-                            element_class=HelmholtzPair,
-                            position=(HELMHOLTZCOILS_PARAMETERS["position"], 0, 0),
-                            radius=HELMHOLTZCOILS_PARAMETERS["radius"])
+        if PARAMETERS_SPIN_FLIPPER['USE']:
+            self.create_element(element_class=SpinFlipper,
+                                **PARAMETERS_SPIN_FLIPPER)
 
-        self.create_element(element_class=SpinFlipper,
-                            **SPIN_FLIPPER_PARAMETERS)
-
-        self.create_element(element_class=CoilSet,
-                            current=COIL_SET_PARAMETERS["current"],  # [A]
-                            name='CoilSet',
-                            position=COIL_SET_PARAMETERS['position'] + self.coil_set_distance)
+        if PARAMETERS_COIL_SET['USE']:
+            self.create_element(element_class=CoilSet,
+                                current=PARAMETERS_COIL_SET["current"],  # [A]
+                                name='CoilSet',
+                                position=PARAMETERS_COIL_SET['position'] + self.coil_set_distance)
 
         self.update_metadata()
 
@@ -65,7 +68,8 @@ def compute_magnetic_field_mieze(grid_size=default_beam_grid,
                                  coil_set_distance=ELEMENTS_POSITIONS_RELATIVE["coil_set_distance"],
                                  spin_flipper_distance=ELEMENTS_POSITIONS_RELATIVE["spin_flipper_distance"],
                                  filename='data/data_magnetic_field',
-                                 save_individual_data_sets=True):
+                                 save_individual_data_sets=True,
+                                 point_value=None):
     """Compute the magnetic field for the MIEZE experimental_setup.
 
     Parameters
@@ -80,6 +84,9 @@ def compute_magnetic_field_mieze(grid_size=default_beam_grid,
         The filename to store the magnetic field data to.
     save_individual_data_sets: bool
         Flag indicating whether to store the magnetic field from the individual components as well.
+    point_value: ndarray or None
+        If an ndarray, it computes the magnetic value of the MIEZE setup for only the given point.
+        If None, it computes the magnetic field for the entire computational grid.
     """
 
     # Initialize an object from the MIEZE class
@@ -90,30 +97,24 @@ def compute_magnetic_field_mieze(grid_size=default_beam_grid,
     # Create the components of the beamline with their parameters
     experiment.create_setup()
 
-    # Initialize the computational space (grid) and compute the magnetic field for it
-    experiment.initialize_computational_space(**grid_size)
-    experiment.calculate_static_b_field()
-
-    # Compute the magnetic field for one point only
-    # output = experiment.calculate_b_field(point=(0, 0, 0))
-    # print(output)
+    if point_value:
+        # Compute the magnetic field for one point only
+        output = experiment.calculate_static_b_field(point=(0, 0, 0))
+        print(output)
+    else:
+        # Initialize the computational space (grid) and compute the magnetic field for it
+        experiment.initialize_computational_space(**grid_size)
+        experiment.calculate_static_b_field()
 
     # Save the obtained data to a file
     experiment.save_total_data_to_file(filename=filename)
-
-    # Plot results
-    # experiment.set_plot_ticks(set_ticks=False)
-
-    # experiment.plot_field_1d_scalar(component='x')
-    # experiment.plot_field_1d_scalar(component='y')
-    # experiment.plot_field_1d_scalar(component='z')
 
 
 if __name__ == '__main__':
     # Use this filename by default.
     # filename = './../../../data/data_magnetic_field'
 
-    # Use this to investigat the polarisation
+    # Use this to investigate the polarisation
     filename = '../../../analysises/adiabatic_polarisation/data/data_magnetic_field_mieze'
 
     compute_magnetic_field_mieze(filename=filename)
