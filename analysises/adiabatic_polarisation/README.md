@@ -1,2 +1,0 @@
-Adiabatic Polarisation
-***********************

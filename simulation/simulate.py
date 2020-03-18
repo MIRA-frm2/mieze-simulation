@@ -15,17 +15,16 @@ from simulation.beamline.beam import NeutronBeam
 from analysises.adiabatic_polarisation.scripts.adiabacity_parameter_plot import compute_polarisation
 from analysises.neutron_polarisation_simulation.scripts.plotting_scripts import plot_polarisation_vector
 
-from experiments.mieze.parameters import ELEMENTS_POSITIONS_RELATIVE
 from simulation.beamline.beamline_properties import BEAM_PROPERTIES
 from simulation.parameters_simulation import absolute_x_position, default_beam_grid, total_simulation_time
 
 
-def simulate(experiment_class):
+def simulate(experiment_class, experiment_parameters):
     """Main program that computes the neutron beam in the MIEZE experimental_setup."""
 
     # Initialize an object from the MIEZE class
-    experiment = experiment_class(spin_flipper_distance=ELEMENTS_POSITIONS_RELATIVE["spin_flipper_distance"],
-                                  coil_set_distance=ELEMENTS_POSITIONS_RELATIVE["coil_set_distance"],
+    experiment = experiment_class(spin_flipper_distance=experiment_parameters["spin_flipper_distance"],
+                                  coil_set_distance=experiment_parameters["coil_set_distance"],
                                   save_individual_data_sets=False)
 
     # Create the components of the beamline with their parameters

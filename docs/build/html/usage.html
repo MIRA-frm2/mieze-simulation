@@ -37,10 +37,10 @@
 <div class="section" id="mieze-simulation">
 <h2>MIEZE Simulation<a class="headerlink" href="#mieze-simulation" title="Permalink to this headline">¶</a></h2>
 <p>The parameter space for computing the magnetic field of the MIEZE setup is represented by
-<a class="reference external" href="experimental_setup/mieze/parameters.py">this file</a>.</p>
+<a class="reference external" href="https://github.com/dprelipcean/mieze-simulation/blob/master/experiments/mieze/parameters.py">this file</a>.</p>
 <p>Additional user input consists of defining the 3d computational grid in the <a class="reference external" href="simulate.py">main file</a>.</p>
 <p>In the following, each file is shortly described. For its usage, please consult also the documentation in each file.</p>
-<p>The <a class="reference external" href="simulation/simulate.py">main script</a> computes the magnetic field for the MIEZE experiment, which is saved in the
+<p>The <a class="reference external" href="https://github.com/dprelipcean/mieze-simulation/tree/master/simulation/simulate.py">main script</a> computes the magnetic field for the MIEZE experiment, which is saved in the
 <a class="reference external" href="./data/data_magnetic_field.csv">data_magnetifc_field</a> file.</p>
 <p>The folder <a class="reference external" href="analysises">analysis_scripts</a> contains several analysis scripts that have been used to
 find the ideal position for several elements of the experiment, or the check whether other properties are satisfied or
@@ -51,23 +51,27 @@ not.</p>
 <li><p><a class="reference external" href="analysises/neutron_polarisation_simulation/neutron_pol_sim.py">Neutron Polarisation Simulation</a>: Computes the neutrons trajectories along the beam and their polarisation. It saved the data in the <a class="reference external" href="./data/data_polarisation.csv">data_polarisation</a> file.</p></li>
 <li><p><a class="reference external" href="analysises/polariser_adjustment/polariser_adjustment.py">Polariser Adjustment</a>: Interpolates the measured polariser data points and optimises its magnetic dipole function.</p></li>
 </ul>
+<div class="section" id="elements">
+<h3>Elements<a class="headerlink" href="#elements" title="Permalink to this headline">¶</a></h3>
 <p>The folder <a class="reference external" href="simulation/elements">elements</a> contains the individual elements that are placed along the beam, such as
 the beam trajectory, such as the:</p>
 <ul class="simple">
-<li><p><a class="reference external" href="simulation/elements/coils.py">Coils</a>: Circular (Simple and Real) and Rectangular</p></li>
+<li><p><a class="reference external" href="https://github.com/dprelipcean/mieze-simulation/blob/master/simulation/elements/coils.py">Coils</a>: Circular (Simple and Real) and Rectangular</p></li>
 <li><p><a class="reference external" href="simulation/elements/coil_set.py">CoilSet</a>: The set of four coils for the mieze setup</p></li>
 <li><p><a class="reference external" href="simulation/elements/helmholtz_pair.py">HelmholtzPair</a>: The pair of two coils in Helmholtz condition.</p></li>
 <li><p><a class="reference external" href="simulation/elements/coils.py">Polariser</a>: The Polariser (similar to a dipole&gt;)</p></li>
 <li><p><a class="reference external" href="simulation/elements/spin_flipper.py">SpinFlipper</a>: The Pi/2 Spin Flipper.</p></li>
 </ul>
+<p>All elements are derived from a <a class="reference external" href="simulation/elements/spin_flipper.py">Base class</a></p>
+</div>
 </div>
 <div class="section" id="experiments">
 <h2>Experiments<a class="headerlink" href="#experiments" title="Permalink to this headline">¶</a></h2>
 </div>
 <div class="section" id="analysises">
 <h2>Analysises<a class="headerlink" href="#analysises" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="id2">
-<h3>Adiabatic Transition<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id3">
+<h3>Adiabatic Transition<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
 <p>One crucial aspect of the MIEZE setup is that the polarization between the polariser and the helmholtz coils proceeds
 adiabatically (the adiabatic transition condition can be found in the literature, but for convenience we provide
 [two slides](docs/adiabatic_transition_literature.pdf) about it).</p>
@@ -139,9 +143,9 @@ adjust the coefficients (a, n) of the the magnetic dipole equation: y = a * x **
 <p>The result is plotted [here](./by_bx.png).</p>
 </div>
 </div>
-</div>
 <div class="section" id="data">
-<span id="usage-data"></span><h1>Data<a class="headerlink" href="#data" title="Permalink to this headline">¶</a></h1>
+<span id="usage-data"></span><h2>Data<a class="headerlink" href="#data" title="Permalink to this headline">¶</a></h2>
+</div>
 </div>
 
 
@@ -165,10 +169,13 @@ adjust the coefficients (a, n) of the the magnetic dipole equation: y = a * x **
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Usage</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#mieze-simulation">MIEZE Simulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#mieze-simulation">MIEZE Simulation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#elements">Elements</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="#experiments">Experiments</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#analysises">Analysises</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#id2">Adiabatic Transition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id3">Adiabatic Transition</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#adiabatic-polarisation">Adiabatic Polarisation</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#coil-set-configuration">Coil Set Configuration</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#results">Results</a></li>
@@ -178,9 +185,9 @@ adjust the coefficients (a, n) of the the magnetic dipole equation: y = a * x **
 <li class="toctree-l3"><a class="reference internal" href="#polariser-equation-adjustment">Polariser equation adjustment</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="#data">Data</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="#data">Data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="administratorguide.html">Administrator Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="developerguide.html">Developer Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>

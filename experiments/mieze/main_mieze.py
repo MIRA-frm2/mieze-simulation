@@ -9,6 +9,7 @@
 """An implementation of the MIEZE experimental_setup."""
 
 from simulation.experimental_setup.setup import Setup
+
 from experiments.mieze.parameters import (
     CONSIDER_EARTH_FIELD, COIL_SET_PARAMETERS, ELEMENTS_POSITIONS_ABSOLUTE, ELEMENTS_POSITIONS_RELATIVE,
     HELMHOLTZCOILS_PARAMETERS, SPIN_FLIPPER_PARAMETERS

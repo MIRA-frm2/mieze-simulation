@@ -24,7 +24,7 @@ class SpinFlipper(RectangularCoil):
     def __init__(self, name='SpinFlipper', position=(SpinFlipper_position1, 0, 0), **kwargs):
         super(SpinFlipper, self).__init__(position, name=name, **kwargs)
 
-        self.thickness = kwargs.get('thickness', 1e-2)  # [m], thickness of the coil
+        self.thickness = kwargs.get('thickness', 1e-2)
 
     def meta_data(self):
         """Return meta data."""

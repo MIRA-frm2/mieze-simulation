@@ -27,5 +27,5 @@ def plot_adiabatic_condition():
 
 
 if __name__ == "__main__":
-    # find_ideal_relative_distance()
-    plot_adiabatic_condition()
+    find_ideal_relative_distance()
+    # plot_adiabatic_condition()

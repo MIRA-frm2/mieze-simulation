@@ -47,10 +47,6 @@ class CoilSet(BasicElement):
 
         self._create_coil_set()
 
-        # Legacy current:
-        # current1 = current
-        # current2 = current * self.detector_distance / (self.detector_distance - self.coil_distance)
-
     def meta_data(self):
         """Return metadata for the given class."""
         return {"position": self.position_x, "coil_type": self.coil_type.name}

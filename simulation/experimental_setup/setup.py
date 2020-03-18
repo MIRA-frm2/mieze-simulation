@@ -62,7 +62,6 @@ class Setup:
         """Update metadata for the experiment based on elements metadata."""
         for element in self.elements:
             self.meta_data[element.name] = element.meta_data()
-            # self.meta_data[element.name] = dict(element.__dict__)
 
     def create_element(self, element_class, position, **kwargs):
         """Create the physical geometry of the coils."""
@@ -135,7 +134,7 @@ class Setup:
                     print(f'calculation for element {element.name} finished')
 
                     if self.save_individual_data_sets:
-                        file_name = f'../../../data/elements_magnetic_fields/data_magnetic_field_{element.name}'
+                        file_name = f'../../data/elements_magnetic_fields/data_magnetic_field_{element.name}'
                         save_data_to_file(b, file_name=file_name)
 
                     if i == 0:
@@ -145,9 +144,9 @@ class Setup:
                         for k in self.b_static.keys():
                             self.b_static[k] += b[k]
             else:
-                result = list()
-                for value in positions:
-                    result.append([0, 0, 0])
+                # If no elements are given, return a result consisting of zeroes.
+                result = [0, 0, 0] * len(positions)
+
                 self.b_static = dict(zip(positions, result))
 
     def calculate_varying_magnetic_field(self, t_j):
@@ -186,8 +185,6 @@ class Setup:
 
         for element in self.elements:
             np.add(field, element.b_field(*r), out=field)
-
-        # logger.error(f'{self.computation_number}: Computed total magnetic field for point {r} is {field}')
 
         field = add_earth_magnetic_field(field, flag=self.consider_earth_field)
 

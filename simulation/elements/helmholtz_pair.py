@@ -15,6 +15,8 @@ from simulation.elements.coils import Coil
 
 
 class HelmholtzPair(BasicElement):
+    """Class that implements a Helmholtz Pair of Coils."""
+
     adjustment_factor = 1
     class_name = 'HelmholtzPair'
 

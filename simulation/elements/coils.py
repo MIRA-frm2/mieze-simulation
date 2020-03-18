@@ -75,17 +75,6 @@ class BaseCoil(BasicElement):
 
         if r_eff:
             self.r = r_eff
-        # # Compute the effective radius from the min, max radiuses and the wire diameter.
-        # elif r_min and r_max:
-        #     inverse_r_sum = 0
-        #     if self.wire_d:
-        #         radius_values = np.arange(r_min, r_max, self.wire_d)
-        #         num_layers = len(radius_values)
-        #         for r_i in radius_values:
-        #             inverse_r_sum += 1 / r_i
-        #
-        #         self.r = 1 / (inverse_r_sum / num_layers)
-
         elif r_min and r_max:
             self.compute_effective_radius(r_min, r_max)
 
@@ -103,18 +92,22 @@ class BaseCoil(BasicElement):
         return json.dumps(self, default=lambda o: o.__dict__,
                           sort_keys=True, indent=4)
 
+    def _rectify_x_position(self, position_x):
+        """Shift" the coil to the computational "0"."""
+        position_x -= self.position_x
+        return position_x
+
     def compute_effective_radius(self, r_min, r_max):
         """Compute the effective radius from the other physical parameters."""
         inverse_r_sum = 0
 
         num_layers = (r_max - r_min) / (self.wire_d + self.wire_spacing)
         step = (r_max - r_min) / num_layers
-        # print(f'r_min:{r_min}\nwire_d:{self.wire_d}\nwire_spacing:{self.wire_spacing}')
+
         for r_i in np.arange(r_min, r_max, step):
             inverse_r_sum += 1 / r_i
 
         self.r = 1 / (inverse_r_sum / num_layers)
-        # print(self.r)
 
     @staticmethod
     def _k(m):
@@ -177,6 +170,7 @@ class BaseCoil(BasicElement):
         return 4.0 * self.r * rho / self.beta(rho, x, s) ** 2
 
     def b_field(self, r: '(x, y, z)'):
+        """Compute magnetic field at position r."""
         raise NotImplementedError
 
 
@@ -211,7 +205,7 @@ class Coil(BaseCoil):
         if rho == 0:
             return 0
 
-        x -= self.position_x
+        x = self._rectify_x_position(x)
         rho = abs(rho)
         return self.prefactor * (self.sum_element_rho(rho, x, s=1) - self.sum_element_rho(rho, x, s=-1))
 
@@ -240,12 +234,11 @@ class Coil(BaseCoil):
         -------
 
         """
-        x -= self.position_x
+        x = self._rectify_x_position(x)
 
         # symmetric
         rho = abs(rho)
 
-        # print(f'r:{self.r}\nrho:{rho}')
         n = 4.0 * self.r * rho / (rho + self.r) ** 2
 
         return self.prefactor * (-self.sum_element_x(n, rho, x, s=-1) + self.sum_element_x(n, rho, x, s=1))
@@ -298,7 +291,7 @@ class RealCoil(Coil):
         if rho == 0:
             return 0
 
-        x -= self.position_x
+        x = self._rectify_x_position(x)
 
         return self.prefactor * (self.sum_element_rho(rho, x, s=1) - self.sum_element_rho(rho, x, s=-1))
 
@@ -408,7 +401,9 @@ class RectangularCoil(BaseCoil):
 
     @staticmethod
     def _change_coordinates(x, y, z):
-        """Fix coordinates for the equations, as they have the axes pointing differently compared to the experimental_setup."""
+        """Fix coordinates for the equations.
+
+         The equations taken from the paper have axes pointing differently compared to the experimental_setup."""
         return np.array([-z, x, -y])
 
     def b_field(self, r: '(x, y, z)'):
@@ -418,14 +413,11 @@ class RectangularCoil(BaseCoil):
         -------
         magnetic field in cartesian coordinates
         """
-        # print(f'{r}')
         x, y, z = r
 
-        # "Shift" the coil to the computational "0".
-        x -= self.position_x
+        x = self._rectify_x_position(x)
 
         self.x, self.y, self.z = self._change_coordinates(x, y, z)
-        # print(f'{self.x} {self.y} {self.z}')
 
         field = self.check_physical_coil_overlap()
         if field:

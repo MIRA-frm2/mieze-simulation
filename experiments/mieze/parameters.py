@@ -8,7 +8,6 @@
 
 """Parameters for the neutron beam simulatoin for the MIEZE experimental_setup."""
 
-import numpy as np
 
 # Variables are stored as tuples with numerical value and units
 I_real_coil = 10  # [A]

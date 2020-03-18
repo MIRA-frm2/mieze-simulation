@@ -22,7 +22,7 @@ def main():
     """Main program that computes the neutron beam in the MIEZE experimental_setup."""
     # Initialize the neutron beam
     simulation = NeutronBeam(beamsize=BEAM_PROPERTIES['beamsize'],
-                             speed=BEAM_PROPERTIES['speed'],
+                             speed=BEAM_PROPERTIES['neutron_speed'],
                              total_simulation_time=total_simulation_time)
 
     simulation.initialize_computational_space(**default_beam_grid)
@@ -47,7 +47,7 @@ def main():
                                    polarisation=initial_polarisation)
 
         # Adjust the beam
-        simulation.collimate_neutrons(max_angle=BEAM_PROPERTIES['max_angle'])
+        simulation.collimate_neutrons(max_angle=BEAM_PROPERTIES['angular_distribution'])
         simulation.monochromate_neutrons(wavelength_min=BEAM_PROPERTIES['wavelength_min'],
                                          wavelength_max=BEAM_PROPERTIES['wavelength_max'])
 
